@@ -10,6 +10,42 @@
 <project name="EDD_Project" default="default" basedir=".">
     <description>Builds, tests, and runs the project EDD_Project.</description>
     <import file="nbproject/build-impl.xml"/>
+    
+    <!-- Definir directorios -->
+    <property name="src.dir" value="src"/>
+    <property name="build.dir" value="build"/>
+    <property name="dist.dir" value="dist"/>
+    <property name="lib.dir" value="lib"/>
+    
+    
+    <!-- Definir classpath -->
+    <path id="classpath">
+        <fileset dir="${lib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+    
+    
+    <!-- Tarea para compilar -->
+    <target name="compile">
+        <mkdir dir="${build.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" classpathref="classpath"/>
+    </target>
+    
+    
+    <!-- Tarea para ejecutar el proyecto -->
+    <target name="run" depends="compile">
+        <java classname="main.Main" classpath="${build.dir}:${lib.dir}/gson-2.8.9.jar:${lib.dir}/*">
+            <classpath>
+                <pathelement location="${build.dir}"/>
+                <fileset dir="${lib.dir}">
+                    <include name="**/*.jar"/>
+                </fileset>
+            </classpath>
+        </java>
+    </target>
+    
+    
     <!--
 
     There exist several targets which are by default empty and which can be 
