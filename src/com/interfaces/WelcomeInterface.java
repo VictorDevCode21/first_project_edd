@@ -89,7 +89,6 @@ public class WelcomeInterface extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    
     /*Boton para agregar una red de tren nueva*/
     private void addNetworkButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addNetworkButtonActionPerformed
         JFileChooser fileChooser = new JFileChooser();
@@ -102,11 +101,16 @@ public class WelcomeInterface extends javax.swing.JFrame {
         if (result == JFileChooser.APPROVE_OPTION) {
             String filePath = fileChooser.getSelectedFile().getAbsolutePath();
 
+            if (!filePath.endsWith(".json")) {
+                JOptionPane.showMessageDialog(this, "Error: Only Json files are admitted", "File type not allowed", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             try {
                 if (datasource == null) {
                     datasource = new DataSource();
                 }
-                
+
                 datasource.loadNetworkFromFile(filePath);
                 JOptionPane.showMessageDialog(this, "Network loaded succesfully!");
                 JOptionPane.showMessageDialog(this, datasource.getNetworkData());
