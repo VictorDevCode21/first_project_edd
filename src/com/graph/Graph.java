@@ -10,6 +10,7 @@ import java.util.*;
  * @author PC
  */
 public class Graph {
+    // Creamos un atributo para la lista de adyacencia
     private Map<String, List<String>> adjacencyList;
     private Map<String, Boolean> isSucursal;  // Para identificar las sucursales
 
