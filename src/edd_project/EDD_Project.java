@@ -1,6 +1,6 @@
 package edd_project;
-import com.datasource.DataSource;
-import com.graph.Graph;
+import com.EDD.JsonLoader;
+import com.EDD.Grafo;
 import java.io.IOException;
 import com.interfaces.WelcomeInterface;
 
@@ -15,7 +15,7 @@ public class EDD_Project {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-//        DataSource dataSource = new DataSource();
+//        JsonLoader dataSource = new JsonLoader();
 //        try {
 ////            dataSource.loadNetworkFromFile("src/resources/Bogota.json"); // Carga el archivo de Bogotá
 //            // O para Caracas:
