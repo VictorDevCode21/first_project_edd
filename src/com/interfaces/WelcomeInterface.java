@@ -6,7 +6,7 @@ package com.interfaces;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import com.datasource.DataSource;
+import com.EDD.JsonLoader;
 import java.io.IOException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -17,7 +17,7 @@ import javax.swing.JOptionPane;
  */
 public class WelcomeInterface extends javax.swing.JFrame {
 
-    private DataSource datasource;
+    private JsonLoader datasource;
 
     /**
      * Creates new form WelcomeInterface
@@ -95,7 +95,7 @@ public class WelcomeInterface extends javax.swing.JFrame {
         int result = fileChooser.showOpenDialog(this);
 
         /* Si el JFileChooser aprueba el archivo guardamos su path absoluto 
-        e intentamos cargarlo desde el DataSource, si da error lo manejamos con
+        e intentamos cargarlo desde el JsonLoader, si da error lo manejamos con
         el catch
          */
         if (result == JFileChooser.APPROVE_OPTION) {
@@ -108,12 +108,11 @@ public class WelcomeInterface extends javax.swing.JFrame {
 
             try {
                 if (datasource == null) {
-                    datasource = new DataSource();
+                    datasource = new JsonLoader();
                 }
 
-                datasource.loadNetworkFromFile(filePath);
+                datasource.cargarRedDesdeJson(filePath);
                 JOptionPane.showMessageDialog(this, "Network loaded succesfully!");
-                JOptionPane.showMessageDialog(this, datasource.getNetworkData());
             } catch (IOException e) {
                 JOptionPane.showMessageDialog(this, "There was an error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
