@@ -103,7 +103,8 @@ public class NetworkTrain {
 
     //    
     public void loadFromJson(JSONObject json) {
-        JSONArray metroLines = json.getJSONArray("Metro de Caracas");
+        String networkName = json.keys().next();
+        JSONArray metroLines = json.getJSONArray(networkName);
 
         // Recorrer cada línea del metro
         for (int i = 0; i < metroLines.length(); i++) {

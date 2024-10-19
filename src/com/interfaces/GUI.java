@@ -89,7 +89,8 @@ public class GUI extends JFrame {
         graphStreamGraph = new SingleGraph("Metro Network");
 
         try {
-            JSONArray metroLines = jsonObject.getJSONArray("Metro de Caracas");
+            String networkName = jsonObject.keys().next();
+            JSONArray metroLines = jsonObject.getJSONArray(networkName);
 
             // Paso 1: Agregar todas las estaciones (nodos) y conexiones
             for (int i = 0; i < metroLines.length(); i++) {
