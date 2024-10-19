@@ -15,8 +15,9 @@ public class EDD_Project {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-          WelcomeInterface interface1 = new WelcomeInterface();
-          interface1.show();
+        
+        WelcomeInterface interface1 = new WelcomeInterface();
+        interface1.show();
         
     }
     
