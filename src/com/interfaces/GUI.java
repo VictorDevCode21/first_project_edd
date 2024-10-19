@@ -19,6 +19,10 @@ import java.io.IOException;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Set;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -30,11 +34,13 @@ public class GUI extends JFrame {
 
     private NetworkTrain networkTrain;
     private Graph graphStreamGraph;
+    private Set<String> addedStations; // Para evitar agregar una estación más de una vez
 
     public GUI() {
         setTitle("Supermarket Location Planner");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        addedStations = new HashSet<>(); // Inicializa el conjunto de estaciones agregadas
         initUI();
     }
 
@@ -60,7 +66,7 @@ public class GUI extends JFrame {
                         networkTrain.loadFromJson(jsonObject);
 
                         // Mostrar la red en GraphStream
-                        showNetworkTrain();
+                        showNetworkTrain(jsonObject);
                     } catch (IOException ex) {
                         ex.printStackTrace();
                         JOptionPane.showMessageDialog(null, "Error al cargar el archivo JSON: " + ex.getMessage());
@@ -77,63 +83,89 @@ public class GUI extends JFrame {
         // Otros componentes y configuraciones
     }
 
-    // Método para mostrar la red en GraphStream
-    private void showNetworkTrain() {
+    // Mostrar la red con las conexiones
+    private void showNetworkTrain(JSONObject jsonObject) {
         System.setProperty("org.graphstream.ui", "swing");
         graphStreamGraph = new SingleGraph("Metro Network");
 
-        Node stationNode = networkTrain.getStations().getHead();
+        try {
+            JSONArray metroLines = jsonObject.getJSONArray("Metro de Caracas");
 
-        // Primero, agregar todos los nodos de estaciones al grafo
-        while (stationNode != null) {
-            Station station = (Station) stationNode.getData();
-            String stationName = station.getName();
+            // Paso 1: Agregar todas las estaciones (nodos) y conexiones
+            for (int i = 0; i < metroLines.length(); i++) {
+                JSONObject lineObject = metroLines.getJSONObject(i);
+                String lineName = lineObject.keys().next();
+                JSONArray stations = lineObject.getJSONArray(lineName);
 
-            // Agregar el nodo de la estación solo si no existe
-            if (graphStreamGraph.getNode(stationName) == null) {
-                graphStreamGraph.addNode(stationName);
-                graphStreamGraph.getNode(stationName).setAttribute("ui.label", stationName);
+                // Recorrer las estaciones y conectarlas
+                for (int j = 0; j < stations.length(); j++) {
+                    Object currentStationObj = stations.get(j);
+                    String currentStation;
+                    String nextStation = null;
+
+                    if (currentStationObj instanceof JSONObject) {
+                        // Estación de transferencia con dos conexiones
+                        JSONObject connectionObj = (JSONObject) currentStationObj;
+                        currentStation = connectionObj.keys().next();
+                        nextStation = connectionObj.getString(currentStation);
+
+                        // Agregar nodo solo si no fue agregado previamente
+                        if (!addedStations.contains(currentStation)) {
+                            addStationToGraph(currentStation);
+                            addedStations.add(currentStation);
+                        }
+                        // Agregar conexión con la siguiente estación en la transferencia
+                        addEdgeIfNotExists(currentStation, nextStation);
+                    } else {
+                        // Estación normal (sin transferencia)
+                        currentStation = (String) currentStationObj;
+                    }
+
+                    if (j < stations.length() - 1) {
+                        // Obtener la siguiente estación
+                        Object nextStationObj = stations.get(j + 1);
+                        if (nextStationObj instanceof JSONObject) {
+                            JSONObject nextConnectionObj = (JSONObject) nextStationObj;
+                            nextStation = nextConnectionObj.keys().next();
+                        } else {
+                            nextStation = (String) nextStationObj;
+                        }
+
+                        // Conectar la estación actual con la siguiente
+                        addEdgeIfNotExists(currentStation, nextStation);
+                    }
+                }
             }
-
-            stationNode = stationNode.getNext();  // Avanzar a la siguiente estación
+            graphStreamGraph.display();
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-
-        // Luego, agregar todas las conexiones
-        stationNode = networkTrain.getStations().getHead(); // Reiniciar el nodo de estaciones
-        while (stationNode != null) {
-            Station station = (Station) stationNode.getData();
-            addConnectionsToGraph(station); // Agregar conexiones de cada estación
-
-            stationNode = stationNode.getNext();  // Avanzar a la siguiente estación
-        }
-
-        graphStreamGraph.display();
     }
 
-// Método auxiliar para agregar conexiones al grafo
-    private void addConnectionsToGraph(Station station) {
-        LinkedList<Connection> connections = station.getConnections(); // Obtener conexiones de la estación actual
+    // Agregar estación al grafo si no existe
+    private void addStationToGraph(String station) {
+        if (graphStreamGraph.getNode(station) == null) {
+            graphStreamGraph.addNode(station);
+            graphStreamGraph.getNode(station).setAttribute("ui.label", station);
+        }
+    }
 
-        for (Node<Connection> connectionNode = connections.getHead(); connectionNode != null; connectionNode = connectionNode.getNext()) {
-            Connection connection = connectionNode.getData();
+    // Agrega una arista si no existe entre dos estaciones
+    private void addEdgeIfNotExists(String station1, String station2) {
+        if (!addedStations.contains(station1)) {
+            addStationToGraph(station1);
+            addedStations.add(station1);
+        }
 
-            String station1Name = connection.getStation1().getName();
-            String station2Name = connection.getStation2().getName();
+        if (!addedStations.contains(station2)) {
+            addStationToGraph(station2);
+            addedStations.add(station2);
+        }
 
-            // Comprobar si ambos nodos existen en el grafo
-            if (graphStreamGraph.getNode(station1Name) != null && graphStreamGraph.getNode(station2Name) != null) {
-                String edgeId = station1Name + "-" + station2Name;
-
-                // Verifica si la arista ya existe antes de agregarla
-                boolean edgeExists = graphStreamGraph.getEdge(edgeId) != null
-                        || graphStreamGraph.getEdge(station2Name + "-" + station1Name) != null;
-
-                if (!edgeExists) {
-                    graphStreamGraph.addEdge(edgeId, station1Name, station2Name);
-                }
-            } else {
-                System.out.println("Una de las estaciones no existe: " + station1Name + " o " + station2Name);
-            }
+        // Verifica si la arista ya existe en alguna dirección
+        String edgeId = station1 + "-" + station2;
+        if (graphStreamGraph.getEdge(edgeId) == null && graphStreamGraph.getEdge(station2 + "-" + station1) == null) {
+            graphStreamGraph.addEdge(edgeId, station1, station2);
         }
     }
 
