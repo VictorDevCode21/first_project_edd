@@ -38,7 +38,6 @@ public class WelcomeInterface extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        addNetworkButton = new javax.swing.JButton();
         showGraphButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -47,13 +46,6 @@ public class WelcomeInterface extends javax.swing.JFrame {
         jLabel1.setText("Welcome to Transmetropolis");
 
         jLabel2.setText("Options:");
-
-        addNetworkButton.setText("Add Network");
-        addNetworkButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                addNetworkButtonActionPerformed(evt);
-            }
-        });
 
         showGraphButton.setText("Show Graph");
         showGraphButton.addActionListener(new java.awt.event.ActionListener() {
@@ -66,19 +58,18 @@ public class WelcomeInterface extends javax.swing.JFrame {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(48, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(113, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jLabel2)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                            .addComponent(jLabel1)
-                            .addGap(135, 135, 135)))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(addNetworkButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(showGraphButton)
-                        .addGap(144, 144, 144))))
+                    .addComponent(jLabel1)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(25, 25, 25)
+                        .addComponent(showGraphButton)))
+                .addGap(135, 135, 135))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(158, 158, 158)
+                .addComponent(jLabel2)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -87,49 +78,15 @@ public class WelcomeInterface extends javax.swing.JFrame {
                 .addComponent(jLabel1)
                 .addGap(18, 18, 18)
                 .addComponent(jLabel2)
-                .addGap(27, 27, 27)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(addNetworkButton)
-                    .addComponent(showGraphButton))
-                .addContainerGap(121, Short.MAX_VALUE))
+                .addGap(37, 37, 37)
+                .addComponent(showGraphButton)
+                .addContainerGap(111, Short.MAX_VALUE))
         );
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 400, 300));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    /*Boton para agregar una red de tren nueva*/
-    private void addNetworkButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addNetworkButtonActionPerformed
-        JFileChooser fileChooser = new JFileChooser();
-        int result = fileChooser.showOpenDialog(this);
-
-        /* Si el JFileChooser aprueba el archivo guardamos su path absoluto 
-        e intentamos cargarlo desde el JsonLoader, si da error lo manejamos con
-        el catch
-         */
-        if (result == JFileChooser.APPROVE_OPTION) {
-            String filePath = fileChooser.getSelectedFile().getAbsolutePath();
-
-            if (!filePath.endsWith(".json")) {
-                JOptionPane.showMessageDialog(this, "Error: Only Json files are admitted", "File type not allowed", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            try {
-                if (datasource == null) {
-                    datasource = new JsonLoader();
-                }
-
-                datasource.cargarRedDesdeJson(filePath);
-                JOptionPane.showMessageDialog(this, "Network loaded succesfully!");
-            } catch (IOException e) {
-                JOptionPane.showMessageDialog(this, "There was an error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            }
-
-        }
-
-    }//GEN-LAST:event_addNetworkButtonActionPerformed
 
     private void showGraphButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showGraphButtonActionPerformed
         GUI gui = new GUI();
@@ -173,7 +130,6 @@ public class WelcomeInterface extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton addNetworkButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;

@@ -8,6 +8,8 @@ package com.EDD;
  *
  * @author carlos
  */
+
+//Vertice
 public class Nodo {
     
     /** El identificador de la parada. */
@@ -18,6 +20,10 @@ public class Nodo {
     
     /** Lista de aristas adyacentes a esta parada. */
     private ListaAristas paradasAdyacentes;
+    
+    
+    // Distancia medida en matriz de negocio    
+    private int matrixDistance;
 
     /**
      * Constructor que inicializa una parada con un identificador específico.

@@ -14,6 +14,7 @@ import org.graphstream.graph.implementations.SingleGraph;
  *
  * @author carlos
  */
+
 public class Grafo {
     
     /** Mapa de nodos que representan las paradas del grafo. */
