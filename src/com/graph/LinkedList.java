@@ -39,7 +39,22 @@ public class LinkedList<T> implements Iterable<T> {
             aux.setNext(newNode);  // Agrega el nuevo nodo al final
         }
     }
-    
+
+//    Agrega un nuevo nodo al inicio
+    public void addFirst(T data) {
+        Node<T> newNode = new Node<>(data);
+
+        if (getHead() == null) {
+            setHead(newNode);
+            last = newNode;
+        } else {
+            Node<T> aux = getHead();
+            setHead(newNode);
+            newNode.setNext(aux);
+        }
+        size++;
+    }
+
     public T removeFirst() {
         if (isEmpty()) {
             return null;  // Lista vacía
@@ -108,7 +123,7 @@ public class LinkedList<T> implements Iterable<T> {
         }
         return count;
     }
-    
+
     // Método para obtener el iterador
     @Override
     public Iterator<T> iterator() {
@@ -132,13 +147,25 @@ public class LinkedList<T> implements Iterable<T> {
         };
     }
 
+//    Obtiene un elemento por su indice
+    public T get(int index) {
+        if (index < 0 || index >= size()) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size());
+        }
+
+        Node<T> current = head;
+        for (int i = 0; i < index; i++) {
+            current = current.getNext();
+        }
+        return current.getData();
+    }
+
     /**
      * @return the head
      */
     public Node<T> getHead() {
         return head;
     }
-
 
     /**
      * @param head the head to set
@@ -150,5 +177,23 @@ public class LinkedList<T> implements Iterable<T> {
     // Retorna true si la lista esta vacia, de lo contrario retorna false
     public boolean isEmpty() {
         return head == null;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        Node<T> current = head;
+
+        sb.append("[");
+        while (current != null) {
+            sb.append(current.getData());
+            current = current.getNext();
+            if (current != null) {
+                sb.append(", ");  // Añadir coma entre elementos
+            }
+        }
+        sb.append("]");
+
+        return sb.toString();  // Retornar la representación como String
     }
 }

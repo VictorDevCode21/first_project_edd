@@ -11,6 +11,9 @@ import com.graph.Connection;
 import com.graph.BreadthFirstSearch;
 import com.graph.BFSListener;
 import com.graph.Station;
+import com.graph.Stack;
+
+
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.SingleGraph;
 import javax.swing.*;
@@ -83,7 +86,7 @@ public class GUI extends JFrame {
         // Otros componentes y configuraciones
     }
 
-    // Mostrar la red con las conexiones
+    // Muestra el grafo con las estaciones y conexiones
     private void showNetworkTrain(JSONObject jsonObject) {
         System.setProperty("org.graphstream.ui", "swing");
         graphStreamGraph = new SingleGraph("Metro Network");
@@ -93,7 +96,19 @@ public class GUI extends JFrame {
             String startStationName = JOptionPane.showInputDialog(this, "Ingrese el nombre de la estación de inicio:");
 
             if (startStationName != null && !startStationName.trim().isEmpty()) {
-                // Lógica para cargar y visualizar la red en GraphStream
+                // Muestra un cuadro de diálogo para seleccionar el algoritmo
+                String[] algorithms = {"BFS", "DFS"};
+                String selectedAlgorithm = (String) JOptionPane.showInputDialog(
+                        this,
+                        "Seleccione el algoritmo a usar:",
+                        "Algoritmo",
+                        JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        algorithms,
+                        algorithms[0]
+                );
+
+                // Cargar y visualizar la red en GraphStream
                 String networkName = jsonObject.keys().next();
                 JSONArray metroLines = jsonObject.getJSONArray(networkName);
 
@@ -110,7 +125,6 @@ public class GUI extends JFrame {
                         String nextStation = null;
 
                         if (currentStationObj instanceof JSONObject) {
-                            // Estación de transferencia con dos conexiones
                             JSONObject connectionObj = (JSONObject) currentStationObj;
                             currentStation = connectionObj.keys().next();
                             nextStation = connectionObj.getString(currentStation);
@@ -118,7 +132,6 @@ public class GUI extends JFrame {
                             addStationToGraph(currentStation);
                             addEdgeIfNotExists(currentStation, nextStation);
 
-                            // Conectar con la estación anterior si no es la primera estación
                             if (j > 0) {
                                 Object prevStationObj = stations.get(j - 1);
                                 String previousStation;
@@ -129,13 +142,11 @@ public class GUI extends JFrame {
                                 }
                                 addEdgeIfNotExists(currentStation, previousStation);
                             }
-
                         } else {
                             currentStation = (String) currentStationObj;
                             addStationToGraph(currentStation);
                         }
 
-                        // Siempre conectar a la siguiente estación
                         if (j < stations.length() - 1) {
                             Object nextStationObj = stations.get(j + 1);
                             if (nextStationObj instanceof JSONObject) {
@@ -152,20 +163,75 @@ public class GUI extends JFrame {
                 // Mostrar el grafo
                 graphStreamGraph.display();
 
-                // Llamar al algoritmo de BFS desde la estación de inicio
+                // Ejecutar el algoritmo seleccionado
                 Station startStation = networkTrain.getStationByName(startStationName);
                 if (startStation != null) {
-                    runBFS(startStation);
+                    if ("BFS".equals(selectedAlgorithm)) {
+                        runBFS(startStation);
+                    } else if ("DFS".equals(selectedAlgorithm)) {
+                        runDFS(startStation); 
+                    }
                 } else {
                     JOptionPane.showMessageDialog(this, "Estación no encontrada: " + startStationName);
                 }
             } else {
                 JOptionPane.showMessageDialog(this, "Debe ingresar un nombre de estación válido.");
             }
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    private void runDFS(Station startStation) {
+        // Crear una pila para el algoritmo DFS
+        Stack<Station> stack = new Stack();
+        LinkedList<String> visited = new LinkedList<>();
+
+        // Añadir la estación inicial a la pila
+        stack.push(startStation);
+
+        // Mientras la pila no esté vacía
+        while (!stack.isEmpty()) {
+            // Sacar la estación de la cima de la pila
+            Station currentStation = stack.pop();
+
+            // Si la estación no ha sido visitada
+            if (!visited.contains(currentStation.getName())) {
+                // Marcar la estación como visitada
+                visited.add(currentStation.getName());
+
+                // Cambiar el color de la estación en el grafo a verde
+                graphStreamGraph.getNode(currentStation.getName()).setAttribute("ui.style", "fill-color: green;");
+
+                // Obtener las conexiones (adyacencias) de la estación actual
+                LinkedList<Connection> connections = currentStation.getConnections();
+
+                // Recorrer las estaciones adyacentes
+                for (int i = 0; i < connections.size(); i++) {
+                    Connection connection = connections.get(i);
+
+                    // Determinar cuál es la estación opuesta en la conexión
+                    Station adjacentStation = connection.getStation1().equals(currentStation)
+                            ? connection.getStation2()
+                            : connection.getStation1();
+
+                    // Si la estación adyacente no ha sido visitada, agregarla a la pila
+                    if (!visited.contains(adjacentStation.getName())) {
+                        stack.push(adjacentStation);
+                    }
+                }
+
+                // Pausar para que el cambio de color sea visible
+//                try {
+//                    Thread.sleep(500); // Pausa de 500 milisegundos
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+            }
+        }
+
+        // Mostrar las estaciones visitadas
+//        System.out.println("Estaciones visitadas en DFS: " + visited.toString());
     }
 
 // Método para ejecutar el BFS y colorear las estaciones
@@ -182,7 +248,7 @@ public class GUI extends JFrame {
                     if (graphStreamGraph.getNode(station.getName()) != null) {
                         graphStreamGraph.getNode(station.getName()).setAttribute("ui.style", "fill-color: green;");
                     }
-                    System.out.println("Estación visitada: " + station.getName()); // Debug
+//                    System.out.println("Estación visitada: " + station.getName()); // Debug
                 }
             }
         });
@@ -191,7 +257,7 @@ public class GUI extends JFrame {
         Node<Station> aux = bfs.getVisitedStations().getHead();
         while (aux != null) {
             Station station = aux.getData();
-            System.out.println("Estación recorrida en BFS: " + station.getName()); // Debug
+//            System.out.println("Estación recorrida en BFS: " + station.getName()); // Debug
             aux = aux.getNext();
         }
     }
@@ -212,7 +278,7 @@ public class GUI extends JFrame {
         // Verifica si la arista ya existe
         if (graphStreamGraph.getEdge(edgeId) == null) {
             graphStreamGraph.addEdge(edgeId, station1, station2);
-            System.out.println("Conexión agregada entre: " + station1 + " y " + station2); // Debug
+//            System.out.println("Conexión agregada entre: " + station1 + " y " + station2); // Debug
         }
     }
 

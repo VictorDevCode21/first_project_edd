@@ -22,12 +22,12 @@ public class BreadthFirstSearch {
         Queue<Station> queue = new Queue<>();
         visitedStations.add(startStation); // Añadimos la estación de inicio a las visitadas
         queue.enqueue(startStation);
-        System.out.println("Iniciando BFS desde la estación: " + startStation.getName());
+//        System.out.println("Iniciando BFS desde la estación: " + startStation.getName());
 
         while (!queue.isEmpty()) {
             Station currentStation = queue.dequeue();
             listener.stationVisited(currentStation);
-            System.out.println("Visitando estación: " + currentStation.getName());
+//            System.out.println("Visitando estación: " + currentStation.getName());
 
             // Verificar las conexiones de la estación actual
             for (Connection connection : currentStation.getConnections()) {
@@ -40,9 +40,9 @@ public class BreadthFirstSearch {
                 if (!isVisited(adjacentStation)) {
                     visitedStations.add(adjacentStation); // Añadimos al conjunto de visitadas
                     queue.enqueue(adjacentStation);
-                    System.out.println("Encolando estación: " + adjacentStation.getName());
+//                    System.out.println("Encolando estación: " + adjacentStation.getName());
                 } else {
-                    System.out.println("Conexión ya visitada entre: " + currentStation.getName() + " y " + adjacentStation.getName());
+//                    System.out.println("Conexión ya visitada entre: " + currentStation.getName() + " y " + adjacentStation.getName());
                 }
             }
         }

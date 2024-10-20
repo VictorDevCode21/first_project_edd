@@ -85,9 +85,9 @@ public class NetworkTrain {
                 station1.addConnection(connection);
                 station2.addConnection(connection);
                 graph.addEdge(station1.getName() + "-" + station2.getName(), station1.getName(), station2.getName());
-                System.out.println("Conexión agregada: " + station1.getName() + " <-> " + station2.getName());
+//                System.out.println("Conexión agregada: " + station1.getName() + " <-> " + station2.getName());
             } else {
-                System.out.println("La conexión ya existe: " + station1.getName() + " <-> " + station2.getName());
+//                System.out.println("La conexión ya existe: " + station1.getName() + " <-> " + station2.getName());
             }
         }
     }
@@ -153,7 +153,7 @@ public class NetworkTrain {
                 }
             }
         }
-        printGraph();
+//        printGraph();
     }
 
     public void printGraph() {

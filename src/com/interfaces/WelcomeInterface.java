@@ -6,7 +6,6 @@ package com.interfaces;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import com.EDD.JsonLoader;
 import java.io.IOException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -16,8 +15,6 @@ import javax.swing.JOptionPane;
  * @author PC
  */
 public class WelcomeInterface extends javax.swing.JFrame {
-
-    private JsonLoader datasource;
 
     /**
      * Creates new form WelcomeInterface
