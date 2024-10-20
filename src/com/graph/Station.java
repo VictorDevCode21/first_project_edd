@@ -18,8 +18,6 @@ public class Station {
     /* Lista para guardar
     los vertices vecinos
      */
-
-
  /* Constructor de la clase estacion que pide como parametro el name y 
     crea una nueva lista de conexiones */
     public Station(String name) {
@@ -29,7 +27,21 @@ public class Station {
 
     // Agrega una conexion 
     public void addConnection(Connection connection) {
-        this.getConnections().add(connection);
+        if (!connectionsContains(connection)) {
+            this.getConnections().add(connection);
+        }
+    }
+
+    private boolean connectionsContains(Connection connection) {
+        Node current = connections.getHead();
+        while (current != null) {
+            Connection existingConnection = (Connection) current.getData();
+            if (existingConnection.isEqual(connection)) {
+                return true;
+            }
+            current = current.getNext();
+        }
+        return false;
     }
 
     // Obtiene el nombre de la estacion

@@ -70,7 +70,6 @@ public class NetworkTrain {
             // Verificar si la conexión ya existe
             boolean connectionExists = false;
 
-            // Verificar en las conexiones de la primera estación
             for (Node<Connection> connNode = station1.getConnections().getHead(); connNode != null; connNode = connNode.getNext()) {
                 Connection connection = connNode.getData();
                 if ((connection.getStation1().equals(station1) && connection.getStation2().equals(station2))
@@ -80,25 +79,16 @@ public class NetworkTrain {
                 }
             }
 
-            // Si la conexión no existe, agregarla
+            // Solo agregar la conexión si no existe
             if (!connectionExists) {
-                Connection connection = new Connection(station1, station2);
+                Connection connection = new Connection(station1, station2); // Tipo regular por defecto
                 station1.addConnection(connection);
                 station2.addConnection(connection);
-                graph.addEdge(station1.getName() + "-" + station2.getName(), station1.getName(), station2.getName()); // Agregar la conexión en el grafo
+                graph.addEdge(station1.getName() + "-" + station2.getName(), station1.getName(), station2.getName());
+                System.out.println("Conexión agregada: " + station1.getName() + " <-> " + station2.getName());
+            } else {
+                System.out.println("La conexión ya existe: " + station1.getName() + " <-> " + station2.getName());
             }
-        }
-    }
-
-    public void addConnection(String name1, String name2, String type) {
-        Station station1 = getStation(name1);
-        Station station2 = getStation(name2);
-
-        if (station1 != null && station2 != null) {
-            // Asignar tipo de conexión si es relevante
-            Connection connection = new Connection(station1, station2, type);
-            station1.addConnection(connection);
-            station2.addConnection(connection);
         }
     }
 
@@ -124,38 +114,58 @@ public class NetworkTrain {
         for (int i = 0; i < metroLines.length(); i++) {
             JSONObject lineObject = metroLines.getJSONObject(i);
 
-            // Obtener el nombre de la línea
             for (String lineName : lineObject.keySet()) {
                 JSONArray stationsArray = lineObject.getJSONArray(lineName);
-                Station previousStation = null; // Para conectar estaciones en línea
+                Station previousStation = null;
 
-                // Recorrer cada estación en la línea
                 for (int j = 0; j < stationsArray.length(); j++) {
                     Object station = stationsArray.get(j);
                     String stationName;
 
                     if (station instanceof String) {
-                        // Agregar estación normal
                         stationName = (String) station;
                         addStation(stationName); // Agregar la estación
 
-                        // Si hay una estación anterior, agregar conexión
+                        // Conectar la estación anterior si existe
                         if (previousStation != null) {
-                            addConnection(previousStation.getName(), stationName);
+                            addConnection(previousStation.getName(), stationName); // Conexión regular
                         }
-                        // Actualizar la estación anterior
                         previousStation = getStation(stationName);
                     } else if (station instanceof JSONObject) {
-                        // Manejar conexiones peatonales
                         JSONObject connection = (JSONObject) station;
-                        String station1 = connection.keys().next(); // Nombre de la estación
-                        String station2 = connection.getString(station1); // Estación conectada
+                        String station1 = connection.keys().next();
+                        String station2 = connection.getString(station1);
 
-                        // Agregar estaciones si no están ya en la lista
                         addStation(station1);
                         addStation(station2);
-                        addConnection(station1, station2, "peatonal");
+
+                        // Conectar la estación de transferencia con la anterior si existe
+                        if (previousStation != null) {
+                            addConnection(previousStation.getName(), station1); // Conexión con estación anterior
+                        }
+
+                        // Agregar conexión como regular entre las estaciones de transferencia
+                        addConnection(station1, station2); // Sin distinción de tipo
+
+                        // Establecer la última estación conocida
+                        previousStation = getStation(station1); // Actualizar la estación anterior
                     }
+                }
+            }
+        }
+        printGraph();
+    }
+
+    public void printGraph() {
+        for (Station station : stations) {
+            System.out.println("Estación: " + station.getName());
+            // Obtener las conexiones de la estación actual
+            for (Node<Connection> connNode = station.getConnections().getHead(); connNode != null; connNode = connNode.getNext()) {
+                Connection conn = connNode.getData();
+                if (conn.getStation1().equals(station)) {
+                    System.out.println("  Conexión a: " + conn.getStation2().getName());
+                } else if (conn.getStation2().equals(station)) {
+                    System.out.println("  Conexión a: " + conn.getStation1().getName());
                 }
             }
         }

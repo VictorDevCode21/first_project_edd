@@ -79,8 +79,11 @@ public class Connection {
     }
 
     public boolean isEqual(Connection other) {
-        return (this.station1.equals(other.station1) && this.station2.equals(other.station2))
-                || (this.station1.equals(other.station2) && this.station2.equals(other.station1));
+        if (other == null) {
+            return false; // Controla si el objeto comparado es nulo
+        }
+        return (this.station1 != null && this.station2 != null)
+                && ((this.station1.equals(other.station1) && this.station2.equals(other.station2))
+                || (this.station1.equals(other.station2) && this.station2.equals(other.station1)));
     }
-
 }

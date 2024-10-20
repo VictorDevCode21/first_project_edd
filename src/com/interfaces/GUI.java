@@ -36,13 +36,11 @@ public class GUI extends JFrame {
 
     private NetworkTrain networkTrain;
     private Graph graphStreamGraph;
-    private Set<String> addedStations; // Para evitar agregar una estación más de una vez
 
     public GUI() {
         setTitle("Supermarket Location Planner");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        addedStations = new HashSet<>(); // Inicializa el conjunto de estaciones agregadas
         initUI();
     }
 
@@ -119,10 +117,25 @@ public class GUI extends JFrame {
 
                             addStationToGraph(currentStation);
                             addEdgeIfNotExists(currentStation, nextStation);
+
+                            // Conectar con la estación anterior si no es la primera estación
+                            if (j > 0) {
+                                Object prevStationObj = stations.get(j - 1);
+                                String previousStation;
+                                if (prevStationObj instanceof JSONObject) {
+                                    previousStation = ((JSONObject) prevStationObj).keys().next();
+                                } else {
+                                    previousStation = (String) prevStationObj;
+                                }
+                                addEdgeIfNotExists(currentStation, previousStation);
+                            }
+
                         } else {
                             currentStation = (String) currentStationObj;
+                            addStationToGraph(currentStation);
                         }
 
+                        // Siempre conectar a la siguiente estación
                         if (j < stations.length() - 1) {
                             Object nextStationObj = stations.get(j + 1);
                             if (nextStationObj instanceof JSONObject) {
@@ -136,16 +149,13 @@ public class GUI extends JFrame {
                     }
                 }
 
-                // Mostrar conexiones de las estaciones
-//                networkTrain.printAllConnections(); // Imprimir todas las conexiones
-
                 // Mostrar el grafo
                 graphStreamGraph.display();
 
                 // Llamar al algoritmo de BFS desde la estación de inicio
-                Station startStation = networkTrain.getStationByName(startStationName); // Obtener el objeto Station
+                Station startStation = networkTrain.getStationByName(startStationName);
                 if (startStation != null) {
-                    runBFS(startStation); // Ejecutar BFS
+                    runBFS(startStation);
                 } else {
                     JOptionPane.showMessageDialog(this, "Estación no encontrada: " + startStationName);
                 }
@@ -158,27 +168,51 @@ public class GUI extends JFrame {
         }
     }
 
-    // Método para ejecutar el BFS y colorear las estaciones
+// Método para ejecutar el BFS y colorear las estaciones
     private void runBFS(Station startStation) {
-        BreadthFirstSearch bfs = new BreadthFirstSearch(startStation, new LinkedList<Station>()); // Pasar la nueva lista
+        BreadthFirstSearch bfs = new BreadthFirstSearch(startStation, new LinkedList<Station>());
+        Set<Station> visitedStations = new HashSet<>(); // Para llevar el seguimiento de estaciones visitadas
 
         bfs.traverse(new BFSListener() {
             @Override
             public void stationVisited(Station station) {
-                // Colorea la estación de verde en el grafo visual de GraphStream
-                if (graphStreamGraph.getNode(station.getName()) != null) {
-                    graphStreamGraph.getNode(station.getName()).setAttribute("ui.style", "fill-color: green;");
+                // Verifica si la estación ya ha sido visitada
+                if (!visitedStations.contains(station)) {
+                    visitedStations.add(station); // Marcar estación como visitada
+                    if (graphStreamGraph.getNode(station.getName()) != null) {
+                        graphStreamGraph.getNode(station.getName()).setAttribute("ui.style", "fill-color: green;");
+                    }
+                    System.out.println("Estación visitada: " + station.getName()); // Debug
                 }
             }
         });
 
         // Mostrar las estaciones visitadas
-        System.out.println("Estaciones visitadas en orden:");
-        Node<Station> aux = bfs.getVisitedStations().getHead(); // Asegúrate de tener un método para obtener visitedStations
+        Node<Station> aux = bfs.getVisitedStations().getHead();
         while (aux != null) {
             Station station = aux.getData();
-            System.out.println("Estación recorrida: " + station.getName());
+            System.out.println("Estación recorrida en BFS: " + station.getName()); // Debug
             aux = aux.getNext();
+        }
+    }
+
+// Agrega una arista si no existe entre dos estaciones
+    private void addEdgeIfNotExists(String station1, String station2) {
+        // Asegúrate de que las estaciones sean diferentes
+        if (station1.equals(station2)) {
+            return; // No agregar conexión si son la misma estación
+        }
+
+        addStationToGraph(station1);
+        addStationToGraph(station2);
+
+        // Crear un identificador único para la conexión
+        String edgeId = station1.compareTo(station2) < 0 ? station1 + "-" + station2 : station2 + "-" + station1;
+
+        // Verifica si la arista ya existe
+        if (graphStreamGraph.getEdge(edgeId) == null) {
+            graphStreamGraph.addEdge(edgeId, station1, station2);
+            System.out.println("Conexión agregada entre: " + station1 + " y " + station2); // Debug
         }
     }
 
@@ -187,25 +221,6 @@ public class GUI extends JFrame {
         if (graphStreamGraph.getNode(station) == null) {
             graphStreamGraph.addNode(station);
             graphStreamGraph.getNode(station).setAttribute("ui.label", station);
-        }
-    }
-
-    // Agrega una arista si no existe entre dos estaciones
-    private void addEdgeIfNotExists(String station1, String station2) {
-        if (!addedStations.contains(station1)) {
-            addStationToGraph(station1);
-            addedStations.add(station1);
-        }
-
-        if (!addedStations.contains(station2)) {
-            addStationToGraph(station2);
-            addedStations.add(station2);
-        }
-
-        // Verifica si la arista ya existe en alguna dirección
-        String edgeId = station1 + "-" + station2;
-        if (graphStreamGraph.getEdge(edgeId) == null && graphStreamGraph.getEdge(station2 + "-" + station1) == null) {
-            graphStreamGraph.addEdge(edgeId, station1, station2);
         }
     }
 
