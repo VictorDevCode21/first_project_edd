@@ -10,10 +10,17 @@ package com.graph;
  */
 public class Station {
 
-    String name; // Es el atributo que identifica la lista de estaciones
-    LinkedList connections; // Lista de aristas/conexiones
+    private String name; // Es el atributo que identifica la lista de estaciones
+    private LinkedList connections; // Lista de aristas/conexiones
+    private boolean visited; // Atributo para saber si este vertice fue visitado
+    private LinkedList<Station> neighbors = new LinkedList<>();
 
-    /* Constructor de la clase estacion que pide como parametro el name y 
+    /* Lista para guardar
+    los vertices vecinos
+     */
+
+
+ /* Constructor de la clase estacion que pide como parametro el name y 
     crea una nueva lista de conexiones */
     public Station(String name) {
         this.name = name;
@@ -22,7 +29,7 @@ public class Station {
 
     // Agrega una conexion 
     public void addConnection(Connection connection) {
-        this.connections.add(connection);
+        this.getConnections().add(connection);
     }
 
     // Obtiene el nombre de la estacion
@@ -31,7 +38,7 @@ public class Station {
     }
 
     // Obtiene una lista de conexiones
-    public LinkedList getConnections() {
+    public LinkedList<Connection> getConnections() {
         return connections;
     }
 
@@ -39,7 +46,7 @@ public class Station {
     public LinkedList getSpecialConnections() {
         LinkedList specialConnections = new LinkedList();
 
-        Node current = connections.getHead();
+        Node current = getConnections().getHead();
         while (current != null) {
             Connection connection = (Connection) current.getData();
 
@@ -65,5 +72,58 @@ public class Station {
         // Por simplicidad, vamos a asumir que si el nombre de la estación de destino
         // contiene un guion, se considera una conexión especial.
         return station2Name.contains("-");
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * @param connections the connections to set
+     */
+    public void setConnections(LinkedList connections) {
+        this.connections = connections;
+    }
+
+    /**
+     * @return the visited
+     */
+    public boolean isVisited() {
+        return visited;
+    }
+
+    /**
+     * @param visited the visited to set
+     */
+    public void setVisited(boolean visited) {
+        this.visited = visited;
+    }
+
+    /**
+     * @return the neighbors
+     */
+    public LinkedList<Station> getNeighbors() {
+        return neighbors;
+    }
+
+    /**
+     * @param neighbors the neighbors to set
+     */
+    public void setNeighbors(LinkedList<Station> neighbors) {
+        this.neighbors = neighbors;
+    }
+
+    public void printConnections(LinkedList<Station> stations) {
+        for (Station station : stations) {
+            System.out.println("Estación: " + station.getName());
+            for (Connection connection : station.getConnections()) {
+                System.out.println("  Conexión a: " + (connection.getStation1().equals(station)
+                        ? connection.getStation2().getName()
+                        : connection.getStation1().getName()));
+            }
+        }
     }
 }

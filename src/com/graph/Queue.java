@@ -8,33 +8,27 @@ package com.graph;
  *
  * @author PC
  */
-
 // Clase Queue (Cola) que usaremos para la busqueda BFS
-public class Queue {
-    LinkedList list; 
-    
-    
+public class Queue<T> {
+
+    private LinkedList<T> list;
+
     public Queue() {
-        this.list = new LinkedList();
+        list = new LinkedList<>();
     }
-    
-    public void enqueue(Object data) {
-        list.add(data);
+
+    public void enqueue(T item) {
+        list.add(item);
     }
-    
-    public Object dequeue() {
-        if (!list.isEmpty()) {
-            Object data = list.getHead().getData();
-            list.setHead(list.getHead().getNext());
-            return data;
+
+    public T dequeue() {
+        if (!isEmpty()) {
+            return list.removeFirst();
         }
         return null;
     }
-    
+
     public boolean isEmpty() {
         return list.isEmpty();
     }
-    
-    
-    
 }

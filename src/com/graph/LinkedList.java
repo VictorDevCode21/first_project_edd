@@ -15,10 +15,14 @@ import java.util.NoSuchElementException;
 public class LinkedList<T> implements Iterable<T> {
 
     private Node<T> head;
+    private Node<T> last;
+    private int size;
 
 //  Constructor de la clase LinkedList  
     public LinkedList() {
         this.head = null;
+        this.last = null;
+        this.size = 0;
     }
 
     // Metodo para agregar elementos a la lista
@@ -34,6 +38,19 @@ public class LinkedList<T> implements Iterable<T> {
             }
             aux.setNext(newNode);  // Agrega el nuevo nodo al final
         }
+    }
+    
+    public T removeFirst() {
+        if (isEmpty()) {
+            return null;  // Lista vacía
+        }
+        T data = head.getData();  // Obtener los datos del primer nodo
+        head = head.getNext();  // Mover la cabeza al siguiente nodo
+        size--;
+        if (isEmpty()) {
+            last = null;  // Si la lista queda vacía, ajustar el tail a null
+        }
+        return data;  // Devolver los datos del nodo eliminado
     }
 
     // Muestra los elementos de la lista

@@ -22,7 +22,7 @@ import org.graphstream.graph.implementations.SingleGraph;
  */
 public class NetworkTrain {
 
-    private LinkedList stations;
+    private LinkedList<Station> stations;
     private Graph graph;
 
     public NetworkTrain() {
@@ -85,6 +85,7 @@ public class NetworkTrain {
                 Connection connection = new Connection(station1, station2);
                 station1.addConnection(connection);
                 station2.addConnection(connection);
+                graph.addEdge(station1.getName() + "-" + station2.getName(), station1.getName(), station2.getName()); // Agregar la conexión en el grafo
             }
         }
     }
@@ -99,6 +100,19 @@ public class NetworkTrain {
             station1.addConnection(connection);
             station2.addConnection(connection);
         }
+    }
+
+    // Método para obtener una estación por su nombre
+    public Station getStationByName(String name) {
+        Node<Station> current = stations.getHead();
+        while (current != null) {
+            Station station = current.getData();
+            if (station.getName().equals(name)) {
+                return station;
+            }
+            current = current.getNext();
+        }
+        return null; // Retorna null si no se encuentra la estación
     }
 
     //    
@@ -162,6 +176,15 @@ public class NetworkTrain {
                 connAux = connAux.getNext();
             }
             aux = aux.getNext();
+        }
+    }
+
+    public void printAllConnections() {
+        System.out.println("Conexiones en la red:");
+        for (Station station : this.stations) { // Asegúrate de tener una colección de estaciones
+            for (Connection connection : station.getConnections()) {
+                System.out.println("Conexión: " + connection.getStation1().getName() + " - " + connection.getStation2().getName());
+            }
         }
     }
 

@@ -13,6 +13,7 @@ package com.graph;
 public class Node<T> {
     private T data;            // Data que se guardara en el nodo
     private Node<T> next;      // Puntero hacia el nodo siguiente
+    private Integer headQuarterDistance; // Distancia de la sucursal principal
 
     // Constructor para inicializar el nodo
     public Node(T data) {

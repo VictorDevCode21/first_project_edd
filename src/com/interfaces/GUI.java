@@ -8,6 +8,8 @@ import com.graph.NetworkTrain;
 import com.graph.LinkedList;
 import com.graph.Node;
 import com.graph.Connection;
+import com.graph.BreadthFirstSearch;
+import com.graph.BFSListener;
 import com.graph.Station;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.SingleGraph;
@@ -89,57 +91,94 @@ public class GUI extends JFrame {
         graphStreamGraph = new SingleGraph("Metro Network");
 
         try {
-            String networkName = jsonObject.keys().next();
-            JSONArray metroLines = jsonObject.getJSONArray(networkName);
+            // Muestra un cuadro de diálogo para ingresar la estación inicial
+            String startStationName = JOptionPane.showInputDialog(this, "Ingrese el nombre de la estación de inicio:");
 
-            // Paso 1: Agregar todas las estaciones (nodos) y conexiones
-            for (int i = 0; i < metroLines.length(); i++) {
-                JSONObject lineObject = metroLines.getJSONObject(i);
-                String lineName = lineObject.keys().next();
-                JSONArray stations = lineObject.getJSONArray(lineName);
+            if (startStationName != null && !startStationName.trim().isEmpty()) {
+                // Lógica para cargar y visualizar la red en GraphStream
+                String networkName = jsonObject.keys().next();
+                JSONArray metroLines = jsonObject.getJSONArray(networkName);
 
-                // Recorrer las estaciones y conectarlas
-                for (int j = 0; j < stations.length(); j++) {
-                    Object currentStationObj = stations.get(j);
-                    String currentStation;
-                    String nextStation = null;
+                // Paso 1: Agregar todas las estaciones (nodos) y conexiones
+                for (int i = 0; i < metroLines.length(); i++) {
+                    JSONObject lineObject = metroLines.getJSONObject(i);
+                    String lineName = lineObject.keys().next();
+                    JSONArray stations = lineObject.getJSONArray(lineName);
 
-                    if (currentStationObj instanceof JSONObject) {
-                        // Estación de transferencia con dos conexiones
-                        JSONObject connectionObj = (JSONObject) currentStationObj;
-                        currentStation = connectionObj.keys().next();
-                        nextStation = connectionObj.getString(currentStation);
+                    // Recorrer las estaciones y conectarlas
+                    for (int j = 0; j < stations.length(); j++) {
+                        Object currentStationObj = stations.get(j);
+                        String currentStation;
+                        String nextStation = null;
 
-                        // Agregar nodo solo si no fue agregado previamente
-                        if (!addedStations.contains(currentStation)) {
+                        if (currentStationObj instanceof JSONObject) {
+                            // Estación de transferencia con dos conexiones
+                            JSONObject connectionObj = (JSONObject) currentStationObj;
+                            currentStation = connectionObj.keys().next();
+                            nextStation = connectionObj.getString(currentStation);
+
                             addStationToGraph(currentStation);
-                            addedStations.add(currentStation);
-                        }
-                        // Agregar conexión con la siguiente estación en la transferencia
-                        addEdgeIfNotExists(currentStation, nextStation);
-                    } else {
-                        // Estación normal (sin transferencia)
-                        currentStation = (String) currentStationObj;
-                    }
-
-                    if (j < stations.length() - 1) {
-                        // Obtener la siguiente estación
-                        Object nextStationObj = stations.get(j + 1);
-                        if (nextStationObj instanceof JSONObject) {
-                            JSONObject nextConnectionObj = (JSONObject) nextStationObj;
-                            nextStation = nextConnectionObj.keys().next();
+                            addEdgeIfNotExists(currentStation, nextStation);
                         } else {
-                            nextStation = (String) nextStationObj;
+                            currentStation = (String) currentStationObj;
                         }
 
-                        // Conectar la estación actual con la siguiente
-                        addEdgeIfNotExists(currentStation, nextStation);
+                        if (j < stations.length() - 1) {
+                            Object nextStationObj = stations.get(j + 1);
+                            if (nextStationObj instanceof JSONObject) {
+                                JSONObject nextConnectionObj = (JSONObject) nextStationObj;
+                                nextStation = nextConnectionObj.keys().next();
+                            } else {
+                                nextStation = (String) nextStationObj;
+                            }
+                            addEdgeIfNotExists(currentStation, nextStation);
+                        }
                     }
                 }
+
+                // Mostrar conexiones de las estaciones
+//                networkTrain.printAllConnections(); // Imprimir todas las conexiones
+
+                // Mostrar el grafo
+                graphStreamGraph.display();
+
+                // Llamar al algoritmo de BFS desde la estación de inicio
+                Station startStation = networkTrain.getStationByName(startStationName); // Obtener el objeto Station
+                if (startStation != null) {
+                    runBFS(startStation); // Ejecutar BFS
+                } else {
+                    JOptionPane.showMessageDialog(this, "Estación no encontrada: " + startStationName);
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Debe ingresar un nombre de estación válido.");
             }
-            graphStreamGraph.display();
+
         } catch (JSONException e) {
             e.printStackTrace();
+        }
+    }
+
+    // Método para ejecutar el BFS y colorear las estaciones
+    private void runBFS(Station startStation) {
+        BreadthFirstSearch bfs = new BreadthFirstSearch(startStation, new LinkedList<Station>()); // Pasar la nueva lista
+
+        bfs.traverse(new BFSListener() {
+            @Override
+            public void stationVisited(Station station) {
+                // Colorea la estación de verde en el grafo visual de GraphStream
+                if (graphStreamGraph.getNode(station.getName()) != null) {
+                    graphStreamGraph.getNode(station.getName()).setAttribute("ui.style", "fill-color: green;");
+                }
+            }
+        });
+
+        // Mostrar las estaciones visitadas
+        System.out.println("Estaciones visitadas en orden:");
+        Node<Station> aux = bfs.getVisitedStations().getHead(); // Asegúrate de tener un método para obtener visitedStations
+        while (aux != null) {
+            Station station = aux.getData();
+            System.out.println("Estación recorrida: " + station.getName());
+            aux = aux.getNext();
         }
     }
 
