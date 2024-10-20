@@ -24,9 +24,9 @@ public class Stack<T> {
     }
 
 //    Remueve el ultimo elemento agregado, o sea el primero de la lista
-    public Station pop() {
+    public String pop() {
         if (!list.isEmpty()) {
-            return (Station) list.removeFirst(); 
+            return (String) list.removeFirst(); 
         }
         return null;  // Devolver null si la lista está vacía
     }

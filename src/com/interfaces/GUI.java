@@ -12,7 +12,7 @@ import com.graph.BreadthFirstSearch;
 import com.graph.BFSListener;
 import com.graph.Station;
 import com.graph.Stack;
-
+import com.graph.DepthFirstSearch;
 
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.SingleGraph;
@@ -169,7 +169,7 @@ public class GUI extends JFrame {
                     if ("BFS".equals(selectedAlgorithm)) {
                         runBFS(startStation);
                     } else if ("DFS".equals(selectedAlgorithm)) {
-                        runDFS(startStation); 
+                        runDFS(startStation);
                     }
                 } else {
                     JOptionPane.showMessageDialog(this, "Estación no encontrada: " + startStationName);
@@ -183,55 +183,19 @@ public class GUI extends JFrame {
     }
 
     private void runDFS(Station startStation) {
-        // Crear una pila para el algoritmo DFS
-        Stack<Station> stack = new Stack();
-        LinkedList<String> visited = new LinkedList<>();
+        // Instancia de la clase DFS
+        DepthFirstSearch dfs = new DepthFirstSearch(networkTrain); 
 
-        // Añadir la estación inicial a la pila
-        stack.push(startStation);
+        // Obtener las estaciones visitadas
+        LinkedList<String> visited = dfs.dfs(startStation.getName());
 
-        // Mientras la pila no esté vacía
-        while (!stack.isEmpty()) {
-            // Sacar la estación de la cima de la pila
-            Station currentStation = stack.pop();
-
-            // Si la estación no ha sido visitada
-            if (!visited.contains(currentStation.getName())) {
-                // Marcar la estación como visitada
-                visited.add(currentStation.getName());
-
-                // Cambiar el color de la estación en el grafo a verde
-                graphStreamGraph.getNode(currentStation.getName()).setAttribute("ui.style", "fill-color: green;");
-
-                // Obtener las conexiones (adyacencias) de la estación actual
-                LinkedList<Connection> connections = currentStation.getConnections();
-
-                // Recorrer las estaciones adyacentes
-                for (int i = 0; i < connections.size(); i++) {
-                    Connection connection = connections.get(i);
-
-                    // Determinar cuál es la estación opuesta en la conexión
-                    Station adjacentStation = connection.getStation1().equals(currentStation)
-                            ? connection.getStation2()
-                            : connection.getStation1();
-
-                    // Si la estación adyacente no ha sido visitada, agregarla a la pila
-                    if (!visited.contains(adjacentStation.getName())) {
-                        stack.push(adjacentStation);
-                    }
-                }
-
-                // Pausar para que el cambio de color sea visible
-//                try {
-//                    Thread.sleep(500); // Pausa de 500 milisegundos
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-            }
+        // Cambiar el color de las estaciones en el grafo a verde
+        for (String stationName : visited) {
+            graphStreamGraph.getNode(stationName).setAttribute("ui.style", "fill-color: green;");
         }
 
         // Mostrar las estaciones visitadas
-//        System.out.println("Estaciones visitadas en DFS: " + visited.toString());
+        System.out.println("Estaciones visitadas en DFS: " + visited.toString());
     }
 
 // Método para ejecutar el BFS y colorear las estaciones

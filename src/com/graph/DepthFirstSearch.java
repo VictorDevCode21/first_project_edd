@@ -11,54 +11,44 @@ package com.graph;
 public class DepthFirstSearch {
 
     private NetworkTrain graph;
-    private LinkedList visitedStations;
+    private LinkedList<String> visitedStations; // Cambiado para almacenar nombres de estaciones
 
     public DepthFirstSearch(NetworkTrain graph) {
         this.graph = graph;
-        visitedStations = new LinkedList();
+        visitedStations = new LinkedList<>();
     }
 
-    public void dfs(String startStation) {
-        //  Simulamos el Stack usando la clase Stack que es una LinkedList 
-        Stack stack = new Stack();
+    public LinkedList<String> dfs(String startStation) {
+        // Simulamos el Stack usando la clase Stack que es una LinkedList 
+        Stack<String> stack = new Stack<>();
         stack.push(startStation);
 
         while (!stack.isEmpty()) {
-            Station currentStation = stack.pop();
+            String currentStationName = stack.pop();
 
-            //  Si la estacion no ha sido visitada
-            if (!visitedStations.contains(currentStation)) {
-//                System.out.println("Visitando: " + currentStation);
-                visitedStations.add(currentStation);
+            // Si la estación no ha sido visitada
+            if (!visitedStations.contains(currentStationName)) {
+                visitedStations.add(currentStationName); // Añadir el nombre de la estación visitada
 
-                // Obtener estaciones adyacentes (conexiones)
-                Station station = graph.getStation(currentStation.getName());
-                LinkedList connections = station.getConnections(); // Devuelve las conexiones
+                // Obtener la estación actual
+                Station currentStation = graph.getStation(currentStationName);
+                LinkedList<Connection> connections = currentStation.getConnections(); // Obtener conexiones
 
-                // Agregamos las estaciones no visitadas al stack 
+                // Agregar las estaciones no visitadas al stack
                 for (int i = 0; i < connections.size(); i++) {
-                    Connection conn = (Connection) connections.get(i);
+                    Connection conn = connections.get(i);
+                    String neighborName = conn.getStation1().getName().equals(currentStationName)
+                            ? conn.getStation2().getName()
+                            : conn.getStation1().getName();
 
-                    // Determinamos cual es la estacion vecina
-                    String neighbor = null;
-
-                    if (conn.getStation1().getName().equals(currentStation)) {
-                        neighbor = conn.getStation2().getName();
-                    } else {
-                        neighbor = conn.getStation1().getName();
+                    // Si la estación vecina no ha sido visitada, la agregamos al stack
+                    if (!visitedStations.contains(neighborName)) {
+                        stack.push(neighborName);
                     }
-
-                    // Si la estacion vecina no ha sido visitada la agregamos al stack
-                    if (!visitedStations.contains(neighbor)) {
-                        stack.push(neighbor);
-                    }
-
                 }
-
             }
-
         }
 
+        return visitedStations; // Retorna la lista de estaciones visitadas
     }
-
 }
