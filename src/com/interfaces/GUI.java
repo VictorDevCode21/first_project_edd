@@ -190,42 +190,65 @@ public class GUI extends JFrame {
     }
 
     private void runDFS(Station startStation, int T) {
-        // Instancia de la clase DFS
-        DepthFirstSearch dfs = new DepthFirstSearch(networkTrain);
-
-        // Obtener las estaciones visitadas
-        LinkedList<String> visited = dfs.dfs(startStation.getName());
-
         // Inicializamos la primera sucursal
         branches.add(startStation);
-        int stationsFromLastBranch = 0;
+        Map<Station, Integer> distances = new HashMap<>();
+        distances.put(startStation, 0); // La distancia de la estación inicial es 0
 
-        // Recorrer estaciones visitadas y agregar sucursales según la distancia T
-        for (String stationName : visited) {
-            Station currentStation = networkTrain.getStationByName(stationName);
-            stationsFromLastBranch++;
+        // Colorear la primera sucursal en verde
+        if (graphStreamGraph.getNode(startStation.getName()) != null) {
+            graphStreamGraph.getNode(startStation.getName()).setAttribute("ui.style", "fill-color: green;");
+            graphStreamGraph.getNode(startStation.getName()).setAttribute("ui.label", startStation.getName() + " 0");
+        }
 
-            if (stationsFromLastBranch == T) {
-                branches.add(currentStation);
-                stationsFromLastBranch = 0; // Reiniciamos el contador
-            }
+        // Usamos una pila para implementar DFS manualmente
+        Stack<Station> stack = new Stack<>(); // Asegúrate que sea Stack<Station>
+        Set<Station> visited = new HashSet<>();
+        stack.push(startStation); // Asegúrate de que aquí estés usando Station
+        visited.add(startStation);
 
-            // Cambiar el color de las estaciones a verde
-            if (graphStreamGraph.getNode(stationName) != null) {
-                graphStreamGraph.getNode(stationName).setAttribute("ui.style", "fill-color: green;");
+        // Realizamos el recorrido DFS
+        while (!stack.isEmpty()) {
+            Station currentStation = stack.pop(); // Aquí debería ser tipo Station
+            int currentDistance = distances.get(currentStation); // Usar currentStation aquí
+
+            // Obtener estaciones vecinas
+            LinkedList<Station> neighbors = networkTrain.getNeighbors(currentStation); // Esto debe devolver LinkedList<Station>
+            int nextDistance = currentDistance + 1; // Incrementar distancia para las estaciones vecinas
+
+            for (Station neighbor : neighbors) {
+                if (!visited.contains(neighbor)) {
+                    visited.add(neighbor);
+                    distances.put(neighbor, nextDistance);
+                    stack.push(neighbor); // Asegúrate de que estás empujando Station
+
+                    // Mostrar el nombre de la estación y su distancia desde la estación inicial en el grafo
+                    if (graphStreamGraph.getNode(neighbor.getName()) != null) {
+                        graphStreamGraph.getNode(neighbor.getName()).setAttribute("ui.label", neighbor.getName() + " " + nextDistance);
+                    }
+
+                    // Colocar sucursal si la distancia es divisible por T
+                    if (nextDistance % T == 0) {
+                        branches.add(neighbor);
+
+                        // Cambiar el color de la nueva sucursal a verde
+                        if (graphStreamGraph.getNode(neighbor.getName()) != null) {
+                            graphStreamGraph.getNode(neighbor.getName()).setAttribute("ui.style", "fill-color: green;");
+                        }
+                    }
+                }
             }
         }
 
-        // Mostrar las estaciones visitadas
-//        System.out.println("Estaciones visitadas en DFS: " + visited.toString());
+        // Mostrar las sucursales creadas
         System.out.println("Sucursales creadas (DFS): " + branches.toString());
     }
 
     private void runBFS(Station startStation, int T) {
         // Inicializar la distancia de la estación inicial
         Queue<Station> queue = new Queue<>();
-        Set<Station> visitedStations = new HashSet<>();
         branches.add(startStation); // Sucursal inicial
+        Set<Station> visitedStations = new HashSet<>();
         Map<Station, Integer> distances = new HashMap<>();
         distances.put(startStation, 0);
 
@@ -270,7 +293,7 @@ public class GUI extends JFrame {
                 graphStreamGraph.getNode(station.getName()).setAttribute("ui.label", station.getName() + " " + distance);
             }
 
-            System.out.println("Estación: " + station.getName() + ", Distancia: " + distance);
+//            System.out.println("Estación: " + station.getName() + ", Distancia: " + distance);
         }
 
         System.out.println("Sucursales creadas (BFS): " + branches.toString());
