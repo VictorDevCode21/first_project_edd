@@ -92,6 +92,30 @@ public class NetworkTrain {
         }
     }
 
+    // Método para obtener los vecinos de una estación
+    public LinkedList<Station> getNeighbors(Station station) {
+        LinkedList<Station> neighbors = new LinkedList<>(); // Lista para almacenar los vecinos
+
+        // Itera sobre todas las estaciones
+        for (Node<Station> stationNode = stations.getHead(); stationNode != null; stationNode = stationNode.getNext()) {
+            Station currentStation = stationNode.getData();
+
+            // Verifica si la estación actual tiene conexiones
+            for (Node<Connection> connNode = currentStation.getConnections().getHead(); connNode != null; connNode = connNode.getNext()) {
+                Connection connection = connNode.getData();
+
+                // Comprueba si la conexión incluye la estación dada
+                if (connection.getStation1().equals(station)) {
+                    neighbors.add(connection.getStation2()); // Agrega la estación vecina
+                } else if (connection.getStation2().equals(station)) {
+                    neighbors.add(connection.getStation1()); // Agrega la estación vecina
+                }
+            }
+        }
+
+        return neighbors; // Retorna la lista de vecinos
+    }
+
     // Método para obtener una estación por su nombre
     public Station getStationByName(String name) {
         Node<Station> current = stations.getHead();

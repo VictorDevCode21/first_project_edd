@@ -12,6 +12,7 @@ import com.graph.BreadthFirstSearch;
 import com.graph.BFSListener;
 import com.graph.Station;
 import com.graph.Stack;
+import com.graph.Queue;
 import com.graph.DepthFirstSearch;
 
 import org.graphstream.graph.Graph;
@@ -24,7 +25,9 @@ import java.io.IOException;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,6 +42,7 @@ public class GUI extends JFrame {
 
     private NetworkTrain networkTrain;
     private Graph graphStreamGraph;
+    private LinkedList<Station> branches; // Lista para almacenar sucursales
 
     public GUI() {
         setTitle("Supermarket Location Planner");
@@ -67,6 +71,7 @@ public class GUI extends JFrame {
                         // Cargar los datos desde el objeto JSONObject
                         networkTrain = new NetworkTrain();
                         networkTrain.loadFromJson(jsonObject);
+                        branches = new LinkedList<>();
 
                         // Mostrar la red en GraphStream
                         showNetworkTrain(jsonObject);
@@ -107,6 +112,8 @@ public class GUI extends JFrame {
                         algorithms,
                         algorithms[0]
                 );
+
+                int T = Integer.parseInt(JOptionPane.showInputDialog(this, "Ingrese la distancia T entre sucursales:"));
 
                 // Cargar y visualizar la red en GraphStream
                 String networkName = jsonObject.keys().next();
@@ -167,9 +174,9 @@ public class GUI extends JFrame {
                 Station startStation = networkTrain.getStationByName(startStationName);
                 if (startStation != null) {
                     if ("BFS".equals(selectedAlgorithm)) {
-                        runBFS(startStation);
+                        runBFS(startStation, T);
                     } else if ("DFS".equals(selectedAlgorithm)) {
-                        runDFS(startStation);
+                        runDFS(startStation, T);
                     }
                 } else {
                     JOptionPane.showMessageDialog(this, "Estación no encontrada: " + startStationName);
@@ -182,51 +189,94 @@ public class GUI extends JFrame {
         }
     }
 
-    private void runDFS(Station startStation) {
+    private void runDFS(Station startStation, int T) {
         // Instancia de la clase DFS
-        DepthFirstSearch dfs = new DepthFirstSearch(networkTrain); 
+        DepthFirstSearch dfs = new DepthFirstSearch(networkTrain);
 
         // Obtener las estaciones visitadas
         LinkedList<String> visited = dfs.dfs(startStation.getName());
 
-        // Cambiar el color de las estaciones en el grafo a verde
+        // Inicializamos la primera sucursal
+        branches.add(startStation);
+        int stationsFromLastBranch = 0;
+
+        // Recorrer estaciones visitadas y agregar sucursales según la distancia T
         for (String stationName : visited) {
-            graphStreamGraph.getNode(stationName).setAttribute("ui.style", "fill-color: green;");
+            Station currentStation = networkTrain.getStationByName(stationName);
+            stationsFromLastBranch++;
+
+            if (stationsFromLastBranch == T) {
+                branches.add(currentStation);
+                stationsFromLastBranch = 0; // Reiniciamos el contador
+            }
+
+            // Cambiar el color de las estaciones a verde
+            if (graphStreamGraph.getNode(stationName) != null) {
+                graphStreamGraph.getNode(stationName).setAttribute("ui.style", "fill-color: green;");
+            }
         }
 
         // Mostrar las estaciones visitadas
-        System.out.println("Estaciones visitadas en DFS: " + visited.toString());
+//        System.out.println("Estaciones visitadas en DFS: " + visited.toString());
+        System.out.println("Sucursales creadas (DFS): " + branches.toString());
     }
 
-// Método para ejecutar el BFS y colorear las estaciones
-    private void runBFS(Station startStation) {
-        BreadthFirstSearch bfs = new BreadthFirstSearch(startStation, new LinkedList<Station>());
-        Set<Station> visitedStations = new HashSet<>(); // Para llevar el seguimiento de estaciones visitadas
+    private void runBFS(Station startStation, int T) {
+        // Inicializar la distancia de la estación inicial
+        Queue<Station> queue = new Queue<>();
+        Set<Station> visitedStations = new HashSet<>();
+        branches.add(startStation); // Sucursal inicial
+        Map<Station, Integer> distances = new HashMap<>();
+        distances.put(startStation, 0);
 
-        bfs.traverse(new BFSListener() {
-            @Override
-            public void stationVisited(Station station) {
-                // Verifica si la estación ya ha sido visitada
-                if (!visitedStations.contains(station)) {
-                    visitedStations.add(station); // Marcar estación como visitada
-                    if (graphStreamGraph.getNode(station.getName()) != null) {
-                        graphStreamGraph.getNode(station.getName()).setAttribute("ui.style", "fill-color: green;");
+        // Colorear la estación inicial en verde
+        if (graphStreamGraph.getNode(startStation.getName()) != null) {
+            graphStreamGraph.getNode(startStation.getName()).setAttribute("ui.style", "fill-color: green;");
+        }
+
+        queue.enqueue(startStation);
+        visitedStations.add(startStation);
+
+        while (!queue.isEmpty()) {
+            Station current = queue.dequeue();
+            LinkedList<Station> neighbors = networkTrain.getNeighbors(current); // Usar el método getNeighbors
+
+            for (Station neighbor : neighbors) {
+                if (!visitedStations.contains(neighbor)) {
+                    visitedStations.add(neighbor);
+                    queue.enqueue(neighbor);
+                    distances.put(neighbor, distances.get(current) + 1);
+
+                    // Aquí decides cuándo agregar una nueva sucursal
+                    if (distances.get(neighbor) % T == 0) {
+                        branches.add(neighbor);
+
+                        // Colorear la nueva sucursal en verde
+                        if (graphStreamGraph.getNode(neighbor.getName()) != null) {
+                            graphStreamGraph.getNode(neighbor.getName()).setAttribute("ui.style", "fill-color: green;");
+                        }
                     }
-//                    System.out.println("Estación visitada: " + station.getName()); // Debug
                 }
             }
-        });
-
-        // Mostrar las estaciones visitadas
-        Node<Station> aux = bfs.getVisitedStations().getHead();
-        while (aux != null) {
-            Station station = aux.getData();
-//            System.out.println("Estación recorrida en BFS: " + station.getName()); // Debug
-            aux = aux.getNext();
         }
+
+        // Mostrar las estaciones y sus distancias
+        for (Map.Entry<Station, Integer> entry : distances.entrySet()) {
+            Station station = entry.getKey();
+            Integer distance = entry.getValue();
+
+            // Mostrar el nombre de la estación y su distancia en el grafo
+            if (graphStreamGraph.getNode(station.getName()) != null) {
+                graphStreamGraph.getNode(station.getName()).setAttribute("ui.label", station.getName() + " " + distance);
+            }
+
+            System.out.println("Estación: " + station.getName() + ", Distancia: " + distance);
+        }
+
+        System.out.println("Sucursales creadas (BFS): " + branches.toString());
     }
 
-// Agrega una arista si no existe entre dos estaciones
+    // Agrega una arista si no existe entre dos estaciones
     private void addEdgeIfNotExists(String station1, String station2) {
         // Asegúrate de que las estaciones sean diferentes
         if (station1.equals(station2)) {
