@@ -4,11 +4,8 @@
  */
 package com.interfaces;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
+import java.awt.BorderLayout;
+import javax.swing.JPanel;
 
 /**
  *
@@ -21,7 +18,23 @@ public class WelcomeInterface extends javax.swing.JFrame {
      */
     public WelcomeInterface() {
         initComponents();
+        
+        Page1 p1 = new Page1();
+        ShowPanel(p1);
+
     }
+    
+    private void ShowPanel(JPanel p){
+     p.setSize(389, 178);
+     p.setLocation(0, 0);
+
+     content.removeAll();
+     content.setLayout(new BorderLayout());
+     content.add(p, BorderLayout.CENTER);
+     content.revalidate();
+     content.repaint();
+    }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -36,13 +49,29 @@ public class WelcomeInterface extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         showGraphButton = new javax.swing.JButton();
+        jPanel2 = new javax.swing.JPanel();
+        addStation = new javax.swing.JButton();
+        addBranch = new javax.swing.JButton();
+        deleteBranch = new javax.swing.JButton();
+        setT = new javax.swing.JButton();
+        branchCoverage = new javax.swing.JButton();
+        content = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel1.setText("Welcome to Transmetropolis");
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        jLabel1.setBackground(new java.awt.Color(51, 51, 51));
+        jLabel1.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(51, 51, 51));
+        jLabel1.setText("Welcome to Transmetropolis");
+        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 20, -1, -1));
+
+        jLabel2.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
         jLabel2.setText("Options:");
+        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 270, -1, -1));
 
         showGraphButton.setText("Show Graph");
         showGraphButton.addActionListener(new java.awt.event.ActionListener() {
@@ -50,37 +79,69 @@ public class WelcomeInterface extends javax.swing.JFrame {
                 showGraphButtonActionPerformed(evt);
             }
         });
+        jPanel1.add(showGraphButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 260, 110, 30));
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(113, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(25, 25, 25)
-                        .addComponent(showGraphButton)))
-                .addGap(135, 135, 135))
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(158, 158, 158)
-                .addComponent(jLabel2)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        jPanel2.setBackground(new java.awt.Color(0, 51, 102));
+        jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        addStation.setText("Add Station");
+        addStation.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addStationActionPerformed(evt);
+            }
+        });
+        jPanel2.add(addStation, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 50, 170, -1));
+
+        addBranch.setText("Add Branch");
+        addBranch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addBranchActionPerformed(evt);
+            }
+        });
+        jPanel2.add(addBranch, new org.netbeans.lib.awtextra.AbsoluteConstraints(-3, 90, 180, -1));
+
+        deleteBranch.setText("Delete Branch");
+        deleteBranch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deleteBranchActionPerformed(evt);
+            }
+        });
+        jPanel2.add(deleteBranch, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 130, 170, -1));
+
+        setT.setText("Set T");
+        setT.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                setTActionPerformed(evt);
+            }
+        });
+        jPanel2.add(setT, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 170, 180, -1));
+
+        branchCoverage.setText("Branch Coverage");
+        branchCoverage.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                branchCoverageActionPerformed(evt);
+            }
+        });
+        jPanel2.add(branchCoverage, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 210, 170, -1));
+
+        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 170, 300));
+
+        content.setBackground(new java.awt.Color(255, 255, 255));
+
+        javax.swing.GroupLayout contentLayout = new javax.swing.GroupLayout(content);
+        content.setLayout(contentLayout);
+        contentLayout.setHorizontalGroup(
+            contentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 370, Short.MAX_VALUE)
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(75, 75, 75)
-                .addComponent(jLabel1)
-                .addGap(18, 18, 18)
-                .addComponent(jLabel2)
-                .addGap(37, 37, 37)
-                .addComponent(showGraphButton)
-                .addContainerGap(111, Short.MAX_VALUE))
+        contentLayout.setVerticalGroup(
+            contentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 140, Short.MAX_VALUE)
         );
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 400, 300));
+        jPanel1.add(content, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 70, 370, 140));
+
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 540, 300));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -90,6 +151,37 @@ public class WelcomeInterface extends javax.swing.JFrame {
         gui.show();
         
     }//GEN-LAST:event_showGraphButtonActionPerformed
+
+    private void addStationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addStationActionPerformed
+        // TODO add your handling code here:
+        Page1 p1 = new Page1();
+        ShowPanel(p1);
+
+    }//GEN-LAST:event_addStationActionPerformed
+
+    private void addBranchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addBranchActionPerformed
+        // TODO add your handling code here:
+        Page2 p2 = new Page2();
+        ShowPanel(p2);
+    }//GEN-LAST:event_addBranchActionPerformed
+
+    private void deleteBranchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBranchActionPerformed
+        // TODO add your handling code here:
+        Page3 p3 = new Page3();
+        ShowPanel(p3);
+    }//GEN-LAST:event_deleteBranchActionPerformed
+
+    private void setTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setTActionPerformed
+        // TODO add your handling code here:
+        Page4 p4 = new Page4();
+        ShowPanel(p4);
+    }//GEN-LAST:event_setTActionPerformed
+
+    private void branchCoverageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_branchCoverageActionPerformed
+        // TODO add your handling code here:
+        Page5 p5 = new Page5();
+        ShowPanel(p5);
+    }//GEN-LAST:event_branchCoverageActionPerformed
 
     /**
      * @param args the command line arguments
@@ -127,9 +219,16 @@ public class WelcomeInterface extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton addBranch;
+    private javax.swing.JButton addStation;
+    private javax.swing.JButton branchCoverage;
+    private javax.swing.JPanel content;
+    private javax.swing.JButton deleteBranch;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JButton setT;
     private javax.swing.JButton showGraphButton;
     // End of variables declaration//GEN-END:variables
 }
