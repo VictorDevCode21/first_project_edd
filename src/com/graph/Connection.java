@@ -86,4 +86,21 @@ public class Connection {
                 && ((this.station1.equals(other.station1) && this.station2.equals(other.station2))
                 || (this.station1.equals(other.station2) && this.station2.equals(other.station1)));
     }
+
+    /**
+     * Método para obtener la estación vecina a partir de una estación dada.
+     *
+     * @param station La estación de la cual se quiere conocer la estación
+     * vecina.
+     * @return La estación vecina si es parte de esta conexión, null en caso
+     * contrario.
+     */
+    public Station getNeighbors(Station station) {
+        if (station.equals(station1)) {
+            return station2; // Si la estación dada es station1, retorna station2
+        } else if (station.equals(station2)) {
+            return station1; // Si la estación dada es station2, retorna station1
+        }
+        return null; // Si la estación no es parte de esta conexión, retorna null
+    }
 }
