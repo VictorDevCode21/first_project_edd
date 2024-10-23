@@ -39,11 +39,13 @@ public class GUI extends JFrame {
 
     private NetworkTrain networkTrain;
     private Graph graphStreamGraph;
+    private LinkedList <String> stations;
 
     public GUI() {
         setTitle("Supermarket Location Planner");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        stations = new LinkedList<>();
         initUI();
     }
 
@@ -253,6 +255,18 @@ public class GUI extends JFrame {
             graphStreamGraph.getNode(station).setAttribute("ui.label", station);
         }
     }
+    
+    // Verificación de que la estación no se repite
+    public void verificateStations(String station){
+            if (stations.contains(station)) {
+                JOptionPane.showMessageDialog(this, "La estación ya existe", "Aviso", JOptionPane.WARNING_MESSAGE);
+            } else {
+                stations.add(station);
+                JOptionPane.showMessageDialog(this, "Estación añadida exitosamente", "Aviso", JOptionPane.INFORMATION_MESSAGE);
+                addStationToGraph(station);  // Lógica para agregar al grafo
+            }
+        }
+
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
