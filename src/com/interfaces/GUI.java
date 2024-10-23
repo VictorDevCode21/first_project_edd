@@ -42,9 +42,8 @@ public class GUI extends JFrame {
 
     private NetworkTrain networkTrain;
     private Graph graphStreamGraph;
-    private LinkedList <String> stations;
+    private LinkedList<String> stations;
     private LinkedList<Station> branches; // Lista para almacenar sucursales
-
 
     public GUI() {
         setTitle("Supermarket Location Planner");
@@ -192,6 +191,46 @@ public class GUI extends JFrame {
         }
     }
 
+    private int calculateDistance(Station from, Station to) {
+        if (from.equals(to)) {
+            return 0; // La distancia a sí misma es 0
+        }
+
+        // Mapa para rastrear las distancias desde la estación 'from'
+        Map<Station, Integer> distances = new HashMap<>();
+        Queue<Station> queue = new Queue<>();
+        LinkedList<Station> visited = new LinkedList<>(); // Usar LinkedList para rastrear estaciones visitadas
+
+        queue.enqueue(from);
+        distances.put(from, 0);
+        visited.add(from);
+
+        while (!queue.isEmpty()) {
+            Station current = queue.dequeue();
+            int currentDistance = distances.get(current);
+
+            // Obtener estaciones vecinas
+            LinkedList<Station> neighbors = networkTrain.getNeighbors(current);
+
+            for (Station neighbor : neighbors) {
+                // Verifica si la estación ya ha sido visitada
+                if (!visited.contains(neighbor)) {
+                    visited.add(neighbor);
+                    distances.put(neighbor, currentDistance + 1);
+                    queue.enqueue(neighbor);
+
+                    // Si encontramos la estación objetivo, devolvemos la distancia
+                    if (neighbor.equals(to)) {
+                        return distances.get(neighbor);
+                    }
+                }
+            }
+        }
+
+        // Si no se encuentra el destino, retornar -1 o alguna señal de error
+        return -1;
+    }
+
     private void runDFS(Station startStation, int T) {
         // Inicializamos la primera sucursal
         branches.add(startStation);
@@ -205,42 +244,76 @@ public class GUI extends JFrame {
         }
 
         // Usamos una pila para implementar DFS manualmente
-        Stack<Station> stack = new Stack<>(); // Asegúrate que sea Stack<Station>
+        Stack<Station> stack = new Stack<>();
         Set<Station> visited = new HashSet<>();
-        stack.push(startStation); // Asegúrate de que aquí estés usando Station
+        stack.push(startStation);
         visited.add(startStation);
 
         // Realizamos el recorrido DFS
         while (!stack.isEmpty()) {
-            Station currentStation = stack.pop(); // Aquí debería ser tipo Station
-            int currentDistance = distances.get(currentStation); // Usar currentStation aquí
+            Station currentStation = stack.pop();
+            int currentDistance = distances.get(currentStation);
 
             // Obtener estaciones vecinas
-            LinkedList<Station> neighbors = networkTrain.getNeighbors(currentStation); // Esto debe devolver LinkedList<Station>
-            int nextDistance = currentDistance + 1; // Incrementar distancia para las estaciones vecinas
+            LinkedList<Station> neighbors = networkTrain.getNeighbors(currentStation);
 
             for (Station neighbor : neighbors) {
                 if (!visited.contains(neighbor)) {
                     visited.add(neighbor);
-                    distances.put(neighbor, nextDistance);
-                    stack.push(neighbor); // Asegúrate de que estás empujando Station
+                    distances.put(neighbor, currentDistance + 1);
+                    stack.push(neighbor);
 
                     // Mostrar el nombre de la estación y su distancia desde la estación inicial en el grafo
                     if (graphStreamGraph.getNode(neighbor.getName()) != null) {
-                        graphStreamGraph.getNode(neighbor.getName()).setAttribute("ui.label", neighbor.getName() + " " + nextDistance);
+                        graphStreamGraph.getNode(neighbor.getName()).setAttribute("ui.label", neighbor.getName() + " " + distances.get(neighbor));
                     }
 
-                    // Colocar sucursal si la distancia es divisible por T
-                    if (nextDistance % T == 0) {
-                        branches.add(neighbor);
+                    // Calcular la distancia desde la sucursal a las estaciones
+                    int distanceToBranch = calculateDistance(neighbor, startStation);
 
-                        // Cambiar el color de la nueva sucursal a verde
-                        if (graphStreamGraph.getNode(neighbor.getName()) != null) {
-                            graphStreamGraph.getNode(neighbor.getName()).setAttribute("ui.style", "fill-color: green;");
+                    // Verificar si la distancia es divisible por T
+                    if (distances.get(neighbor) % T == 0) {
+                        boolean canPlaceBranch = true; // Variable para verificar la colocación
+                        Station conflictingBranch = null; // Para guardar la sucursal que causa conflicto
+
+                        // Iterar sobre las sucursales ya creadas
+                        for (Station branch : branches) {
+                            // Comprobar si la sucursal ya creada está a menos de T estaciones
+                            int distanceToExistingBranch = calculateDistance(neighbor, branch);
+                            if (distanceToExistingBranch < T) {
+                                canPlaceBranch = false; // Encontramos una sucursal dentro de T estaciones
+                                conflictingBranch = branch; // Guardamos la sucursal conflictiva
+                                break;
+                            }
+                        }
+
+                        // Colocar la sucursal si cumple con las condiciones
+                        if (canPlaceBranch) {
+                            branches.add(neighbor);
+
+                            // Cambiar el color de la nueva sucursal a verde
+                            if (graphStreamGraph.getNode(neighbor.getName()) != null) {
+                                graphStreamGraph.getNode(neighbor.getName()).setAttribute("ui.style", "fill-color: green;");
+                            }
+
+                            // Imprimir la sucursal creada
+                            System.out.println("Sucursal creada en: " + neighbor.getName() + ", distancia: " + distances.get(neighbor));
+                        } else {
+                            // Si ya hay una sucursal cercana, registrar el intento de colocar la sucursal
+                            System.out.println("No se colocó la sucursal en " + neighbor.getName() + " a distancia " + distances.get(neighbor)
+                                    + " porque está a menos de T de la sucursal " + conflictingBranch.getName() + ".");
                         }
                     }
                 }
             }
+        }
+
+        // Mostrar todas las distancias y los nombres de las estaciones
+        System.out.println("Distancias desde la estación inicial:");
+        for (Map.Entry<Station, Integer> entry : distances.entrySet()) {
+            Station station = entry.getKey();
+            Integer distance = entry.getValue();
+            System.out.println("Estación: " + station.getName() + ", Distancia: " + distance);
         }
 
         // Mostrar las sucursales creadas
@@ -329,18 +402,17 @@ public class GUI extends JFrame {
             graphStreamGraph.getNode(station).setAttribute("ui.label", station);
         }
     }
-    
-    // Verificación de que la estación no se repite
-    public void verificateStations(String station){
-            if (stations.contains(station)) {
-                JOptionPane.showMessageDialog(this, "La estación ya existe", "Aviso", JOptionPane.WARNING_MESSAGE);
-            } else {
-                stations.add(station);
-                JOptionPane.showMessageDialog(this, "Estación añadida exitosamente", "Aviso", JOptionPane.INFORMATION_MESSAGE);
-                addStationToGraph(station);  // Lógica para agregar al grafo
-            }
-        }
 
+    // Verificación de que la estación no se repite
+    public void verificateStations(String station) {
+        if (stations.contains(station)) {
+            JOptionPane.showMessageDialog(this, "La estación ya existe", "Aviso", JOptionPane.WARNING_MESSAGE);
+        } else {
+            stations.add(station);
+            JOptionPane.showMessageDialog(this, "Estación añadida exitosamente", "Aviso", JOptionPane.INFORMATION_MESSAGE);
+            addStationToGraph(station);  // Lógica para agregar al grafo
+        }
+    }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
