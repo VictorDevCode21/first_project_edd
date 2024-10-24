@@ -94,7 +94,8 @@ public class GUI extends JFrame {
 
         try {
             // Muestra un cuadro de diálogo para ingresar la estación inicial
-            String startStationName = JOptionPane.showInputDialog(this, "Ingrese el nombre de la estación de inicio:");
+            String startStationName = JOptionPane.showInputDialog(this, 
+                    "Ingrese el nombre de la estación de inicio:");
 
             if (startStationName != null && !startStationName.trim().isEmpty()) {
                 // Muestra un cuadro de diálogo para seleccionar el algoritmo
@@ -211,9 +212,14 @@ public class GUI extends JFrame {
                 // Verifica si la estación ya ha sido visitada
                 if (!visitedStations.contains(station)) {
                     visitedStations.add(station); // Marcar estación como visitada
+                    JOptionPane.showMessageDialog(null, "La estación ha sido agregada exitosamente", 
+                             "Aviso", JOptionPane.INFORMATION_MESSAGE);
                     if (graphStreamGraph.getNode(station.getName()) != null) {
                         graphStreamGraph.getNode(station.getName()).setAttribute("ui.style", "fill-color: green;");
                     }
+                }else{
+                    JOptionPane.showMessageDialog(null, "La estación ya existe", 
+                             "Aviso", JOptionPane.WARNING_MESSAGE);
                 }
             }
         });
@@ -260,10 +266,12 @@ public class GUI extends JFrame {
     // Verificación de que la estación no se repite
     public void verificateStations(String station){
             if (stations.contains(station)) {
-                JOptionPane.showMessageDialog(this, "La estación ya existe", "Aviso", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "La estación ya existe", 
+                        "Aviso", JOptionPane.WARNING_MESSAGE);
             } else {
                 stations.add(station);
-                JOptionPane.showMessageDialog(this, "Estación añadida exitosamente", "Aviso", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Estación añadida exitosamente", 
+                        "Aviso", JOptionPane.INFORMATION_MESSAGE);
                 addStationToGraph(station);  // Lógica para agregar al grafo
            }
         }
