@@ -7,11 +7,9 @@ package com.interfaces;
 import com.graph.NetworkTrain;
 import com.graph.LinkedList;
 import com.graph.Node;
-import com.graph.Connection;
 import com.graph.BreadthFirstSearch;
 import com.graph.BFSListener;
 import com.graph.Station;
-import com.graph.Stack;
 import com.graph.DepthFirstSearch;
 
 import org.graphstream.graph.Graph;
@@ -24,8 +22,6 @@ import java.io.IOException;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,6 +36,7 @@ public class GUI extends JFrame {
     private NetworkTrain networkTrain;
     private Graph graphStreamGraph;
     private LinkedList <String> stations;
+    
 
     public GUI() {
         setTitle("Supermarket Location Planner");
@@ -47,6 +44,8 @@ public class GUI extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         stations = new LinkedList<>();
         initUI();
+
+
     }
 
     private void initUI() {
@@ -200,10 +199,11 @@ public class GUI extends JFrame {
         System.out.println("Estaciones visitadas en DFS: " + visited.toString());
     }
 
-// Método para ejecutar el BFS y colorear las estaciones
+    // Método para ejecutar el BFS y colorear las estaciones
     private void runBFS(Station startStation) {
         BreadthFirstSearch bfs = new BreadthFirstSearch(startStation, new LinkedList<Station>());
-        Set<Station> visitedStations = new HashSet<>(); // Para llevar el seguimiento de estaciones visitadas
+        //Guardar las estaciones visitadas en una LinkedList
+        LinkedList<Station> visitedStations = new LinkedList<>();
 
         bfs.traverse(new BFSListener() {
             @Override
@@ -214,7 +214,6 @@ public class GUI extends JFrame {
                     if (graphStreamGraph.getNode(station.getName()) != null) {
                         graphStreamGraph.getNode(station.getName()).setAttribute("ui.style", "fill-color: green;");
                     }
-//                    System.out.println("Estación visitada: " + station.getName()); // Debug
                 }
             }
         });
@@ -223,9 +222,10 @@ public class GUI extends JFrame {
         Node<Station> aux = bfs.getVisitedStations().getHead();
         while (aux != null) {
             Station station = aux.getData();
-//            System.out.println("Estación recorrida en BFS: " + station.getName()); // Debug
+              Station visitedStation = aux.getData();
+            System.out.println("Estación recorrida en BFS: " + visitedStation.getName()); // Debug
             aux = aux.getNext();
-        }
+        }   
     }
 
 // Agrega una arista si no existe entre dos estaciones
@@ -255,6 +255,7 @@ public class GUI extends JFrame {
             graphStreamGraph.getNode(station).setAttribute("ui.label", station);
         }
     }
+
     
     // Verificación de que la estación no se repite
     public void verificateStations(String station){
@@ -264,9 +265,8 @@ public class GUI extends JFrame {
                 stations.add(station);
                 JOptionPane.showMessageDialog(this, "Estación añadida exitosamente", "Aviso", JOptionPane.INFORMATION_MESSAGE);
                 addStationToGraph(station);  // Lógica para agregar al grafo
-            }
+           }
         }
-
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
@@ -275,6 +275,6 @@ public class GUI extends JFrame {
                 new GUI().setVisible(true);
             }
         });
-    }
+    }    
 
 }
