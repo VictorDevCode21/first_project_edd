@@ -22,7 +22,7 @@ public class Station {
     crea una nueva lista de conexiones */
     public Station(String name) {
         this.name = name;
-        this.connections = new LinkedList(); // Lista de conexiones a otras estaciones
+        this.connections = new LinkedList<>(); // Lista de conexiones a otras estaciones
     }
 
     // Agrega una conexion 
