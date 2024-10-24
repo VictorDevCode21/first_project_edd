@@ -6,6 +6,8 @@ package com.interfaces;
 
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
+import com.graph.LinkedList;
+import com.graph.Station;
 
 /**
  *
@@ -13,28 +15,29 @@ import javax.swing.JPanel;
  */
 public class WelcomeInterface extends javax.swing.JFrame {
 
+    private GUI gui;  // Instancia de GUI
+
     /**
      * Creates new form WelcomeInterface
      */
     public WelcomeInterface() {
         initComponents();
-        
+
         Page1 p1 = new Page1();
         ShowPanel(p1);
 
     }
-    
-    private void ShowPanel(JPanel p){
-     p.setSize(389, 178);
-     p.setLocation(0, 0);
 
-     content.removeAll();
-     content.setLayout(new BorderLayout());
-     content.add(p, BorderLayout.CENTER);
-     content.revalidate();
-     content.repaint();
+    private void ShowPanel(JPanel p) {
+        p.setSize(389, 178);
+        p.setLocation(0, 0);
+
+        content.removeAll();
+        content.setLayout(new BorderLayout());
+        content.add(p, BorderLayout.CENTER);
+        content.revalidate();
+        content.repaint();
     }
-
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -147,9 +150,11 @@ public class WelcomeInterface extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void showGraphButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showGraphButtonActionPerformed
-        GUI gui = new GUI();
+        if (gui == null) {  // Solo crea la instancia una vez
+            gui = new GUI();
+        }
         gui.show();
-        
+
     }//GEN-LAST:event_showGraphButtonActionPerformed
 
     private void addStationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addStationActionPerformed
@@ -166,9 +171,15 @@ public class WelcomeInterface extends javax.swing.JFrame {
     }//GEN-LAST:event_addBranchActionPerformed
 
     private void deleteBranchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBranchActionPerformed
-        // TODO add your handling code here:
-        Page3 p3 = new Page3();
-        ShowPanel(p3);
+        if (gui == null) {  // Solo crea la instancia una vez si no existe
+            gui = new GUI();
+        }
+        // Obtén la lista de sucursales desde GUI
+        LinkedList<Station> branches = gui.getBranches();
+
+        // Pasa las sucursales a la interfaz Page3
+        Page3 p3 = new Page3(gui);  // Le pasamos la lista de sucursales y la instancia de GUI
+        ShowPanel(p3);  // Muestra la interfaz
     }//GEN-LAST:event_deleteBranchActionPerformed
 
     private void setTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setTActionPerformed
