@@ -196,4 +196,5 @@ public class LinkedList<T> implements Iterable<T> {
 
         return sb.toString();  // Retornar la representación como String
     }
+
 }
