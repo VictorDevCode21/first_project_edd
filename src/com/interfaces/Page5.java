@@ -4,16 +4,28 @@
  */
 package com.interfaces;
 
+import com.graph.LinkedList;
+import com.interfaces.GUI;
+import com.graph.NetworkTrain;
+import com.graph.Station;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author Joao
  */
 public class Page5 extends javax.swing.JPanel {
 
+    private String selectedBranchName; // Variable para guardar el nombre de la sucursal
+    private String selectedAlgorithm; // Variable para guardar el algoritmo seleccionado
+    private GUI gui;
+    private NetworkTrain networkTrain;
+
     /**
      * Creates new form Page5
      */
-    public Page5() {
+    public Page5(GUI gui) {
+        this.gui = gui;
         initComponents();
     }
 
@@ -39,19 +51,19 @@ public class Page5 extends javax.swing.JPanel {
         jPanel3.setBackground(new java.awt.Color(255, 255, 255));
         jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        inputBranchName.setBackground(new java.awt.Color(0, 0, 0));
+        inputBranchName.setBackground(new java.awt.Color(153, 153, 153));
         inputBranchName.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 inputBranchNameActionPerformed(evt);
             }
         });
-        jPanel3.add(inputBranchName, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 20, 140, 20));
+        jPanel3.add(inputBranchName, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 20, 140, 20));
 
         jLabel3.setForeground(new java.awt.Color(0, 0, 0));
         jLabel3.setText("Seleccione el algoritmo de búsqueda:");
         jPanel3.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 50, -1, -1));
 
-        dfsSelectButton.setBackground(new java.awt.Color(0, 0, 0));
+        dfsSelectButton.setBackground(new java.awt.Color(153, 153, 153));
         dfsSelectButton.setText("DFS");
         dfsSelectButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -60,7 +72,7 @@ public class Page5 extends javax.swing.JPanel {
         });
         jPanel3.add(dfsSelectButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 70, 70, -1));
 
-        bfsSelectButton.setBackground(new java.awt.Color(0, 0, 0));
+        bfsSelectButton.setBackground(new java.awt.Color(153, 153, 153));
         bfsSelectButton.setText("BFS");
         bfsSelectButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -70,27 +82,73 @@ public class Page5 extends javax.swing.JPanel {
         jPanel3.add(bfsSelectButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 70, 70, -1));
 
         jLabel4.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel4.setText("Introduzca el nombre de la sucursal:");
-        jPanel3.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, -1, -1));
+        jLabel4.setText("Nombre de la sucursal:");
+        jPanel3.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 20, -1, -1));
 
-        seeCoverage.setBackground(new java.awt.Color(0, 0, 0));
+        seeCoverage.setBackground(new java.awt.Color(153, 153, 153));
         seeCoverage.setText("See Coverage");
+        seeCoverage.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                seeCoverageActionPerformed(evt);
+            }
+        });
         jPanel3.add(seeCoverage, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 100, -1, -1));
 
         add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 370, 140));
     }// </editor-fold>//GEN-END:initComponents
 
     private void inputBranchNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inputBranchNameActionPerformed
-        // TODO add your handling code here:
+        selectedBranchName = inputBranchName.getText().trim();
+
+        if (selectedBranchName.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Por favor, ingrese un nombre de sucursal.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_inputBranchNameActionPerformed
 
     private void dfsSelectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dfsSelectButtonActionPerformed
-        // TODO add your handling code here:
+        selectedAlgorithm = "DFS"; // Guardamos la selección como DFS
     }//GEN-LAST:event_dfsSelectButtonActionPerformed
 
     private void bfsSelectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bfsSelectButtonActionPerformed
-        // TODO add your handling code here:
+        selectedAlgorithm = "BFS"; // Guardamos la selección como BFS
     }//GEN-LAST:event_bfsSelectButtonActionPerformed
+
+    private void seeCoverageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_seeCoverageActionPerformed
+        // Verificar que se haya ingresado un nombre de sucursal
+        if (selectedBranchName == null || selectedBranchName.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Por favor, ingrese un nombre de sucursal antes de continuar.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Verificar que se haya seleccionado un algoritmo
+        if (selectedAlgorithm == null) {
+            JOptionPane.showMessageDialog(this, "Por favor, seleccione un algoritmo de búsqueda (DFS o BFS).", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Obtener la estación de la sucursal a partir del nombre
+        Station branchStation = networkTrain.getStationByName(selectedBranchName);
+        if (branchStation == null) {
+            JOptionPane.showMessageDialog(this, "La sucursal no existe en el sistema.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Obtener el valor de T desde la GUI
+        int T = gui.getT();
+
+        // Ejecutar el algoritmo seleccionado
+        LinkedList<Station> coveredStations;
+        if (selectedAlgorithm.equals("DFS")) {
+            coveredStations = gui.getCoveredStationsDFS(branchStation);
+        } else {
+            coveredStations = gui.getCoveredStationsBFS(branchStation);
+        }
+
+        // Mostrar los resultados en la nueva interfaz
+        ShowBranchesCoverage coverageWindow = new ShowBranchesCoverage(coveredStations);
+        coverageWindow.setVisible(true);
+
+    }//GEN-LAST:event_seeCoverageActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

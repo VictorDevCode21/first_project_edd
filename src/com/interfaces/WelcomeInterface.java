@@ -8,6 +8,7 @@ import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import com.graph.LinkedList;
 import com.graph.Station;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -16,6 +17,7 @@ import com.graph.Station;
 public class WelcomeInterface extends javax.swing.JFrame {
 
     private GUI gui;  // Instancia de GUI
+    private boolean isGraphShown = false; // Variable para controlar si el grafo ha sido mostrado
 
     /**
      * Creates new form WelcomeInterface
@@ -154,25 +156,32 @@ public class WelcomeInterface extends javax.swing.JFrame {
             gui = new GUI();
         }
         gui.show();
-
+        isGraphShown = true; // Cambiamos la variable a true una vez que se muestra el grafo
     }//GEN-LAST:event_showGraphButtonActionPerformed
 
     private void addStationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addStationActionPerformed
-        // TODO add your handling code here:
+        if (!isGraphShown) {
+            JOptionPane.showMessageDialog(this, "Por favor haga click en 'Show Graph' antes de continuar.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         Page1 p1 = new Page1();
         ShowPanel(p1);
 
     }//GEN-LAST:event_addStationActionPerformed
 
     private void totalCoverageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_totalCoverageActionPerformed
-        // TODO add your handling code here:
+        if (!isGraphShown) {
+            JOptionPane.showMessageDialog(this, "Por favor haga click en 'Show Graph' antes de continuar.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         Page2 p2 = new Page2();
         ShowPanel(p2);
     }//GEN-LAST:event_totalCoverageActionPerformed
 
     private void deleteBranchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBranchActionPerformed
-        if (gui == null) {  // Solo crea la instancia una vez si no existe
-            gui = new GUI();
+        if (!isGraphShown) {
+            JOptionPane.showMessageDialog(this, "Por favor haga click en 'Show Graph' antes de poder borrar sucursales.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
         }
         // Obtén la lista de sucursales desde GUI
         LinkedList<Station> branches = gui.getBranches();
@@ -183,14 +192,20 @@ public class WelcomeInterface extends javax.swing.JFrame {
     }//GEN-LAST:event_deleteBranchActionPerformed
 
     private void setTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setTActionPerformed
-        // TODO add your handling code here:
+        if (!isGraphShown) {
+            JOptionPane.showMessageDialog(this, "Por favor haga click en 'Show Graph' antes de continuar.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         Page4 p4 = new Page4();
         ShowPanel(p4);
     }//GEN-LAST:event_setTActionPerformed
 
     private void branchCoverageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_branchCoverageActionPerformed
-        // TODO add your handling code here:
-        Page5 p5 = new Page5();
+        if (!isGraphShown) {
+            JOptionPane.showMessageDialog(this, "Por favor haga click en 'Show Graph' antes de continuar.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        Page5 p5 = new Page5(gui);
         ShowPanel(p5);
     }//GEN-LAST:event_branchCoverageActionPerformed
 

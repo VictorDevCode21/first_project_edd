@@ -40,6 +40,7 @@ public class GUI extends JFrame {
     private Graph graphStreamGraph;
     private LinkedList<String> stations;
     private LinkedList<Station> branches; // Lista para almacenar sucursales
+    private int T; // Para guardar el T que representa distancia entre estaciones
 
     public GUI() {
         setTitle("Supermarket Location Planner");
@@ -161,7 +162,7 @@ public class GUI extends JFrame {
                         algorithms[0]
                 );
 
-                int T = Integer.parseInt(JOptionPane.showInputDialog(this, "Ingrese la distancia T entre sucursales:"));
+                T = Integer.parseInt(JOptionPane.showInputDialog(this, "Ingrese la distancia T entre sucursales:"));
 
                 // Cargar y visualizar la red en GraphStream
                 String networkName = jsonObject.keys().next();
@@ -276,6 +277,64 @@ public class GUI extends JFrame {
         // Si no se encuentra el destino, retornar -1 o alguna señal de error
         return -1;
     }
+
+    // Método para obtener las estaciones cubiertas usando DFS
+    public LinkedList<Station> getCoveredStationsDFS(Station startStation) {
+        LinkedList<Station> coveredStations = new LinkedList<>();
+        // Llamar al método DFS existente
+        runDFS(startStation, coveredStations, 0, T);
+        return coveredStations; // Devuelve la lista de estaciones cubiertas
+    }
+
+    // Método para obtener las estaciones cubiertas usando BFS
+    public LinkedList<Station> getCoveredStationsBFS(Station startStation) {
+        LinkedList<Station> coveredStations = new LinkedList<>();
+        // Llamar al método BFS existente
+        runBFS(startStation, coveredStations, T);
+        return coveredStations; // Devuelve la lista de estaciones cubiertas
+    }
+
+    // Sobrecarga de metodo para usar el dfs y poder saber la cobertura de sucursal 
+    private void runDFS(Station current, LinkedList<Station> coveredStations, int depth, int maxDistance) {
+        if (depth > maxDistance) {
+            return; // No continuar si se ha superado el límite
+        }
+        coveredStations.add(current);
+        for (Station neighbor : getNeighbors(current)) {
+            if (!coveredStations.contains(neighbor)) {
+                runDFS(neighbor, coveredStations, depth + 1, maxDistance);
+            }
+        }
+    }
+    
+    // Sobrecarga de metodo para usar el bfs y poder saber la cobertura de sucursal 
+    private void runBFS(Station start, LinkedList<Station> coveredStations, int maxDistance) {
+        Queue<Station> queue = new Queue<>();
+        Map<Station, Integer> distances = new HashMap<>();
+        queue.enqueue(start);
+        distances.put(start, 0);
+
+        while (!queue.isEmpty()) {
+            Station current = queue.dequeue();
+            int currentDistance = distances.get(current);
+
+            if (currentDistance <= maxDistance) {
+                coveredStations.add(current);
+                for (Station neighbor : getNeighbors(current)) {
+                    if (!distances.containsKey(neighbor)) {
+                        distances.put(neighbor, currentDistance + 1);
+                        queue.enqueue(neighbor);
+                    }
+                }
+            }
+        }
+    }
+    
+     // Método para obtener los vecinos de una estación
+    public LinkedList<Station> getNeighbors(Station station) {
+        return networkTrain.getNeighbors(station);
+    }
+    
 
     private void runDFS(Station startStation, int T) {
         // Inicializamos la primera sucursal
@@ -464,6 +523,11 @@ public class GUI extends JFrame {
             JOptionPane.showMessageDialog(this, "Estación añadida exitosamente", "Aviso", JOptionPane.INFORMATION_MESSAGE);
             addStationToGraph(station);  // Lógica para agregar al grafo
         }
+    }
+
+    // Método para obtener el valor de T
+    public int getT() {
+        return this.T;
     }
 
     public static void main(String[] args) {
