@@ -27,24 +27,79 @@ public class Page5 extends javax.swing.JPanel {
     private void initComponents() {
 
         jPanel3 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
+        inputBranchName = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        dfsSelectButton = new javax.swing.JButton();
+        bfsSelectButton = new javax.swing.JButton();
+        jLabel4 = new javax.swing.JLabel();
+        seeCoverage = new javax.swing.JButton();
 
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel3.setBackground(new java.awt.Color(255, 255, 255));
         jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel1.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(102, 102, 102));
-        jLabel1.setText("Branch Coverage");
-        jPanel3.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 10, 100, -1));
+        inputBranchName.setBackground(new java.awt.Color(0, 0, 0));
+        inputBranchName.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                inputBranchNameActionPerformed(evt);
+            }
+        });
+        jPanel3.add(inputBranchName, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 20, 140, 20));
+
+        jLabel3.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel3.setText("Seleccione el algoritmo de búsqueda:");
+        jPanel3.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 50, -1, -1));
+
+        dfsSelectButton.setBackground(new java.awt.Color(0, 0, 0));
+        dfsSelectButton.setText("DFS");
+        dfsSelectButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dfsSelectButtonActionPerformed(evt);
+            }
+        });
+        jPanel3.add(dfsSelectButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 70, 70, -1));
+
+        bfsSelectButton.setBackground(new java.awt.Color(0, 0, 0));
+        bfsSelectButton.setText("BFS");
+        bfsSelectButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bfsSelectButtonActionPerformed(evt);
+            }
+        });
+        jPanel3.add(bfsSelectButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 70, 70, -1));
+
+        jLabel4.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel4.setText("Introduzca el nombre de la sucursal:");
+        jPanel3.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, -1, -1));
+
+        seeCoverage.setBackground(new java.awt.Color(0, 0, 0));
+        seeCoverage.setText("See Coverage");
+        jPanel3.add(seeCoverage, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 100, -1, -1));
 
         add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 370, 140));
     }// </editor-fold>//GEN-END:initComponents
 
+    private void inputBranchNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inputBranchNameActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_inputBranchNameActionPerformed
+
+    private void dfsSelectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dfsSelectButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_dfsSelectButtonActionPerformed
+
+    private void bfsSelectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bfsSelectButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_bfsSelectButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JButton bfsSelectButton;
+    private javax.swing.JButton dfsSelectButton;
+    private javax.swing.JTextField inputBranchName;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JButton seeCoverage;
     // End of variables declaration//GEN-END:variables
 }
