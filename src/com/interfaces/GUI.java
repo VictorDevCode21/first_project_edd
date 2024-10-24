@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.interfaces;
 
 import com.graph.NetworkTrain;
@@ -91,6 +87,56 @@ public class GUI extends JFrame {
         // Agregar componentes al frame
         add(loadButton, BorderLayout.NORTH);
         // Otros componentes y configuraciones
+    }
+
+    public LinkedList<Station> getBranches() {
+        // Supongamos que tienes una lista de sucursales en tu clase GUI
+        return this.branches; // Devuelve la lista de sucursales como una lista de Strings
+    }
+
+    public NetworkTrain getNetworkTrain() {
+        return this.networkTrain;  // Donde networkTrain es la instancia de tu grafo
+    }
+
+    public void removeBranch(Station branchName) {
+        branches.remove(branchName);  // Remueve la sucursal de la lista
+        // Actualiza la visualización del grafo, si corresponde.
+        updateGraph();
+    }
+
+    public void updateGraph() {
+        if (graphStreamGraph == null || networkTrain == null) {
+            return;  // Si el grafo o la red no están cargados, no hay nada que actualizar
+        }
+
+        // Limpiar el grafo actual para volver a cargar la red desde el estado actual de `networkTrain`
+        graphStreamGraph.clear();
+
+        // Volver a agregar todas las estaciones y conexiones desde la red de transporte
+        LinkedList<Station> allStations = networkTrain.getStations();
+
+        // Recorrer todas las estaciones de la red y añadirlas al grafo de GraphStream
+        for (Station station : allStations) {
+            addStationToGraph(station.getName());  // Añadir la estación al grafo
+
+            // Obtener los vecinos (conexiones) de la estación actual
+            LinkedList<Station> neighbors = networkTrain.getNeighbors(station);
+
+            for (Station neighbor : neighbors) {
+                addEdgeIfNotExists(station.getName(), neighbor.getName());  // Añadir las conexiones si no existen
+            }
+        }
+
+        // Colorear las sucursales en verde para diferenciarlas
+        for (Station branch : branches) {
+            if (graphStreamGraph.getNode(branch.getName()) != null) {
+                graphStreamGraph.getNode(branch.getName()).setAttribute("ui.style", "fill-color: green;");
+                graphStreamGraph.getNode(branch.getName()).setAttribute("ui.label", branch.getName());  // Mostrar el nombre de la estación
+            }
+        }
+
+        // Volver a mostrar el grafo en la interfaz
+        graphStreamGraph.display();
     }
 
     // Muestra el grafo con las estaciones y conexiones
@@ -375,6 +421,12 @@ public class GUI extends JFrame {
         System.out.println("Sucursales creadas (BFS): " + branches.toString());
     }
 
+    // Agregar una estación al grafo
+//    private void addStationToGraph(String stationName) {
+//        if (graphStreamGraph.getNode(stationName) == null) {
+//            graphStreamGraph.addNode(stationName).setAttribute("ui.label", stationName);
+//        }
+//    }
     // Agrega una arista si no existe entre dos estaciones
     private void addEdgeIfNotExists(String station1, String station2) {
         // Asegúrate de que las estaciones sean diferentes

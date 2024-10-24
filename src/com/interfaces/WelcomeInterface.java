@@ -6,6 +6,8 @@ package com.interfaces;
 
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
+import com.graph.LinkedList;
+import com.graph.Station;
 
 /**
  *
@@ -13,28 +15,29 @@ import javax.swing.JPanel;
  */
 public class WelcomeInterface extends javax.swing.JFrame {
 
+    private GUI gui;  // Instancia de GUI
+
     /**
      * Creates new form WelcomeInterface
      */
     public WelcomeInterface() {
         initComponents();
-        
+
         Page1 p1 = new Page1();
         ShowPanel(p1);
 
     }
-    
-    private void ShowPanel(JPanel p){
-     p.setSize(389, 178);
-     p.setLocation(0, 0);
 
-     content.removeAll();
-     content.setLayout(new BorderLayout());
-     content.add(p, BorderLayout.CENTER);
-     content.revalidate();
-     content.repaint();
+    private void ShowPanel(JPanel p) {
+        p.setSize(389, 178);
+        p.setLocation(0, 0);
+
+        content.removeAll();
+        content.setLayout(new BorderLayout());
+        content.add(p, BorderLayout.CENTER);
+        content.revalidate();
+        content.repaint();
     }
-
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -51,7 +54,7 @@ public class WelcomeInterface extends javax.swing.JFrame {
         showGraphButton = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         addStation = new javax.swing.JButton();
-        addBranch = new javax.swing.JButton();
+        totalCoverage = new javax.swing.JButton();
         deleteBranch = new javax.swing.JButton();
         setT = new javax.swing.JButton();
         branchCoverage = new javax.swing.JButton();
@@ -90,15 +93,15 @@ public class WelcomeInterface extends javax.swing.JFrame {
                 addStationActionPerformed(evt);
             }
         });
-        jPanel2.add(addStation, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 50, 170, -1));
+        jPanel2.add(addStation, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 30, 170, -1));
 
-        addBranch.setText("Add Branch");
-        addBranch.addActionListener(new java.awt.event.ActionListener() {
+        totalCoverage.setText("Total Coverage");
+        totalCoverage.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                addBranchActionPerformed(evt);
+                totalCoverageActionPerformed(evt);
             }
         });
-        jPanel2.add(addBranch, new org.netbeans.lib.awtextra.AbsoluteConstraints(-3, 90, 180, -1));
+        jPanel2.add(totalCoverage, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 230, 170, -1));
 
         deleteBranch.setText("Delete Branch");
         deleteBranch.addActionListener(new java.awt.event.ActionListener() {
@@ -114,7 +117,7 @@ public class WelcomeInterface extends javax.swing.JFrame {
                 setTActionPerformed(evt);
             }
         });
-        jPanel2.add(setT, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 170, 180, -1));
+        jPanel2.add(setT, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 80, 170, -1));
 
         branchCoverage.setText("Branch Coverage");
         branchCoverage.addActionListener(new java.awt.event.ActionListener() {
@@ -122,7 +125,7 @@ public class WelcomeInterface extends javax.swing.JFrame {
                 branchCoverageActionPerformed(evt);
             }
         });
-        jPanel2.add(branchCoverage, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 210, 170, -1));
+        jPanel2.add(branchCoverage, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 180, 170, -1));
 
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 170, 300));
 
@@ -147,9 +150,11 @@ public class WelcomeInterface extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void showGraphButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showGraphButtonActionPerformed
-        GUI gui = new GUI();
+        if (gui == null) {  // Solo crea la instancia una vez
+            gui = new GUI();
+        }
         gui.show();
-        
+
     }//GEN-LAST:event_showGraphButtonActionPerformed
 
     private void addStationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addStationActionPerformed
@@ -159,16 +164,22 @@ public class WelcomeInterface extends javax.swing.JFrame {
 
     }//GEN-LAST:event_addStationActionPerformed
 
-    private void addBranchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addBranchActionPerformed
+    private void totalCoverageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_totalCoverageActionPerformed
         // TODO add your handling code here:
         Page2 p2 = new Page2();
         ShowPanel(p2);
-    }//GEN-LAST:event_addBranchActionPerformed
+    }//GEN-LAST:event_totalCoverageActionPerformed
 
     private void deleteBranchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBranchActionPerformed
-        // TODO add your handling code here:
-        Page3 p3 = new Page3();
-        ShowPanel(p3);
+        if (gui == null) {  // Solo crea la instancia una vez si no existe
+            gui = new GUI();
+        }
+        // Obtén la lista de sucursales desde GUI
+        LinkedList<Station> branches = gui.getBranches();
+
+        // Pasa las sucursales a la interfaz Page3
+        Page3 p3 = new Page3(gui);  // Le pasamos la lista de sucursales y la instancia de GUI
+        ShowPanel(p3);  // Muestra la interfaz
     }//GEN-LAST:event_deleteBranchActionPerformed
 
     private void setTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setTActionPerformed
@@ -219,7 +230,6 @@ public class WelcomeInterface extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton addBranch;
     private javax.swing.JButton addStation;
     private javax.swing.JButton branchCoverage;
     private javax.swing.JPanel content;
@@ -230,5 +240,6 @@ public class WelcomeInterface extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JButton setT;
     private javax.swing.JButton showGraphButton;
+    private javax.swing.JButton totalCoverage;
     // End of variables declaration//GEN-END:variables
 }

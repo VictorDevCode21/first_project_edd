@@ -4,17 +4,25 @@
  */
 package com.interfaces;
 
+import com.graph.NetworkTrain;
+import com.graph.Station;
+import com.graph.LinkedList;
+
 /**
  *
  * @author Joao
  */
 public class Page3 extends javax.swing.JPanel {
 
+    private GUI gui; // Referencia a la clase GUI para obtener las sucursales
+
     /**
      * Creates new form Page3
      */
-    public Page3() {
+    public Page3(GUI gui) {
+        this.gui = gui; // Asigna el objeto GUI
         initComponents();
+        displayBranchesList(); // Llama al método que muestra la lista de sucursales
     }
 
     /**
@@ -26,25 +34,105 @@ public class Page3 extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTextArea2 = new javax.swing.JTextArea();
         jPanel3 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        inputRemoveBranch = new javax.swing.JTextField();
+        removeBranchButton = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        showBranchesList = new javax.swing.JTextArea();
+
+        jTextArea2.setColumns(20);
+        jTextArea2.setRows(5);
+        jScrollPane2.setViewportView(jTextArea2);
 
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel3.setBackground(new java.awt.Color(255, 255, 255));
         jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel1.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(102, 102, 102));
-        jLabel1.setText("Delete Branch");
-        jPanel3.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 10, 100, -1));
+        jLabel2.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel2.setText("Introduce el nombre de la sucursal a eliminar:");
+        jPanel3.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 90, 250, -1));
 
-        add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 370, 140));
+        inputRemoveBranch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                inputRemoveBranchActionPerformed(evt);
+            }
+        });
+        jPanel3.add(inputRemoveBranch, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 110, 160, -1));
+
+        removeBranchButton.setBackground(new java.awt.Color(0, 0, 0));
+        removeBranchButton.setText("Remove");
+        removeBranchButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                removeBranchButtonActionPerformed(evt);
+            }
+        });
+        jPanel3.add(removeBranchButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 110, -1, -1));
+
+        showBranchesList.setColumns(20);
+        showBranchesList.setRows(5);
+        jScrollPane1.setViewportView(showBranchesList);
+
+        jPanel3.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 0, -1, -1));
+
+        add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 370, -1));
     }// </editor-fold>//GEN-END:initComponents
+
+    // Método para obtener la lista de sucursales desde GUI y mostrarla en el TextArea
+    private void displayBranchesList() {
+        LinkedList<Station> branches = gui.getBranches(); // Obtiene la lista de sucursales desde GUI
+        StringBuilder branchesText = new StringBuilder();
+
+        // Recorre la lista y convierte cada estación a una cadena de texto
+        for (int i = 0; i < branches.size(); i++) {
+            Station branch = branches.get(i); // Obtiene cada estación
+            branchesText.append(branch.getName()).append("\n"); // Convierte a texto
+        }
+
+        // Actualiza el TextArea con la lista de sucursales
+        showBranchesList.setText(branchesText.toString());
+    }
+
+
+    private void inputRemoveBranchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inputRemoveBranchActionPerformed
+
+
+    }//GEN-LAST:event_inputRemoveBranchActionPerformed
+
+    private void removeBranchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeBranchButtonActionPerformed
+        // Obtiene el texto ingresado por el usuario
+        String branchName = inputRemoveBranch.getText().trim();
+
+        // Verifica si el texto no está vacío
+        if (!branchName.isEmpty()) {
+            // Obtiene la referencia a la instancia de NetworkTrain a través de GUI
+            NetworkTrain networkTrain = gui.getNetworkTrain();  // Asumo que tienes un método en GUI para obtener el grafo
+
+            // Busca la sucursal en NetworkTrain (el grafo) y la elimina
+            Station branchStation = networkTrain.getStationByName(branchName); // Método en NetworkTrain para obtener la estación
+            if (branchStation != null) {
+                gui.removeBranch(branchStation); // Llama al método removeBranch en GUI para eliminar la sucursal
+                displayBranchesList(); // Actualiza la lista en el TextArea
+                gui.updateGraph(); // Actualiza el grafo después de eliminar la sucursal
+            } else {
+                // Si la sucursal no existe, puedes mostrar un mensaje de error o manejar el caso
+                System.out.println("Sucursal no encontrada.");
+            }
+        }
+    }//GEN-LAST:event_removeBranchButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JTextField inputRemoveBranch;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTextArea jTextArea2;
+    private javax.swing.JButton removeBranchButton;
+    private javax.swing.JTextArea showBranchesList;
     // End of variables declaration//GEN-END:variables
 }
