@@ -1,5 +1,6 @@
 package com.interfaces;
 
+import com.graph.BranchListener;
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import com.graph.LinkedList;
@@ -14,7 +15,7 @@ import javax.swing.JOptionPane;
  *
  * @author PC
  */
-public class WelcomeInterface extends javax.swing.JFrame implements StationLoadListener, PanelChangeListener, TValueListener {
+public class WelcomeInterface extends javax.swing.JFrame implements StationLoadListener, PanelChangeListener, TValueListener, BranchListener {
 
     private GUI gui;  // Instancia de GUI
     private boolean isGraphShown = false; // Variable para controlar si el grafo ha sido mostrado
@@ -33,6 +34,10 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
         if (isGraphShown) {
             Page1 p1 = new Page1(gui);
             ShowPanel(p1);
+        }
+
+        if (gui != null) {
+            gui.addBranchListener(this);
         }
 
     }
@@ -163,6 +168,18 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    // Este método será llamado cuando se active el evento
+    @Override
+    public void onBranchChanged() {
+        // Aquí puedes implementar la lógica para actualizar el estado de las sucursales
+        updateBranchesDisplay(); // Método que actualiza la visualización de sucursales
+    }
+
+    // Método para actualizar la visualización de las sucursales
+    private void updateBranchesDisplay() {
+        LinkedList<Station> branches = gui.getBranches();
+    }
+
     @Override
     public void onStationsLoaded(LinkedList<Station> loadedStations) {
         // Aquí puedes manejar las estaciones cargadas
@@ -228,7 +245,7 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
         try {
             checkNetworkLoaded();
 
-            Page2 p2 = new Page2();
+            Page2 p2 = new Page2(gui, this);
             ShowPanel(p2);
         } catch (Exception e) {
             // Maneja el error si checkNetworkLoaded lanza una excepción

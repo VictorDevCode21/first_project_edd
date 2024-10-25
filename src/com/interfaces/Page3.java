@@ -4,6 +4,7 @@
  */
 package com.interfaces;
 
+import com.graph.BranchListener;
 import com.graph.NetworkTrain;
 import com.graph.Station;
 import com.graph.LinkedList;
@@ -22,6 +23,15 @@ public class Page3 extends javax.swing.JPanel {
     public Page3(GUI gui) {
         this.gui = gui; // Asigna el objeto GUI
         initComponents();
+
+        // Registro como BranchListener
+        gui.addBranchListener(new BranchListener() {
+            @Override
+            public void onBranchChanged() {
+                displayBranchesList(); // Actualiza la lista cuando cambian las sucursales
+            }
+        });
+
         displayBranchesList(); // Llama al método que muestra la lista de sucursales
     }
 
@@ -117,6 +127,8 @@ public class Page3 extends javax.swing.JPanel {
             Station branchStation = networkTrain.getStationByName(branchName); // Método en NetworkTrain para obtener la estación
             if (branchStation != null) {
                 gui.removeBranch(branchStation); // Llama al método removeBranch en GUI para eliminar la sucursal
+                gui.checkTotalCoverage(); // Verifica la cobertura total después de eliminar la sucursal
+
                 displayBranchesList(); // Actualiza la lista en el TextArea
                 gui.updateGraph2(); // Actualiza el grafo después de eliminar la sucursal
             } else {

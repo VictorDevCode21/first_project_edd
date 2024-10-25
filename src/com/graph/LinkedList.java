@@ -36,7 +36,16 @@ public class LinkedList<T> implements Iterable<T> {
         }
     }
 
-//    Agrega un nuevo nodo al inicio
+    // Método para agregar una lista de estaciones a la lista
+    public void addAll(LinkedList<? extends T> stations) {
+        Node<? extends T> current = stations.getHead();
+        while (current != null) {
+            add(current.getData()); // Agrega cada estación usando el método add
+            current = current.getNext();
+        }
+    }
+
+    // Agrega un nuevo nodo al inicio
     public void addFirst(T data) {
         Node<T> newNode = new Node<>(data);
 
@@ -174,12 +183,33 @@ public class LinkedList<T> implements Iterable<T> {
     public boolean isEmpty() {
         return head == null;
     }
-    
+
     // Elimina todos los nodos y pointers    
     public void clear() {
         head = null;  // Limpiar la lista
         last = null;  // Opcional
         size = 0;     // Restablecer tamaño
+    }
+
+    // Método para eliminar todos los elementos de otra lista
+    public void removeAll(LinkedList<T> other) {
+        Node<T> current = other.getHead();
+        while (current != null) {
+            remove(current.getData()); // Elimina cada elemento de "other" de la lista actual
+            current = current.getNext();
+        }
+    }
+
+    // Método para verificar si contiene todos los elementos de otra lista
+    public boolean containsAll(LinkedList<T> other) {
+        Node<T> current = other.getHead();
+        while (current != null) {
+            if (!contains(current.getData())) { // Usa el método contains
+                return false; // Si no contiene algún elemento, retorna false
+            }
+            current = current.getNext();
+        }
+        return true; // Si contiene todos, retorna true
     }
 
     @Override
