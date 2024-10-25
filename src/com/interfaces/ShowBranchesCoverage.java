@@ -5,19 +5,54 @@
 package com.interfaces;
 
 import com.graph.LinkedList;
+import com.graph.NetworkTrain;
+import com.graph.PanelChangeListener;
+import com.graph.Station;
 
 /**
  *
  * @author Joao
  */
 public class ShowBranchesCoverage extends javax.swing.JPanel {
-    private LinkedList coveredStations;
+
+    private LinkedList<Station> coveredStations;
+    private PanelChangeListener listener; // Referencia al listener
+    private GUI gui;
+    private NetworkTrain networkTrain;
 
     /**
      * Creates new form Page5
      */
-    public ShowBranchesCoverage(LinkedList coveredStations) {
+    public ShowBranchesCoverage(LinkedList<Station> coveredStations, PanelChangeListener listener,GUI gui , NetworkTrain networkTrain ) {
+        this.coveredStations = coveredStations; // Almacenar la lista de sucursales
+        this.listener = listener;
+        this.gui = gui;
+        this.networkTrain = networkTrain;
         initComponents();
+        displayCoveredStations(); // Llamar al método para mostrar las estaciones
+    }
+
+    private void displayCoveredStations() {
+        LinkedList stationNames = new LinkedList(); // Crear una nueva lista enlazada para los nombres de las estaciones
+
+        // Iterar a través de coveredStations
+        for (int i = 0; i < coveredStations.size(); i++) {
+            Station station = (Station) coveredStations.get(i); // Obtener cada estación
+            stationNames.add(station.getName()); // Agregar el nombre a la lista
+        }
+
+        // Establecer el texto en el JTextArea directamente
+        showBranches.setText(convertListToString(stationNames));
+    }
+
+    private String convertListToString(LinkedList list) {
+        String result = ""; // Inicializa una cadena vacía
+
+        for (int i = 0; i < list.size(); i++) {
+            result += list.get(i) + "\n"; // Concatenar cada elemento con un salto de línea
+        }
+
+        return result; // Retornar la cadena final
     }
 
     /**
@@ -32,7 +67,7 @@ public class ShowBranchesCoverage extends javax.swing.JPanel {
         jPanel1 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        showBranches = new javax.swing.JTextArea();
         closeButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
@@ -41,31 +76,37 @@ public class ShowBranchesCoverage extends javax.swing.JPanel {
         jPanel3.setBackground(new java.awt.Color(255, 255, 255));
         jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jTextArea1.setBackground(new java.awt.Color(0, 0, 0));
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane1.setViewportView(jTextArea1);
+        showBranches.setBackground(new java.awt.Color(153, 153, 153));
+        showBranches.setColumns(20);
+        showBranches.setRows(5);
+        jScrollPane1.setViewportView(showBranches);
 
-        jPanel3.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(68, 10, 240, -1));
+        jPanel3.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 10, 260, -1));
 
-        closeButton.setBackground(new java.awt.Color(0, 0, 0));
+        closeButton.setBackground(new java.awt.Color(153, 153, 153));
         closeButton.setText("Close");
         closeButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 closeButtonActionPerformed(evt);
             }
         });
-        jPanel3.add(closeButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 100, -1, 20));
+        jPanel3.add(closeButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 110, -1, 20));
 
         jLabel1.setForeground(new java.awt.Color(0, 0, 0));
         jLabel1.setText("Lista de Sucursales cubiertas");
-        jPanel3.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 100, -1, -1));
+        jPanel3.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 110, -1, -1));
 
         add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 370, 140));
     }// </editor-fold>//GEN-END:initComponents
 
     private void closeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeButtonActionPerformed
-        // TODO add your handling code here:
+
+        if (listener != null) {
+            // Asegúrate de tener una instancia de Page5
+            Page5 page5Panel = new Page5(gui, networkTrain, listener); // O usa una referencia existente si ya fue creada
+
+            listener.onChangePanel(page5Panel); // Llama al método para cambiar a Page5
+        }
     }//GEN-LAST:event_closeButtonActionPerformed
 
 
@@ -75,6 +116,6 @@ public class ShowBranchesCoverage extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JTextArea showBranches;
     // End of variables declaration//GEN-END:variables
 }

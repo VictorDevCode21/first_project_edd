@@ -1,29 +1,32 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package com.interfaces;
 
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import com.graph.LinkedList;
+import com.graph.NetworkTrain;
+import com.graph.PanelChangeListener;
 import com.graph.Station;
+import com.graph.StationLoadListener;
 import javax.swing.JOptionPane;
 
 /**
  *
  * @author PC
  */
-public class WelcomeInterface extends javax.swing.JFrame {
+public class WelcomeInterface extends javax.swing.JFrame implements StationLoadListener, PanelChangeListener {
 
     private GUI gui;  // Instancia de GUI
     private boolean isGraphShown = false; // Variable para controlar si el grafo ha sido mostrado
+    private NetworkTrain networkTrain; // Variablepara almacenar instancia de NetworkTrain
+    private LinkedList<Station> stations; // Para almacenar estaciones cargadas
 
     /**
      * Creates new form WelcomeInterface
      */
     public WelcomeInterface() {
         initComponents();
+        // Inicializa NetworkTrain al crear la WelcomeInterface
+        this.networkTrain = new NetworkTrain();
 
         Page1 p1 = new Page1();
         ShowPanel(p1);
@@ -39,6 +42,11 @@ public class WelcomeInterface extends javax.swing.JFrame {
         content.add(p, BorderLayout.CENTER);
         content.revalidate();
         content.repaint();
+    }
+
+    @Override
+    public void onChangePanel(JPanel newPanel) {
+        ShowPanel(newPanel);
     }
 
     /**
@@ -151,25 +159,31 @@ public class WelcomeInterface extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    @Override
+    public void onStationsLoaded(LinkedList<Station> loadedStations) {
+        // Aquí puedes manejar las estaciones cargadas
+        // Por ejemplo, puedes guardarlas en una variable de instancia
+        this.stations = loadedStations; // Asegúrate de tener un campo para guardar las estaciones en WelcomeInterface
+    }
+
     private void showGraphButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showGraphButtonActionPerformed
         if (gui == null) {  // Solo crea la instancia una vez
-            gui = new GUI();
+            gui = new GUI(networkTrain);
+            gui.addStationLoadListener(this); // Agrega el listener aquí
         }
         gui.show();
-        isGraphShown = true; // Cambiamos la variable a true una vez que se muestra el grafo
+
     }//GEN-LAST:event_showGraphButtonActionPerformed
 
     private void addStationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addStationActionPerformed
-        if (!isGraphShown) {
-            JOptionPane.showMessageDialog(this, "Por favor haga click en 'Show Graph' antes de continuar.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+        checkNetworkLoaded();
         Page1 p1 = new Page1();
         ShowPanel(p1);
 
     }//GEN-LAST:event_addStationActionPerformed
 
     private void totalCoverageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_totalCoverageActionPerformed
+        checkNetworkLoaded();
         if (!isGraphShown) {
             JOptionPane.showMessageDialog(this, "Por favor haga click en 'Show Graph' antes de continuar.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
@@ -179,6 +193,7 @@ public class WelcomeInterface extends javax.swing.JFrame {
     }//GEN-LAST:event_totalCoverageActionPerformed
 
     private void deleteBranchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBranchActionPerformed
+        checkNetworkLoaded();
         if (!isGraphShown) {
             JOptionPane.showMessageDialog(this, "Por favor haga click en 'Show Graph' antes de poder borrar sucursales.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
@@ -192,6 +207,7 @@ public class WelcomeInterface extends javax.swing.JFrame {
     }//GEN-LAST:event_deleteBranchActionPerformed
 
     private void setTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setTActionPerformed
+        checkNetworkLoaded();
         if (!isGraphShown) {
             JOptionPane.showMessageDialog(this, "Por favor haga click en 'Show Graph' antes de continuar.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
@@ -201,13 +217,27 @@ public class WelcomeInterface extends javax.swing.JFrame {
     }//GEN-LAST:event_setTActionPerformed
 
     private void branchCoverageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_branchCoverageActionPerformed
+        checkNetworkLoaded();
+
         if (!isGraphShown) {
             JOptionPane.showMessageDialog(this, "Por favor haga click en 'Show Graph' antes de continuar.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        Page5 p5 = new Page5(gui);
+
+        // Obtén la lista de sucursales desde GUI
+        LinkedList<Station> branches = gui.getBranches();
+
+        Page5 p5 = new Page5(gui, networkTrain, this);
         ShowPanel(p5);
     }//GEN-LAST:event_branchCoverageActionPerformed
+
+    private void checkNetworkLoaded() {
+        if (gui.isNetworkLoaded()) {
+            isGraphShown = true; // Solo cambia a true si todo ha sido cargado correctamente
+        } else {
+            isGraphShown = false; // Si hay error se mantiene en false
+        }
+    }
 
     /**
      * @param args the command line arguments
