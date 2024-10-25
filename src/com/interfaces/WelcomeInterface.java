@@ -73,10 +73,11 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
         showGraphButton = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         addStation = new javax.swing.JButton();
-        totalCoverage = new javax.swing.JButton();
+        addLineButton = new javax.swing.JButton();
         deleteBranch = new javax.swing.JButton();
         setT = new javax.swing.JButton();
         branchCoverage = new javax.swing.JButton();
+        totalCoverage1 = new javax.swing.JButton();
         content = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -112,15 +113,15 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
                 addStationActionPerformed(evt);
             }
         });
-        jPanel2.add(addStation, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 30, 170, -1));
+        jPanel2.add(addStation, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 10, 170, -1));
 
-        totalCoverage.setText("Total Coverage");
-        totalCoverage.addActionListener(new java.awt.event.ActionListener() {
+        addLineButton.setText("Add Line");
+        addLineButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                totalCoverageActionPerformed(evt);
+                addLineButtonActionPerformed(evt);
             }
         });
-        jPanel2.add(totalCoverage, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 230, 170, -1));
+        jPanel2.add(addLineButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 230, 170, -1));
 
         deleteBranch.setText("Delete Branch");
         deleteBranch.addActionListener(new java.awt.event.ActionListener() {
@@ -128,7 +129,7 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
                 deleteBranchActionPerformed(evt);
             }
         });
-        jPanel2.add(deleteBranch, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 130, 170, -1));
+        jPanel2.add(deleteBranch, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 90, 170, -1));
 
         setT.setText("Set T");
         setT.addActionListener(new java.awt.event.ActionListener() {
@@ -136,7 +137,7 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
                 setTActionPerformed(evt);
             }
         });
-        jPanel2.add(setT, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 80, 170, -1));
+        jPanel2.add(setT, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 50, 170, -1));
 
         branchCoverage.setText("Branch Coverage");
         branchCoverage.addActionListener(new java.awt.event.ActionListener() {
@@ -144,7 +145,15 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
                 branchCoverageActionPerformed(evt);
             }
         });
-        jPanel2.add(branchCoverage, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 180, 170, -1));
+        jPanel2.add(branchCoverage, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 130, 170, -1));
+
+        totalCoverage1.setText("Total Coverage");
+        totalCoverage1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                totalCoverage1ActionPerformed(evt);
+            }
+        });
+        jPanel2.add(totalCoverage1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 180, 170, -1));
 
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 170, 300));
 
@@ -241,19 +250,19 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
 
     }//GEN-LAST:event_addStationActionPerformed
 
-    private void totalCoverageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_totalCoverageActionPerformed
+    private void addLineButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addLineButtonActionPerformed
         try {
             checkNetworkLoaded();
 
-            Page2 p2 = new Page2(gui, this);
-            ShowPanel(p2);
+            Page6 p6 = new Page6(gui , networkTrain);
+            ShowPanel(p6);
         } catch (Exception e) {
             // Maneja el error si checkNetworkLoaded lanza una excepción
             JOptionPane.showMessageDialog(this,
                     "Error: La red no está cargada correctamente. Por favor, cargue la red antes de proceder.",
                     "Error de carga de red", JOptionPane.ERROR_MESSAGE);
         }
-    }//GEN-LAST:event_totalCoverageActionPerformed
+    }//GEN-LAST:event_addLineButtonActionPerformed
 
     private void deleteBranchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBranchActionPerformed
         try {
@@ -299,6 +308,10 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
                     "Error de carga de red", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_branchCoverageActionPerformed
+
+    private void totalCoverage1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_totalCoverage1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_totalCoverage1ActionPerformed
 
     //  Revisa si las estaciones estan cargadas 
     private void checkNetworkLoaded() {
@@ -350,6 +363,7 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton addLineButton;
     private javax.swing.JButton addStation;
     private javax.swing.JButton branchCoverage;
     private javax.swing.JPanel content;
@@ -360,6 +374,6 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
     private javax.swing.JPanel jPanel2;
     private javax.swing.JButton setT;
     private javax.swing.JButton showGraphButton;
-    private javax.swing.JButton totalCoverage;
+    private javax.swing.JButton totalCoverage1;
     // End of variables declaration//GEN-END:variables
 }

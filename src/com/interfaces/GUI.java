@@ -12,6 +12,7 @@ import com.graph.Stack;
 import com.graph.Queue;
 
 import com.graph.DepthFirstSearch;
+import com.graph.NetworkTrainListener;
 import com.graph.StationLoadListener;
 import com.graph.TValueListener;
 
@@ -38,7 +39,7 @@ import org.json.JSONTokener;
  *
  * @author carlos
  */
-public class GUI extends JFrame implements BranchListener, AlgorithmSelectionListener {
+public class GUI extends JFrame implements BranchListener, AlgorithmSelectionListener, NetworkTrainListener {
 
     private NetworkTrain networkTrain;
     private Graph graphStreamGraph;
@@ -62,8 +63,26 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         stations = new LinkedList<>();
         bListeners = new LinkedList<>();  // Inicializar la lista de listeners
+        networkTrain.addListener(this);
         initUI();
     }
+    
+    
+    @Override
+    public void onStationAdded(Station station) {
+        System.out.println("Nueva estación agregada desde GUI: " + station.getName());
+        // Lógica para actualizar la interfaz gráfica con la nueva estación
+        updateGraph();
+    }
+
+    @Override
+    public void onConnectionAdded(Station station1, Station station2) {
+        System.out.println("Nueva conexión agregada desde GUI: " + station1.getName() + " y " + station2.getName());
+        // Lógica para actualizar la interfaz gráfica con la nueva conexión
+        updateGraph();
+    }
+    
+    
 
     @Override
     public void onAlgorithmSelected(boolean isBFS) {
