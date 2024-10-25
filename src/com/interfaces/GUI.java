@@ -3,12 +3,12 @@ package com.interfaces;
 import com.graph.NetworkTrain;
 import com.graph.LinkedList;
 import com.graph.Node;
-import com.graph.Connection;
 import com.graph.BreadthFirstSearch;
 import com.graph.BFSListener;
 import com.graph.Station;
 import com.graph.Stack;
 import com.graph.Queue;
+
 import com.graph.DepthFirstSearch;
 import com.graph.StationLoadListener;
 
@@ -114,7 +114,8 @@ public class GUI extends JFrame {
 
         try {
             // Muestra un cuadro de diálogo para ingresar la estación inicial
-            String startStationName = JOptionPane.showInputDialog(this, "Ingrese el nombre de la estación de inicio:");
+            String startStationName = JOptionPane.showInputDialog(this,
+                    "Ingrese el nombre de la estación de inicio:");
 
             if (startStationName != null && !startStationName.trim().isEmpty()) {
                 // Muestra un cuadro de diálogo para seleccionar el algoritmo
@@ -358,6 +359,31 @@ public class GUI extends JFrame {
         return networkTrain.getNeighbors(station);
     }
 
+    // Método para ejecutar el BFS y colorear las estaciones
+    private void runBFS(Station startStation) {
+        BreadthFirstSearch bfs = new BreadthFirstSearch(startStation, new LinkedList<Station>());
+        //Guardar las estaciones visitadas en una LinkedList
+        LinkedList<Station> visitedStations = new LinkedList<>();
+
+        bfs.traverse(new BFSListener() {
+            @Override
+            public void stationVisited(Station station) {
+                // Verifica si la estación ya ha sido visitada
+                if (!visitedStations.contains(station)) {
+                    visitedStations.add(station); // Marcar estación como visitada
+                    JOptionPane.showMessageDialog(null, "La estación ha sido agregada exitosamente",
+                            "Aviso", JOptionPane.INFORMATION_MESSAGE);
+                    if (graphStreamGraph.getNode(station.getName()) != null) {
+                        graphStreamGraph.getNode(station.getName()).setAttribute("ui.style", "fill-color: green;");
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(null, "La estación ya existe",
+                            "Aviso", JOptionPane.WARNING_MESSAGE);
+                }
+            }
+        });
+    }
+
     private void runDFS(Station startStation, int T) {
         // Inicializamos la primera sucursal
         branches.add(startStation);
@@ -424,11 +450,11 @@ public class GUI extends JFrame {
                             }
 
                             // Imprimir la sucursal creada
-//                            System.out.println("Sucursal creada en: " + neighbor.getName() + ", distancia: " + distances.get(neighbor));
+                            System.out.println("Sucursal creada en: " + neighbor.getName() + ", distancia: " + distances.get(neighbor));
                         } else {
                             // Si ya hay una sucursal cercana, registrar el intento de colocar la sucursal
-//                            System.out.println("No se colocó la sucursal en " + neighbor.getName() + " a distancia " + distances.get(neighbor)
-//                                    + " porque está a menos de T de la sucursal " + conflictingBranch.getName() + ".");
+                            System.out.println("No se colocó la sucursal en " + neighbor.getName() + " a distancia " + distances.get(neighbor)
+                                    + " porque está a menos de T de la sucursal " + conflictingBranch.getName() + ".");
                         }
                     }
                 }
@@ -440,11 +466,11 @@ public class GUI extends JFrame {
         for (Map.Entry<Station, Integer> entry : distances.entrySet()) {
             Station station = entry.getKey();
             Integer distance = entry.getValue();
-//            System.out.println("Estación: " + station.getName() + ", Distancia: " + distance);
+            System.out.println("Estación: " + station.getName() + ", Distancia: " + distance);
         }
 
         // Mostrar las sucursales creadas
-//        System.out.println("Sucursales creadas (DFS): " + branches.toString());
+        System.out.println("Sucursales creadas (DFS): " + branches.toString());
     }
 
     private void runBFS(Station startStation, int T) {
@@ -618,5 +644,4 @@ public class GUI extends JFrame {
             }
         });
     }
-
 }
