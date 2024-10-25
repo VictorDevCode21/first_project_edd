@@ -52,11 +52,11 @@ public class GUI extends JFrame {
         stations = new LinkedList<>();
         initUI();
     }
-    
+
     public void addStationLoadListener(StationLoadListener listener) {
         listeners.add(listener);
     }
-    
+
     // Método para notificar a los oyentes
     private void notifyStationsLoaded() {
         for (StationLoadListener listener : listeners) {
@@ -64,7 +64,6 @@ public class GUI extends JFrame {
         }
     }
 
-    
     private void initUI() {
         // Paneles y componentes
         JButton loadButton = new JButton("Cargar Red de Transporte");
@@ -89,7 +88,7 @@ public class GUI extends JFrame {
 
                         // Mostrar la red en GraphStream
                         showNetworkTrain(jsonObject);
-                        
+
                         // Notificar a los oyentes que las estaciones han sido cargadas
                         notifyStationsLoaded();
                     } catch (IOException ex) {
@@ -107,7 +106,7 @@ public class GUI extends JFrame {
         add(loadButton, BorderLayout.NORTH);
         // Otros componentes y configuraciones
     }
-    
+
     // Muestra el grafo con las estaciones y conexiones
     private void showNetworkTrain(JSONObject jsonObject) {
         System.setProperty("org.graphstream.ui", "swing");
@@ -261,7 +260,6 @@ public class GUI extends JFrame {
         // Volver a mostrar el grafo en la interfaz
         graphStreamGraph.display();
     }
-
 
     private int calculateDistance(Station from, Station to) {
         if (from.equals(to)) {
@@ -475,13 +473,24 @@ public class GUI extends JFrame {
                     queue.enqueue(neighbor);
                     distances.put(neighbor, distances.get(current) + 1);
 
-                    // Aquí decides cuándo agregar una nueva sucursal
+                    // Verificar si la distancia desde la sucursal inicial es divisible entre T
                     if (distances.get(neighbor) % T == 0) {
-                        branches.add(neighbor);
+                        // Verificar si la nueva estación genera un conflicto
+                        boolean conflict = checkForConflict(neighbor, T);
 
-                        // Colorear la nueva sucursal en verde
-                        if (graphStreamGraph.getNode(neighbor.getName()) != null) {
-                            graphStreamGraph.getNode(neighbor.getName()).setAttribute("ui.style", "fill-color: green;");
+                        if (conflict) {
+                            // Si hay conflicto, no se agrega la sucursal y se muestra el mensaje
+                            System.out.println("Conflicto encontrado: no se puede agregar la sucursal " + neighbor.getName());
+                        } else {
+                            // Agregar la sucursal si no hay conflictos
+                            branches.add(neighbor);
+
+                            // Colorear la nueva sucursal en verde
+                            if (graphStreamGraph.getNode(neighbor.getName()) != null) {
+                                graphStreamGraph.getNode(neighbor.getName()).setAttribute("ui.style", "fill-color: green;");
+                            }
+                            System.out.println("Sucursal agregada: " + neighbor.getName() + " (Distancia desde inicio: "
+                                    + distances.get(neighbor) + ")");
                         }
                     }
                 }
@@ -497,11 +506,56 @@ public class GUI extends JFrame {
             if (graphStreamGraph.getNode(station.getName()) != null) {
                 graphStreamGraph.getNode(station.getName()).setAttribute("ui.label", station.getName() + " " + distance);
             }
-
-//            System.out.println("Estación: " + station.getName() + ", Distancia: " + distance);
         }
 
         System.out.println("Sucursales creadas (BFS): " + branches.toString());
+    }
+
+    /**
+     * Método auxiliar que verifica si una sucursal entra en conflicto con otra
+     * ya existente
+     *
+     * @param newBranch la estación que se quiere convertir en sucursal
+     * @param T la distancia máxima permitida entre sucursales
+     * @return true si hay conflicto, false si no lo hay
+     */
+    private boolean checkForConflict(Station newBranch, int T) {
+        Queue<Station> queue = new Queue<>();
+        Set<Station> visitedStations = new HashSet<>();
+        Map<Station, Integer> distances = new HashMap<>();
+        distances.put(newBranch, 0);
+
+        queue.enqueue(newBranch);
+        visitedStations.add(newBranch);
+
+        while (!queue.isEmpty()) {
+            Station current = queue.dequeue();
+            LinkedList<Station> neighbors = networkTrain.getNeighbors(current); // Obtener vecinos
+
+            for (Station neighbor : neighbors) {
+                if (!visitedStations.contains(neighbor)) {
+                    visitedStations.add(neighbor);
+                    distances.put(neighbor, distances.get(current) + 1);
+
+                    // Verificar si estamos a una distancia mayor que T
+                    if (distances.get(neighbor) >= T) {
+                        return false; // No hay conflicto
+                    }
+
+                    // Verificar si el vecino es una sucursal existente
+                    if (branches.contains(neighbor)) {
+                        System.out.println("Conflicto encontrado: no se puede agregar la sucursal " + newBranch.getName());
+                        System.out.println("Suc. Conflictiva: " + neighbor.getName() + " (Distancia desde "
+                                + newBranch.getName() + ": " + distances.get(neighbor) + ")");
+                        return true; // Hay conflicto
+                    }
+
+                    queue.enqueue(neighbor);
+                }
+            }
+        }
+
+        return false; // No hay conflicto
     }
 
     // Agregar una estación al grafo
