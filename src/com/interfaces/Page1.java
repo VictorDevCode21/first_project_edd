@@ -109,7 +109,7 @@ public class Page1 extends javax.swing.JPanel {
         // Agregar la nueva sucursal
         branches.add(stationToAdd);
         JOptionPane.showMessageDialog(this, "Sucursal agregada exitosamente: " + stationName, "Éxito", JOptionPane.INFORMATION_MESSAGE);
-        gui.updateGraph(); // Actualiza el grafo después de eliminar la sucursal
+        gui.updateGraph2(); // Actualiza el grafo después de eliminar la sucursal
 
     }//GEN-LAST:event_addBranchButtonActionPerformed
 

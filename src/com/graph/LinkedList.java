@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this auxlate
- */
 package com.graph;
 
 import java.util.Iterator;
@@ -177,6 +173,13 @@ public class LinkedList<T> implements Iterable<T> {
     // Retorna true si la lista esta vacia, de lo contrario retorna false
     public boolean isEmpty() {
         return head == null;
+    }
+    
+    // Elimina todos los nodos y pointers    
+    public void clear() {
+        head = null;  // Limpiar la lista
+        last = null;  // Opcional
+        size = 0;     // Restablecer tamaño
     }
 
     @Override

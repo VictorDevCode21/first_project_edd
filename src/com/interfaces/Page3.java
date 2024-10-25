@@ -53,9 +53,10 @@ public class Page3 extends javax.swing.JPanel {
         jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel2.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel2.setText("Introduce el nombre de la sucursal a eliminar:");
+        jLabel2.setText("Nombre de sucursal a eliminar:");
         jPanel3.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 90, 250, -1));
 
+        inputRemoveBranch.setBackground(new java.awt.Color(153, 153, 153));
         inputRemoveBranch.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 inputRemoveBranchActionPerformed(evt);
@@ -63,7 +64,7 @@ public class Page3 extends javax.swing.JPanel {
         });
         jPanel3.add(inputRemoveBranch, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 110, 160, -1));
 
-        removeBranchButton.setBackground(new java.awt.Color(0, 0, 0));
+        removeBranchButton.setBackground(new java.awt.Color(153, 153, 153));
         removeBranchButton.setText("Remove");
         removeBranchButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -72,6 +73,7 @@ public class Page3 extends javax.swing.JPanel {
         });
         jPanel3.add(removeBranchButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 110, -1, -1));
 
+        showBranchesList.setBackground(new java.awt.Color(153, 153, 153));
         showBranchesList.setColumns(20);
         showBranchesList.setRows(5);
         jScrollPane1.setViewportView(showBranchesList);
@@ -116,7 +118,7 @@ public class Page3 extends javax.swing.JPanel {
             if (branchStation != null) {
                 gui.removeBranch(branchStation); // Llama al método removeBranch en GUI para eliminar la sucursal
                 displayBranchesList(); // Actualiza la lista en el TextArea
-                gui.updateGraph(); // Actualiza el grafo después de eliminar la sucursal
+                gui.updateGraph2(); // Actualiza el grafo después de eliminar la sucursal
             } else {
                 // Si la sucursal no existe, puedes mostrar un mensaje de error o manejar el caso
                 System.out.println("Sucursal no encontrada.");
