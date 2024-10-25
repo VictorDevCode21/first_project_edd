@@ -1,16 +1,19 @@
 package com.interfaces;
 
+import com.graph.AlgorithmSelectionListener;
 import com.graph.NetworkTrain;
 import com.graph.LinkedList;
 import com.graph.Node;
 import com.graph.BreadthFirstSearch;
 import com.graph.BFSListener;
+import com.graph.BranchListener;
 import com.graph.Station;
 import com.graph.Stack;
 import com.graph.Queue;
 
 import com.graph.DepthFirstSearch;
 import com.graph.StationLoadListener;
+import com.graph.TValueListener;
 
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.SingleGraph;
@@ -35,22 +38,98 @@ import org.json.JSONTokener;
  *
  * @author carlos
  */
-public class GUI extends JFrame {
+public class GUI extends JFrame implements BranchListener, AlgorithmSelectionListener {
 
     private NetworkTrain networkTrain;
     private Graph graphStreamGraph;
     private LinkedList<String> stations;
     private LinkedList<Station> branches; // Lista para almacenar sucursales
     private int T; // Para guardar el T que representa distancia entre estaciones
-    private LinkedList<StationLoadListener> listeners = new LinkedList();
+    private LinkedList<StationLoadListener> listeners = new LinkedList(); // Lista para agregar estaciones
+    private String selectedAlgorithm;  // Variable para almacenar el algoritmo seleccionado
+    private String startStationName;   // Variable para almacenar la estación inicial
+    private boolean isNetworkWindowOpen = false; // Controlar si la ventana de red está abierta
+    private LinkedList<TValueListener> tValueListeners = new LinkedList<>();
+    private LinkedList<BranchListener> bListeners;  // Lista de listeners
+    private boolean algorithmSelected; // Variable para mantener el algoritmo seleccionado
+    private LinkedList<AlgorithmSelectionListener> aListeners = new LinkedList<>();
 
     public GUI(NetworkTrain networkTrain) {
         this.networkTrain = networkTrain;
+        this.branches = new LinkedList();
         setTitle("Supermarket Location Planner");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         stations = new LinkedList<>();
+        bListeners = new LinkedList<>();  // Inicializar la lista de listeners
         initUI();
+    }
+
+    @Override
+    public void onAlgorithmSelected(boolean isBFS) {
+        algorithmSelected = isBFS; // Actualiza el estado según la selección
+    }
+
+    // Método para añadir un listener
+    public void addAlgorithmSelectionListener(AlgorithmSelectionListener aListener) {
+        aListeners.add(aListener);
+    }
+
+    // Método para eliminar un listener
+    public void removeAlgorithmSelectionListener(AlgorithmSelectionListener aListener) {
+        aListeners.remove(aListener);
+    }
+
+    // Método para notificar a los listeners
+    public void notifyAlgorithmSelection(boolean useBFS) {
+        for (AlgorithmSelectionListener aListener : aListeners) {
+            aListener.onAlgorithmSelected(useBFS);
+        }
+    }
+
+    public boolean isDFSSelected() {
+        return algorithmSelected; // Método para obtener el estado del algoritmo
+    }
+
+    @Override
+    public void onBranchChanged() {
+        // Lógica para actualizar el estado de la GUI cuando cambian las sucursales
+        checkTotalCoverage();  // Verifica la cobertura total
+        suggestNewBranches(algorithmSelected);  // Sugiere nuevas sucursales
+    }
+
+    // Método para añadir una sucursal
+    public void addBranch(Station branch) {
+        branches.add(branch);
+        notifyListeners();  // Notificar a los listeners
+    }
+
+    // Método para registrar un listener
+    public void addBranchListener(BranchListener bListener) {
+        bListeners.add(bListener);
+    }
+
+    // Método para notificar a todos los listeners
+    private void notifyListeners() {
+        for (BranchListener bListener : bListeners) {
+            bListener.onBranchChanged();  // Llamar al método de cambio
+        }
+    }
+
+    public void addTValueListener(TValueListener listener) {
+        tValueListeners.add(listener);
+    }
+
+    private void notifyTValueChanged(int newT) {
+        for (TValueListener listener : tValueListeners) {
+            listener.onTValueChanged(newT);
+        }
+    }
+
+    public void setT(int newT) {
+        this.T = newT;  // Actualiza el valor de T
+        notifyTValueChanged(newT);
+        updateGraph();  // Llama a updateGraph para redibujar el grafo y crear las sucursales
     }
 
     public void addStationLoadListener(StationLoadListener listener) {
@@ -70,6 +149,8 @@ public class GUI extends JFrame {
         loadButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // Deshabilitar el botón para evitar múltiples cargas
+                loadButton.setEnabled(false);
                 JFileChooser fileChooser = new JFileChooser();
                 int result = fileChooser.showOpenDialog(null);
                 if (result == JFileChooser.APPROVE_OPTION) {
@@ -85,6 +166,8 @@ public class GUI extends JFrame {
                         networkTrain = new NetworkTrain();
                         networkTrain.loadFromJson(jsonObject);
                         branches = new LinkedList<>();
+
+                        loadButton.setEnabled(false); // Deshabilita el botón para evitar múltiples cargas
 
                         // Mostrar la red en GraphStream
                         showNetworkTrain(jsonObject);
@@ -109,6 +192,11 @@ public class GUI extends JFrame {
 
     // Muestra el grafo con las estaciones y conexiones
     private void showNetworkTrain(JSONObject jsonObject) {
+        if (isNetworkWindowOpen) {
+            // Si la ventana ya está abierta, no hacemos nada
+            return;
+        }
+//        System.out.println("showNetworkTrain called");
         System.setProperty("org.graphstream.ui", "swing");
         graphStreamGraph = new SingleGraph("Metro Network");
 
@@ -130,8 +218,7 @@ public class GUI extends JFrame {
                         algorithms[0]
                 );
 
-                T = Integer.parseInt(JOptionPane.showInputDialog(this, "Ingrese la distancia T entre sucursales:"));
-
+//                T = Integer.parseInt(JOptionPane.showInputDialog(this, "Ingrese la distancia T entre sucursales:"));
                 // Cargar y visualizar la red en GraphStream
                 String networkName = jsonObject.keys().next();
                 JSONArray metroLines = jsonObject.getJSONArray(networkName);
@@ -186,14 +273,18 @@ public class GUI extends JFrame {
 
                 // Mostrar el grafo
                 graphStreamGraph.display();
+                isNetworkWindowOpen = true; // Marcar que la ventana está abierta
+
+                this.startStationName = startStationName;  // Guardar el nombre de la estación inicial
+                this.selectedAlgorithm = selectedAlgorithm;  // Guardar el algoritmo seleccionado
 
                 // Ejecutar el algoritmo seleccionado
                 Station startStation = networkTrain.getStationByName(startStationName);
                 if (startStation != null) {
                     if ("BFS".equals(selectedAlgorithm)) {
-                        runBFS(startStation, T);
+                        runBFS(startStation);
                     } else if ("DFS".equals(selectedAlgorithm)) {
-                        runDFS(startStation, T);
+                        runDFS(startStation);
                     }
                 } else {
                     JOptionPane.showMessageDialog(this, "Estación no encontrada: " + startStationName);
@@ -206,25 +297,207 @@ public class GUI extends JFrame {
         }
     }
 
-    // Verificar si networkTrain ha sido cargado para validaciones de otros botones en la WelcomeInterface   
-    public boolean isNetworkLoaded() {
-        return networkTrain != null;
+    // Método para verificar la cobertura total
+    public boolean checkTotalCoverage() {
+        boolean useBFS = algorithmSelected;
+
+        LinkedList<Station> allStations = networkTrain.getStations(); // Obtén todas las estaciones de la red
+        LinkedList<Station> coveredStations = new LinkedList<>(); // Lista de estaciones cubiertas
+
+        // Obtener la cobertura usando el algoritmo correspondiente
+        for (Station branch : branches) {
+            if (useBFS) {
+                addCoveredStations(coveredStations, getCoveredStationsBFS(branch));
+            } else {
+                addCoveredStations(coveredStations, getCoveredStationsDFS(branch));
+            }
+        }
+
+        // Verificar si todas las estaciones están cubiertas
+        return coveredStations.containsAll(allStations); // Devuelve true si todas las estaciones están cubiertas
     }
 
-    // Devuelve una lista de las sucursales creadas    
-    public LinkedList<Station> getBranches() {
-        // Supongamos que tienes una lista de sucursales en tu clase GUI
-        return this.branches; // Devuelve la lista de sucursales como una lista de Strings
+    // Método auxiliar para agregar estaciones cubiertas sin duplicados
+    private void addCoveredStations(LinkedList<Station> coveredStations, LinkedList<Station> newStations) {
+        for (int i = 0; i < newStations.size(); i++) {
+            Station station = newStations.get(i);
+            if (!coveredStations.contains(station)) { // Verifica si la estación ya está cubierta
+                coveredStations.add(station); // Agrega la estación solo si no está ya en la lista
+            }
+        }
     }
 
-    public NetworkTrain getNetworkTrain() {
-        return this.networkTrain;  // Donde networkTrain es la instancia de tu grafo
+    // Método para obtener las estaciones no cubiertas
+    public LinkedList<Station> getUncoveredStations(boolean useBFS) {
+        LinkedList<Station> allStations = networkTrain.getStations(); // Todas las estaciones de la red
+        LinkedList<Station> coveredStations = new LinkedList<>(); // Lista de estaciones cubiertas
+
+        // Obtener la cobertura de las sucursales actuales
+        for (Station branch : branches) {
+            if (useBFS) {
+                coveredStations.addAll(getCoveredStationsBFS(branch));
+            } else {
+                coveredStations.addAll(getCoveredStationsDFS(branch));
+            }
+        }
+
+        // Lista para las estaciones no cubiertas
+        LinkedList<Station> uncoveredStations = new LinkedList<>();
+
+        if (useBFS) {
+            // Obtener la cobertura usando BFS
+            for (int i = 0; i < branches.size(); i++) {
+                Station branch = branches.get(i);
+                coveredStations.addAll(getCoveredStationsBFS(branch));
+            }
+        } else {
+            // Obtener la cobertura usando DFS
+            for (int i = 0; i < branches.size(); i++) {
+                Station branch = branches.get(i);
+                coveredStations.addAll(getCoveredStationsDFS(branch));
+            }
+        }
+
+        // Agregar estaciones no cubiertas a la lista
+        for (Station station : allStations) {
+            if (!coveredStations.contains(station)) {
+                uncoveredStations.add(station);
+            }
+        }
+
+        // Encontrar las estaciones que no están en la lista de estaciones cubiertas
+        for (int i = 0; i < allStations.size(); i++) {
+            Station station = allStations.get(i);
+            if (!coveredStations.contains(station)) {
+                uncoveredStations.add(station); // Agregar a las no cubiertas
+            }
+        }
+
+        return uncoveredStations; // Devolver las estaciones no cubiertas
     }
 
-    public void removeBranch(Station branchName) {
-        branches.remove(branchName);  // Remueve la sucursal de la lista
-        // Actualiza la visualización del grafo, si corresponde.
-        updateGraph();
+    public String suggestNewBranches(boolean useBFS) {
+        int maxDistance = T;
+        LinkedList<Station> uncoveredStations = getUncoveredStations(useBFS);
+        Map<Station, LinkedList<Station>> coverageMap = new HashMap<>();
+        Set<Station> suggestedBranches = new HashSet<>();
+
+        for (Station station : uncoveredStations) {
+            LinkedList<Station> coverage;
+
+            // Elegir DFS o BFS
+            if (useBFS) {
+                coverage = getCoveredStationsBFS(station, maxDistance);
+            } else {
+                coverage = getCoveredStationsDFS(station, maxDistance);
+            }
+
+            coverageMap.put(station, coverage);
+        }
+
+        // Verificar cuál estación cubriría más estaciones
+        Station bestStation = null;
+        int maxCoverage = 0;
+        LinkedList<Station> bestCoverageStations = new LinkedList<>();
+
+        for (Station station : coverageMap.keySet()) {
+            LinkedList<Station> coverage = coverageMap.get(station);
+            int coverageCount = coverage.size();
+
+            if (coverageCount > maxCoverage) {
+                maxCoverage = coverageCount;
+                bestStation = station;
+                bestCoverageStations = coverage;
+            }
+        }
+
+        // Construir el resultado
+        if (bestStation != null) {
+            StringBuilder suggestion = new StringBuilder();
+            suggestion.append("Sugerencia: Colocar una sucursal en ").append(bestStation.getName())
+                    .append(" cubriría ").append(maxCoverage).append(" estaciones no cubiertas.\n");
+
+            suggestion.append("Estaciones cubiertas: ");
+            for (Station station : bestCoverageStations) {
+                suggestion.append(station.getName()).append(", ");
+            }
+            suggestion.setLength(suggestion.length() - 2); // Remover la última coma
+
+            return suggestion.toString();
+        } else {
+            return "No se encontraron estaciones para sugerir.";
+        }
+    }
+
+    public void cleanBranches() {
+        LinkedList<Station> uniqueBranches = new LinkedList<>(); // Crear una nueva lista para sucursales únicas
+
+        for (Station branch : branches) {
+            if (!uniqueBranches.contains(branch)) { // Verifica si la sucursal ya está en la lista de únicas
+                uniqueBranches.add(branch); // Si no está, añádela
+            }
+        }
+
+        branches.clear(); // Limpiar la lista original de sucursales
+        branches.addAll(uniqueBranches); // Agregar de nuevo solo las sucursales únicas
+    }
+
+
+    // Método para obtener estaciones cubiertas por varias sucursales usando DFS
+    public LinkedList<Station> getCoveredStationsDFS(Station start, int maxDistance) {
+        LinkedList<Station> coveredStations = new LinkedList<>();
+        Set<Station> visited = new HashSet<>();
+        runDFS(start, coveredStations, visited, 0, maxDistance);
+        return coveredStations;
+    }
+
+    // Método auxiliar para ejecutar getCoveredStationsDFS
+    private void runDFS(Station current, LinkedList<Station> coveredStations, Set<Station> visited, int depth, int maxDistance) {
+        if (depth > maxDistance || visited.contains(current) || branches.contains(current)) {
+            return; // Parar si superamos la distancia máxima, ya fue visitada, o es sucursal
+        }
+        visited.add(current);
+        coveredStations.add(current);
+
+        // Recorrer los vecinos
+        for (Station neighbor : getNeighbors(current)) {
+            if (!visited.contains(neighbor)) {
+                runDFS(neighbor, coveredStations, visited, depth + 1, maxDistance);
+            }
+        }
+    }
+
+    // Método para obtener estaciones cubiertas por varias sucursales usando BFS
+    public LinkedList<Station> getCoveredStationsBFS(Station start, int maxDistance) {
+        LinkedList<Station> coveredStations = new LinkedList<>();
+        Set<Station> visited = new HashSet<>();
+        Queue<Station> queue = new Queue<>();
+        Map<Station, Integer> distances = new HashMap<>();
+
+        queue.enqueue(start);
+        distances.put(start, 0);
+
+        while (!queue.isEmpty()) {
+            Station current = queue.dequeue();
+            int currentDistance = distances.get(current);
+
+            if (currentDistance > maxDistance || branches.contains(current)) {
+                continue; // Saltar si estamos fuera del rango o si es una sucursal
+            }
+
+            coveredStations.add(current);
+            visited.add(current);
+
+            // Recorrer los vecinos
+            for (Station neighbor : getNeighbors(current)) {
+                if (!visited.contains(neighbor) && !distances.containsKey(neighbor)) {
+                    distances.put(neighbor, currentDistance + 1);
+                    queue.enqueue(neighbor);
+                }
+            }
+        }
+
+        return coveredStations;
     }
 
     public void updateGraph() {
@@ -232,21 +505,32 @@ public class GUI extends JFrame {
             return;  // Si el grafo o la red no están cargados, no hay nada que actualizar
         }
 
-        // Limpiar el grafo actual para volver a cargar la red desde el estado actual de `networkTrain`
-        graphStreamGraph.clear();
+        // Limpiar el grafo actual
+        graphStreamGraph.clear(); // Asegúrate de que esto se maneje correctamente.
 
         // Volver a agregar todas las estaciones y conexiones desde la red de transporte
         LinkedList<Station> allStations = networkTrain.getStations();
 
-        // Recorrer todas las estaciones de la red y añadirlas al grafo de GraphStream
+        // Añadir todas las estaciones al grafo
         for (Station station : allStations) {
             addStationToGraph(station.getName());  // Añadir la estación al grafo
+        }
 
-            // Obtener los vecinos (conexiones) de la estación actual
+        // Añadir las conexiones entre las estaciones
+        for (Station station : allStations) {
             LinkedList<Station> neighbors = networkTrain.getNeighbors(station);
-
             for (Station neighbor : neighbors) {
                 addEdgeIfNotExists(station.getName(), neighbor.getName());  // Añadir las conexiones si no existen
+            }
+        }
+
+        // Ejecutar el algoritmo seleccionado de nuevo para recalcular las sucursales
+        Station startStation = networkTrain.getStationByName(startStationName);   // Obtiene la estación inicial
+        if (startStation != null) {
+            if ("BFS".equals(selectedAlgorithm)) {
+                runBFS(startStation);
+            } else if ("DFS".equals(selectedAlgorithm)) {
+                runDFS(startStation);
             }
         }
 
@@ -258,8 +542,8 @@ public class GUI extends JFrame {
             }
         }
 
-        // Volver a mostrar el grafo en la interfaz
-        graphStreamGraph.display();
+        // Aquí no llamamos a display() nuevamente
+        // graphStreamGraph.display();  // Esto es innecesario
     }
 
     private int calculateDistance(Station from, Station to) {
@@ -300,6 +584,33 @@ public class GUI extends JFrame {
 
         // Si no se encuentra el destino, retornar -1 o alguna señal de error
         return -1;
+    }
+
+    // Verificar si networkTrain ha sido cargado para validaciones de otros botones en la WelcomeInterface   
+    public boolean isNetworkLoaded() {
+        return networkTrain != null;
+    }
+
+    // Devuelve una lista de las sucursales creadas    
+    public LinkedList<Station> getBranches() {
+        // Supongamos que tienes una lista de sucursales en tu clase GUI
+        return this.branches; // Devuelve la lista de sucursales como una lista de Strings
+    }
+
+    public NetworkTrain getNetworkTrain() {
+        return this.networkTrain;  // Donde networkTrain es la instancia de tu grafo
+    }
+
+    public void removeBranch(Station branchName) {
+        branches.remove(branchName);  // Remueve la sucursal de la lista
+        notifyListeners();  // Notificar a los listeners
+
+        // Remueve la visualización de la sucursal en el grafo
+        if (graphStreamGraph.getNode(branchName.getName()) != null) {
+            graphStreamGraph.getNode(branchName.getName()).setAttribute("ui.style", "fill-color: grey;"); // Cambia el color para mostrar que ya no es una sucursal
+        }
+
+        updateGraph2();
     }
 
     // Método para obtener las estaciones cubiertas usando DFS
@@ -359,33 +670,10 @@ public class GUI extends JFrame {
         return networkTrain.getNeighbors(station);
     }
 
-    // Método para ejecutar el BFS y colorear las estaciones
-    private void runBFS(Station startStation) {
-        BreadthFirstSearch bfs = new BreadthFirstSearch(startStation, new LinkedList<Station>());
-        //Guardar las estaciones visitadas en una LinkedList
-        LinkedList<Station> visitedStations = new LinkedList<>();
-
-        bfs.traverse(new BFSListener() {
-            @Override
-            public void stationVisited(Station station) {
-                // Verifica si la estación ya ha sido visitada
-                if (!visitedStations.contains(station)) {
-                    visitedStations.add(station); // Marcar estación como visitada
-                    JOptionPane.showMessageDialog(null, "La estación ha sido agregada exitosamente",
-                            "Aviso", JOptionPane.INFORMATION_MESSAGE);
-                    if (graphStreamGraph.getNode(station.getName()) != null) {
-                        graphStreamGraph.getNode(station.getName()).setAttribute("ui.style", "fill-color: green;");
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(null, "La estación ya existe",
-                            "Aviso", JOptionPane.WARNING_MESSAGE);
-                }
-            }
-        });
-    }
-
-    private void runDFS(Station startStation, int T) {
+    private void runDFS(Station startStation) {
+        int T = this.T;
         // Inicializamos la primera sucursal
+        branches.clear();
         branches.add(startStation);
         Map<Station, Integer> distances = new HashMap<>();
         distances.put(startStation, 0); // La distancia de la estación inicial es 0
@@ -470,12 +758,14 @@ public class GUI extends JFrame {
         }
 
         // Mostrar las sucursales creadas
-        System.out.println("Sucursales creadas (DFS): " + branches.toString());
+//        System.out.println("Sucursales creadas (DFS): " + branches.toString());
     }
 
-    private void runBFS(Station startStation, int T) {
+    private void runBFS(Station startStation) {
+        int T = this.T;
         // Inicializar la distancia de la estación inicial
         Queue<Station> queue = new Queue<>();
+        branches.clear();
         branches.add(startStation); // Sucursal inicial
         Set<Station> visitedStations = new HashSet<>();
         Map<Station, Integer> distances = new HashMap<>();
@@ -515,8 +805,8 @@ public class GUI extends JFrame {
                             if (graphStreamGraph.getNode(neighbor.getName()) != null) {
                                 graphStreamGraph.getNode(neighbor.getName()).setAttribute("ui.style", "fill-color: green;");
                             }
-                            System.out.println("Sucursal agregada: " + neighbor.getName() + " (Distancia desde inicio: "
-                                    + distances.get(neighbor) + ")");
+//                            System.out.println("Sucursal agregada: " + neighbor.getName() + " (Distancia desde inicio: "
+//                                    + distances.get(neighbor) + ")");
                         }
                     }
                 }
@@ -570,9 +860,9 @@ public class GUI extends JFrame {
 
                     // Verificar si el vecino es una sucursal existente
                     if (branches.contains(neighbor)) {
-                        System.out.println("Conflicto encontrado: no se puede agregar la sucursal " + newBranch.getName());
-                        System.out.println("Suc. Conflictiva: " + neighbor.getName() + " (Distancia desde "
-                                + newBranch.getName() + ": " + distances.get(neighbor) + ")");
+//                        System.out.println("Conflicto encontrado: no se puede agregar la sucursal " + newBranch.getName());
+//                        System.out.println("Suc. Conflictiva: " + neighbor.getName() + " (Distancia desde "
+//                                + newBranch.getName() + ": " + distances.get(neighbor) + ")");
                         return true; // Hay conflicto
                     }
 
@@ -632,6 +922,47 @@ public class GUI extends JFrame {
     // Método para obtener el valor de T
     public int getT() {
         return this.T;
+    }
+
+    public void updateGraph2() {
+        if (graphStreamGraph == null || networkTrain == null) {
+            return;  // Si el grafo o la red no están cargados, no hay nada que actualizar
+        }
+
+        // Obtén todas las estaciones de la red
+        LinkedList<Station> allStations = networkTrain.getStations();
+
+        // Recorrer todas las estaciones de la red
+        for (Station station : allStations) {
+            // Verifica si la estación ya está en el grafo antes de agregarla
+            if (graphStreamGraph.getNode(station.getName()) == null) {
+                addStationToGraph(station.getName());  // Añadir la estación al grafo si no está
+            }
+
+            // Obtener los vecinos (conexiones) de la estación actual
+            LinkedList<Station> neighbors = networkTrain.getNeighbors(station);
+
+            // Recorrer todos los vecinos (conexiones) de la estación actual
+            for (Station neighbor : neighbors) {
+                // Verificar si la conexión ya existe antes de añadirla
+                if (graphStreamGraph.getEdge(station.getName() + "-" + neighbor.getName()) == null
+                        && graphStreamGraph.getEdge(neighbor.getName() + "-" + station.getName()) == null) {
+                    addEdgeIfNotExists(station.getName(), neighbor.getName());  // Añadir la conexión si no existe
+                }
+            }
+        }
+
+        // Actualizar las estaciones que son sucursales
+        for (Station branch : branches) {
+            if (graphStreamGraph.getNode(branch.getName()) != null) {
+                // Colorear en verde las estaciones que son sucursales
+                graphStreamGraph.getNode(branch.getName()).setAttribute("ui.style", "fill-color: green;");
+                graphStreamGraph.getNode(branch.getName()).setAttribute("ui.label", branch.getName());  // Mostrar el nombre de la estación
+            }
+        }
+
+        // Si quieres actualizar la interfaz gráfica, puedes seguir mostrando el grafo
+//        graphStreamGraph.display();
     }
 
     public static void main(String[] args) {

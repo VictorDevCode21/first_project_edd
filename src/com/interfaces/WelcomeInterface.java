@@ -1,5 +1,6 @@
 package com.interfaces;
 
+import com.graph.BranchListener;
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import com.graph.LinkedList;
@@ -7,18 +8,20 @@ import com.graph.NetworkTrain;
 import com.graph.PanelChangeListener;
 import com.graph.Station;
 import com.graph.StationLoadListener;
+import com.graph.TValueListener;
 import javax.swing.JOptionPane;
 
 /**
  *
  * @author PC
  */
-public class WelcomeInterface extends javax.swing.JFrame implements StationLoadListener, PanelChangeListener {
+public class WelcomeInterface extends javax.swing.JFrame implements StationLoadListener, PanelChangeListener, TValueListener, BranchListener {
 
     private GUI gui;  // Instancia de GUI
     private boolean isGraphShown = false; // Variable para controlar si el grafo ha sido mostrado
     private NetworkTrain networkTrain; // Variablepara almacenar instancia de NetworkTrain
     private LinkedList<Station> stations; // Para almacenar estaciones cargadas
+    private int tValue = -1; // Almacena el valor de T
 
     /**
      * Creates new form WelcomeInterface
@@ -28,8 +31,14 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
         // Inicializa NetworkTrain al crear la WelcomeInterface
         this.networkTrain = new NetworkTrain();
 
-        Page1 p1 = new Page1();
-        ShowPanel(p1);
+        if (isGraphShown) {
+            Page1 p1 = new Page1(gui);
+            ShowPanel(p1);
+        }
+
+        if (gui != null) {
+            gui.addBranchListener(this);
+        }
 
     }
 
@@ -159,6 +168,18 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    // Este método será llamado cuando se active el evento
+    @Override
+    public void onBranchChanged() {
+        // Aquí puedes implementar la lógica para actualizar el estado de las sucursales
+        updateBranchesDisplay(); // Método que actualiza la visualización de sucursales
+    }
+
+    // Método para actualizar la visualización de las sucursales
+    private void updateBranchesDisplay() {
+        LinkedList<Station> branches = gui.getBranches();
+    }
+
     @Override
     public void onStationsLoaded(LinkedList<Station> loadedStations) {
         // Aquí puedes manejar las estaciones cargadas
@@ -166,76 +187,130 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
         this.stations = loadedStations; // Asegúrate de tener un campo para guardar las estaciones en WelcomeInterface
     }
 
+    @Override
+    public void onTValueChanged(int newT) {
+        this.tValue = newT;  // Almacena el valor T
+        if (gui != null) {
+            gui.setT(newT); // Actualiza el valor T en GUI
+            // Si es necesario, aquí puedes llamar a gui.updateGraph();
+            gui.updateGraph();
+        }
+    }
+
+
     private void showGraphButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showGraphButtonActionPerformed
+        // Verifica si tValue es -1 (no establecido)
+        if (tValue == -1) {
+            // Muestra un mensaje de error pidiendo al usuario que establezca T
+            JOptionPane.showMessageDialog(this,
+                    "Por favor, establezca un valor para T haciendo clic en el botón 'Set T'.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;  // Sale del método si T no está establecido
+        }
+
         if (gui == null) {  // Solo crea la instancia una vez
             gui = new GUI(networkTrain);
             gui.addStationLoadListener(this); // Agrega el listener aquí
+            gui.setT(tValue);  // Establece el valor T almacenado
         }
-        gui.show();
+
+        if (!gui.isVisible()) {
+            gui.setVisible(true);  // Asegúrate de que solo se abra si no está visible
+        } else {
+            gui.requestFocus();  // Si ya está abierta, tráela al frente
+        }
 
     }//GEN-LAST:event_showGraphButtonActionPerformed
 
     private void addStationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addStationActionPerformed
-        checkNetworkLoaded();
-        Page1 p1 = new Page1();
-        ShowPanel(p1);
+        try {
+            checkNetworkLoaded();
+
+            // Obtén la lista de sucursales desde GUI
+            LinkedList<Station> branches = gui.getBranches();
+
+            Page1 p1 = new Page1(gui);
+            ShowPanel(p1);
+        } catch (Exception e) {
+            // Maneja el error si checkNetworkLoaded lanza una excepción
+            JOptionPane.showMessageDialog(this,
+                    "Error: La red no está cargada correctamente. Por favor, cargue la red antes de proceder.",
+                    "Error de carga de red", JOptionPane.ERROR_MESSAGE);
+        }
 
     }//GEN-LAST:event_addStationActionPerformed
 
     private void totalCoverageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_totalCoverageActionPerformed
-        checkNetworkLoaded();
-        if (!isGraphShown) {
-            JOptionPane.showMessageDialog(this, "Por favor haga click en 'Show Graph' antes de continuar.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
+        try {
+            checkNetworkLoaded();
+
+            Page2 p2 = new Page2(gui, this);
+            ShowPanel(p2);
+        } catch (Exception e) {
+            // Maneja el error si checkNetworkLoaded lanza una excepción
+            JOptionPane.showMessageDialog(this,
+                    "Error: La red no está cargada correctamente. Por favor, cargue la red antes de proceder.",
+                    "Error de carga de red", JOptionPane.ERROR_MESSAGE);
         }
-        Page2 p2 = new Page2();
-        ShowPanel(p2);
     }//GEN-LAST:event_totalCoverageActionPerformed
 
     private void deleteBranchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBranchActionPerformed
-        checkNetworkLoaded();
-        if (!isGraphShown) {
-            JOptionPane.showMessageDialog(this, "Por favor haga click en 'Show Graph' antes de poder borrar sucursales.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        // Obtén la lista de sucursales desde GUI
-        LinkedList<Station> branches = gui.getBranches();
+        try {
+            checkNetworkLoaded();
 
-        // Pasa las sucursales a la interfaz Page3
-        Page3 p3 = new Page3(gui);  // Le pasamos la lista de sucursales y la instancia de GUI
-        ShowPanel(p3);  // Muestra la interfaz
+            // Obtén la lista de sucursales desde GUI
+            LinkedList<Station> branches = gui.getBranches();
+
+            // Pasa las sucursales a la interfaz Page3
+            Page3 p3 = new Page3(gui);  // Le pasamos la lista de sucursales y la instancia de GUI
+            ShowPanel(p3);  // Muestra la interfaz
+        } catch (Exception e) {
+            // Maneja el error si checkNetworkLoaded lanza una excepción
+            JOptionPane.showMessageDialog(this,
+                    "Error: La red no está cargada correctamente. Por favor, cargue la red antes de proceder.",
+                    "Error de carga de red", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_deleteBranchActionPerformed
 
     private void setTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setTActionPerformed
-        checkNetworkLoaded();
-        if (!isGraphShown) {
-            JOptionPane.showMessageDialog(this, "Por favor haga click en 'Show Graph' antes de continuar.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        Page4 p4 = new Page4();
+
+        Page4 p4 = new Page4(this);
         ShowPanel(p4);
+
     }//GEN-LAST:event_setTActionPerformed
 
     private void branchCoverageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_branchCoverageActionPerformed
-        checkNetworkLoaded();
+        try {
+            // Verifica si la red está cargada correctamente
+            checkNetworkLoaded();
 
-        if (!isGraphShown) {
-            JOptionPane.showMessageDialog(this, "Por favor haga click en 'Show Graph' antes de continuar.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
+            // Si la red está cargada, obten las branches
+            LinkedList<Station> branches = gui.getBranches();
+
+            // Crea y muestra el panel Page5 con los datos
+            Page5 p5 = new Page5(gui, networkTrain, this);
+            ShowPanel(p5);
+
+        } catch (Exception e) {
+            // Maneja el error si checkNetworkLoaded lanza una excepción
+            JOptionPane.showMessageDialog(this,
+                    "Error: La red no está cargada correctamente. Por favor, cargue la red antes de proceder.",
+                    "Error de carga de red", JOptionPane.ERROR_MESSAGE);
         }
-
-        // Obtén la lista de sucursales desde GUI
-        LinkedList<Station> branches = gui.getBranches();
-
-        Page5 p5 = new Page5(gui, networkTrain, this);
-        ShowPanel(p5);
     }//GEN-LAST:event_branchCoverageActionPerformed
 
+    //  Revisa si las estaciones estan cargadas 
     private void checkNetworkLoaded() {
+//        if (gui == null) {
+//            JOptionPane.showMessageDialog(this,
+//                    "La red no ha sido cargada. Por favor, haga click en 'Show Graph' antes de continuar.",
+//                    "Error", JOptionPane.ERROR_MESSAGE);
+//            return;
+//        }
+
         if (gui.isNetworkLoaded()) {
-            isGraphShown = true; // Solo cambia a true si todo ha sido cargado correctamente
-        } else {
-            isGraphShown = false; // Si hay error se mantiene en false
+            isGraphShown = true;
         }
     }
 

@@ -4,16 +4,22 @@
  */
 package com.interfaces;
 
+import com.graph.TValueListener;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author Joao
  */
 public class Page4 extends javax.swing.JPanel {
 
+    private TValueListener listener;  // Listener para notificar cambios
+
     /**
      * Creates new form Page4
      */
-    public Page4() {
+    public Page4(TValueListener listener) {
+        this.listener = listener;  // Inicializa el listener
         initComponents();
     }
 
@@ -27,24 +33,66 @@ public class Page4 extends javax.swing.JPanel {
     private void initComponents() {
 
         jPanel3 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
+        inputTValue = new javax.swing.JTextField();
+        stablishT = new javax.swing.JButton();
 
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel3.setBackground(new java.awt.Color(255, 255, 255));
         jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel1.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(102, 102, 102));
-        jLabel1.setText("Set T");
-        jPanel3.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 10, 50, -1));
+        jLabel2.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel2.setText("Establecer T");
+        jPanel3.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 20, -1, -1));
+
+        jLabel1.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel1.setText("Introduce el valor de T: ");
+        jPanel3.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 50, -1, -1));
+
+        inputTValue.setBackground(new java.awt.Color(153, 153, 153));
+        jPanel3.add(inputTValue, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 50, 100, 20));
+
+        stablishT.setBackground(new java.awt.Color(153, 153, 153));
+        stablishT.setText("Add");
+        stablishT.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                stablishTActionPerformed(evt);
+            }
+        });
+        jPanel3.add(stablishT, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 80, -1, -1));
 
         add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 370, 140));
     }// </editor-fold>//GEN-END:initComponents
 
+    private void stablishTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stablishTActionPerformed
+        try {
+            // Obtén el valor de T del campo de texto
+            int newT = Integer.parseInt(inputTValue.getText().trim());
+
+            // Notificar al listener sobre el cambio en T
+            if (listener != null) {
+                listener.onTValueChanged(newT);
+            } else {
+                // Manejar el caso en que el listener no esté asignado
+                JOptionPane.showMessageDialog(this, "Listener no está asignado.");
+            }
+
+            // Mostrar un mensaje de éxito
+            JOptionPane.showMessageDialog(this, "El valor de T se ha actualizado a: " + newT);
+        } catch (NumberFormatException e) {
+            // Manejo de errores: Si el valor no es un número válido
+            JOptionPane.showMessageDialog(this, "Por favor, introduce un valor numérico válido para T.");
+        }
+    }//GEN-LAST:event_stablishTActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField inputTValue;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JButton stablishT;
     // End of variables declaration//GEN-END:variables
 }
