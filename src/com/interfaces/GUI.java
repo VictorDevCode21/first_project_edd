@@ -22,6 +22,10 @@ import java.io.IOException;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,26 +44,19 @@ public class GUI extends JFrame {
     private int T; // Para guardar el T que representa distancia entre estaciones
     private LinkedList<StationLoadListener> listeners = new LinkedList();
 
-
     public GUI(NetworkTrain networkTrain) {
         this.networkTrain = networkTrain;
-
-
-    public GUI() {
-
         setTitle("Supermarket Location Planner");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         stations = new LinkedList<>();
         initUI();
-
-
     }
-    
+
     public void addStationLoadListener(StationLoadListener listener) {
         listeners.add(listener);
     }
-    
+
     // Método para notificar a los oyentes
     private void notifyStationsLoaded() {
         for (StationLoadListener listener : listeners) {
@@ -67,7 +64,6 @@ public class GUI extends JFrame {
         }
     }
 
-    
     private void initUI() {
         // Paneles y componentes
         JButton loadButton = new JButton("Cargar Red de Transporte");
@@ -92,7 +88,7 @@ public class GUI extends JFrame {
 
                         // Mostrar la red en GraphStream
                         showNetworkTrain(jsonObject);
-                        
+
                         // Notificar a los oyentes que las estaciones han sido cargadas
                         notifyStationsLoaded();
                     } catch (IOException ex) {
@@ -110,7 +106,7 @@ public class GUI extends JFrame {
         add(loadButton, BorderLayout.NORTH);
         // Otros componentes y configuraciones
     }
-    
+
     // Muestra el grafo con las estaciones y conexiones
     private void showNetworkTrain(JSONObject jsonObject) {
         System.setProperty("org.graphstream.ui", "swing");
@@ -118,7 +114,7 @@ public class GUI extends JFrame {
 
         try {
             // Muestra un cuadro de diálogo para ingresar la estación inicial
-            String startStationName = JOptionPane.showInputDialog(this, 
+            String startStationName = JOptionPane.showInputDialog(this,
                     "Ingrese el nombre de la estación de inicio:");
 
             if (startStationName != null && !startStationName.trim().isEmpty()) {
@@ -266,7 +262,6 @@ public class GUI extends JFrame {
         graphStreamGraph.display();
     }
 
-
     private int calculateDistance(Station from, Station to) {
         if (from.equals(to)) {
             return 0; // La distancia a sí misma es 0
@@ -306,7 +301,6 @@ public class GUI extends JFrame {
         // Si no se encuentra el destino, retornar -1 o alguna señal de error
         return -1;
     }
-
 
     // Método para obtener las estaciones cubiertas usando DFS
     public LinkedList<Station> getCoveredStationsDFS(Station startStation) {
@@ -365,7 +359,6 @@ public class GUI extends JFrame {
         return networkTrain.getNeighbors(station);
     }
 
-<
     // Método para ejecutar el BFS y colorear las estaciones
     private void runBFS(Station startStation) {
         BreadthFirstSearch bfs = new BreadthFirstSearch(startStation, new LinkedList<Station>());
@@ -378,14 +371,18 @@ public class GUI extends JFrame {
                 // Verifica si la estación ya ha sido visitada
                 if (!visitedStations.contains(station)) {
                     visitedStations.add(station); // Marcar estación como visitada
-                    JOptionPane.showMessageDialog(null, "La estación ha sido agregada exitosamente", 
-                             "Aviso", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "La estación ha sido agregada exitosamente",
+                            "Aviso", JOptionPane.INFORMATION_MESSAGE);
                     if (graphStreamGraph.getNode(station.getName()) != null) {
                         graphStreamGraph.getNode(station.getName()).setAttribute("ui.style", "fill-color: green;");
                     }
-                }else{
-                    JOptionPane.showMessageDialog(null, "La estación ya existe", 
-                             "Aviso", JOptionPane.WARNING_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(null, "La estación ya existe",
+                            "Aviso", JOptionPane.WARNING_MESSAGE);
+                }
+            }
+        });
+    }
 
     private void runDFS(Station startStation, int T) {
         // Inicializamos la primera sucursal
@@ -453,36 +450,27 @@ public class GUI extends JFrame {
                             }
 
                             // Imprimir la sucursal creada
-//                            System.out.println("Sucursal creada en: " + neighbor.getName() + ", distancia: " + distances.get(neighbor));
+                            System.out.println("Sucursal creada en: " + neighbor.getName() + ", distancia: " + distances.get(neighbor));
                         } else {
                             // Si ya hay una sucursal cercana, registrar el intento de colocar la sucursal
-//                            System.out.println("No se colocó la sucursal en " + neighbor.getName() + " a distancia " + distances.get(neighbor)
-//                                    + " porque está a menos de T de la sucursal " + conflictingBranch.getName() + ".");
+                            System.out.println("No se colocó la sucursal en " + neighbor.getName() + " a distancia " + distances.get(neighbor)
+                                    + " porque está a menos de T de la sucursal " + conflictingBranch.getName() + ".");
                         }
                     }
-
                 }
             }
         }
 
-        // Mostrar las estaciones visitadas
-        Node<Station> aux = bfs.getVisitedStations().getHead();
-        while (aux != null) {
-            Station station = aux.getData();
-              Station visitedStation = aux.getData();
-            System.out.println("Estación recorrida en BFS: " + visitedStation.getName()); // Debug
-            aux = aux.getNext();
-        }  
         // Mostrar todas las distancias y los nombres de las estaciones
         System.out.println("Distancias desde la estación inicial:");
         for (Map.Entry<Station, Integer> entry : distances.entrySet()) {
             Station station = entry.getKey();
             Integer distance = entry.getValue();
-//            System.out.println("Estación: " + station.getName() + ", Distancia: " + distance);
+            System.out.println("Estación: " + station.getName() + ", Distancia: " + distance);
         }
 
         // Mostrar las sucursales creadas
-//        System.out.println("Sucursales creadas (DFS): " + branches.toString());
+        System.out.println("Sucursales creadas (DFS): " + branches.toString());
     }
 
     private void runBFS(Station startStation, int T) {
@@ -511,13 +499,24 @@ public class GUI extends JFrame {
                     queue.enqueue(neighbor);
                     distances.put(neighbor, distances.get(current) + 1);
 
-                    // Aquí decides cuándo agregar una nueva sucursal
+                    // Verificar si la distancia desde la sucursal inicial es divisible entre T
                     if (distances.get(neighbor) % T == 0) {
-                        branches.add(neighbor);
+                        // Verificar si la nueva estación genera un conflicto
+                        boolean conflict = checkForConflict(neighbor, T);
 
-                        // Colorear la nueva sucursal en verde
-                        if (graphStreamGraph.getNode(neighbor.getName()) != null) {
-                            graphStreamGraph.getNode(neighbor.getName()).setAttribute("ui.style", "fill-color: green;");
+                        if (conflict) {
+                            // Si hay conflicto, no se agrega la sucursal y se muestra el mensaje
+                            System.out.println("Conflicto encontrado: no se puede agregar la sucursal " + neighbor.getName());
+                        } else {
+                            // Agregar la sucursal si no hay conflictos
+                            branches.add(neighbor);
+
+                            // Colorear la nueva sucursal en verde
+                            if (graphStreamGraph.getNode(neighbor.getName()) != null) {
+                                graphStreamGraph.getNode(neighbor.getName()).setAttribute("ui.style", "fill-color: green;");
+                            }
+                            System.out.println("Sucursal agregada: " + neighbor.getName() + " (Distancia desde inicio: "
+                                    + distances.get(neighbor) + ")");
                         }
                     }
                 }
@@ -533,11 +532,56 @@ public class GUI extends JFrame {
             if (graphStreamGraph.getNode(station.getName()) != null) {
                 graphStreamGraph.getNode(station.getName()).setAttribute("ui.label", station.getName() + " " + distance);
             }
-
-//            System.out.println("Estación: " + station.getName() + ", Distancia: " + distance);
         }
 
         System.out.println("Sucursales creadas (BFS): " + branches.toString());
+    }
+
+    /**
+     * Método auxiliar que verifica si una sucursal entra en conflicto con otra
+     * ya existente
+     *
+     * @param newBranch la estación que se quiere convertir en sucursal
+     * @param T la distancia máxima permitida entre sucursales
+     * @return true si hay conflicto, false si no lo hay
+     */
+    private boolean checkForConflict(Station newBranch, int T) {
+        Queue<Station> queue = new Queue<>();
+        Set<Station> visitedStations = new HashSet<>();
+        Map<Station, Integer> distances = new HashMap<>();
+        distances.put(newBranch, 0);
+
+        queue.enqueue(newBranch);
+        visitedStations.add(newBranch);
+
+        while (!queue.isEmpty()) {
+            Station current = queue.dequeue();
+            LinkedList<Station> neighbors = networkTrain.getNeighbors(current); // Obtener vecinos
+
+            for (Station neighbor : neighbors) {
+                if (!visitedStations.contains(neighbor)) {
+                    visitedStations.add(neighbor);
+                    distances.put(neighbor, distances.get(current) + 1);
+
+                    // Verificar si estamos a una distancia mayor que T
+                    if (distances.get(neighbor) >= T) {
+                        return false; // No hay conflicto
+                    }
+
+                    // Verificar si el vecino es una sucursal existente
+                    if (branches.contains(neighbor)) {
+                        System.out.println("Conflicto encontrado: no se puede agregar la sucursal " + newBranch.getName());
+                        System.out.println("Suc. Conflictiva: " + neighbor.getName() + " (Distancia desde "
+                                + newBranch.getName() + ": " + distances.get(neighbor) + ")");
+                        return true; // Hay conflicto
+                    }
+
+                    queue.enqueue(neighbor);
+                }
+            }
+        }
+
+        return false; // No hay conflicto
     }
 
     // Agregar una estación al grafo
@@ -574,20 +618,6 @@ public class GUI extends JFrame {
         }
     }
 
-    
-    // Verificación de que la estación no se repite
-    public void verificateStations(String station){
-            if (stations.contains(station)) {
-                JOptionPane.showMessageDialog(this, "La estación ya existe", 
-                        "Aviso", JOptionPane.WARNING_MESSAGE);
-            } else {
-                stations.add(station);
-                JOptionPane.showMessageDialog(this, "Estación añadida exitosamente", 
-                        "Aviso", JOptionPane.INFORMATION_MESSAGE);
-                addStationToGraph(station);  // Lógica para agregar al grafo
-           }
-        }
-                  
     // Verificación de que la estación no se repite
     public void verificateStations(String station) {
         if (stations.contains(station)) {
@@ -613,6 +643,5 @@ public class GUI extends JFrame {
                 new GUI(networkTrain).setVisible(true);
             }
         });
-    }    
-
+    }
 }
