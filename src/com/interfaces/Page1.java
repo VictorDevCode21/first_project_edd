@@ -4,16 +4,24 @@
  */
 package com.interfaces;
 
+import com.graph.LinkedList;
+import com.graph.NetworkTrain;
+import com.graph.Station;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author Joao
  */
 public class Page1 extends javax.swing.JPanel {
 
+    private GUI gui;
+
     /**
      * Creates new form Page1
      */
-    public Page1() {
+    public Page1(GUI gui) {
+        this.gui = gui;
         initComponents();
     }
 
@@ -27,24 +35,89 @@ public class Page1 extends javax.swing.JPanel {
     private void initComponents() {
 
         jPanel3 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        inputBranchToAdd = new javax.swing.JTextField();
+        addBranchButton = new javax.swing.JButton();
 
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel3.setBackground(new java.awt.Color(255, 255, 255));
         jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel1.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(102, 102, 102));
-        jLabel1.setText("Add Station");
-        jPanel3.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 10, 70, -1));
+        jLabel2.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel2.setText("Nombre de la sucursal:");
+        jPanel3.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 40, -1, 10));
+
+        inputBranchToAdd.setBackground(new java.awt.Color(153, 153, 153));
+        inputBranchToAdd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                inputBranchToAddActionPerformed(evt);
+            }
+        });
+        jPanel3.add(inputBranchToAdd, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 30, 150, 30));
+
+        addBranchButton.setText("Add");
+        addBranchButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addBranchButtonActionPerformed(evt);
+            }
+        });
+        jPanel3.add(addBranchButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 80, -1, -1));
 
         add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 370, 140));
     }// </editor-fold>//GEN-END:initComponents
 
+    private void inputBranchToAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inputBranchToAddActionPerformed
+
+    }//GEN-LAST:event_inputBranchToAddActionPerformed
+
+    private void addBranchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addBranchButtonActionPerformed
+        LinkedList<Station> branches = gui.getBranches(); // Obtiene la lista de sucursales desde GUI
+        LinkedList<Station> allStations = gui.getNetworkTrain().getStations(); // Obtiene todas las estaciones desde GUI
+
+        String stationName = inputBranchToAdd.getText().trim();
+
+        // Verificar si el campo está vacío
+        if (stationName.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Por favor ingresa un nombre de sucursal.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Buscar si la estación ingresada existe en la red de transporte
+        Station stationToAdd = null;
+        for (int i = 0; i < allStations.size(); i++) {
+            if (allStations.get(i).getName().equalsIgnoreCase(stationName)) {
+                stationToAdd = allStations.get(i);
+                break;
+            }
+        }
+
+        // Verificar si la estación es válida
+        if (stationToAdd == null) {
+            JOptionPane.showMessageDialog(this, "La estación ingresada no es válida.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Verificar si la estación ya está en la lista de sucursales
+        for (int i = 0; i < branches.size(); i++) {
+            if (branches.get(i).getName().equalsIgnoreCase(stationName)) {
+                JOptionPane.showMessageDialog(this, "La sucursal ya está en la lista.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        }
+
+        // Agregar la nueva sucursal
+        branches.add(stationToAdd);
+        JOptionPane.showMessageDialog(this, "Sucursal agregada exitosamente: " + stationName, "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        gui.updateGraph(); // Actualiza el grafo después de eliminar la sucursal
+
+    }//GEN-LAST:event_addBranchButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JButton addBranchButton;
+    private javax.swing.JTextField inputBranchToAdd;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel3;
     // End of variables declaration//GEN-END:variables
 }

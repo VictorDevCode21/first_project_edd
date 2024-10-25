@@ -590,6 +590,8 @@ public class GUI extends JFrame {
 //            graphStreamGraph.addNode(stationName).setAttribute("ui.label", stationName);
 //        }
 //    }
+    
+    
     // Agrega una arista si no existe entre dos estaciones
     private void addEdgeIfNotExists(String station1, String station2) {
         // Asegúrate de que las estaciones sean diferentes

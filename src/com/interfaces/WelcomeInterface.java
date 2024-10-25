@@ -28,8 +28,10 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
         // Inicializa NetworkTrain al crear la WelcomeInterface
         this.networkTrain = new NetworkTrain();
 
-        Page1 p1 = new Page1();
-        ShowPanel(p1);
+        if (isGraphShown) {
+            Page1 p1 = new Page1(gui);
+            ShowPanel(p1);
+        }
 
     }
 
@@ -177,17 +179,28 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
 
     private void addStationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addStationActionPerformed
         checkNetworkLoaded();
-        Page1 p1 = new Page1();
+
+        if (!isGraphShown) {
+            JOptionPane.showMessageDialog(this, "Por favor haga click en 'Show Graph' antes de continuar.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Obtén la lista de sucursales desde GUI
+        LinkedList<Station> branches = gui.getBranches();
+
+        Page1 p1 = new Page1(gui);
         ShowPanel(p1);
 
     }//GEN-LAST:event_addStationActionPerformed
 
     private void totalCoverageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_totalCoverageActionPerformed
         checkNetworkLoaded();
+
         if (!isGraphShown) {
             JOptionPane.showMessageDialog(this, "Por favor haga click en 'Show Graph' antes de continuar.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
+
         Page2 p2 = new Page2();
         ShowPanel(p2);
     }//GEN-LAST:event_totalCoverageActionPerformed
