@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.graph;
 
 import java.io.FileReader;
@@ -225,8 +221,15 @@ public class NetworkTrain {
     /**
      * @return the stations
      */
-    public LinkedList getStations() {
+    public LinkedList<Station> getStations() {
         return stations;
+    }
+
+    public void printStations() {
+        System.out.println("Estaciones en la red:");
+        for (Station station : this.getStations()) {
+            System.out.println(station.getName());
+        }
     }
 
     /**
