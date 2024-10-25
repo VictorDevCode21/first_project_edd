@@ -7,9 +7,41 @@
 <!-- the Compile on Save feature is turned off for the project. -->
 <!-- You can turn off the Compile on Save (or Deploy on Save) setting -->
 <!-- in the project's Project Properties dialog box.-->
-<project name="EDD_Project" default="default" basedir=".">
+<project name="EDD_Project" default="run" basedir=".">
     <description>Builds, tests, and runs the project EDD_Project.</description>
     <import file="nbproject/build-impl.xml"/>
+    
+    <!-- Directorios -->
+    <property name="src.dir" value="src"/>
+    <property name="build.dir" value="build"/>
+    <property name="lib.dir" value="lib"/>
+
+    <!-- Compilación -->
+    <target name="compile">
+        <mkdir dir="${build.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${build.dir}">
+            <classpath>
+                <!-- Aquí incluimos el JAR de Gson -->
+                <fileset dir="${lib.dir}">
+                    <include name="*.jar"/>
+                </fileset>
+            </classpath>
+        </javac>
+    </target>
+
+    <!-- Ejecutar el proyecto -->
+    <target name="run" depends="compile">
+        <java classname="com.datasource.Main" fork="true" failonerror="true">
+            <classpath>
+                <pathelement path="${build.dir}"/>
+                <fileset dir="${lib.dir}">
+                    <include name="*.jar"/>
+                </fileset>
+            </classpath>
+        </java>
+    </target>
+    
+    
     <!--
 
     There exist several targets which are by default empty and which can be 

@@ -1,8 +1,14 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
- */
 package edd_project;
+
+import java.io.IOException;
+import com.interfaces.WelcomeInterface;
+import com.graph.NetworkTrain;
+import com.graph.Station;
+import com.graph.Connection;
+import com.graph.BFSListener;
+import com.graph.BreadthFirstSearch;
+import com.graph.LinkedList;
+import com.graph.Node;
 
 /**
  *
@@ -14,7 +20,10 @@ public class EDD_Project {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+
+        WelcomeInterface interface1 = new WelcomeInterface();
+        interface1.show();
+        
     }
-    
+
 }
