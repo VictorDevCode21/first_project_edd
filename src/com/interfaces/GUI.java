@@ -3,12 +3,12 @@ package com.interfaces;
 import com.graph.NetworkTrain;
 import com.graph.LinkedList;
 import com.graph.Node;
-import com.graph.Connection;
 import com.graph.BreadthFirstSearch;
 import com.graph.BFSListener;
 import com.graph.Station;
 import com.graph.Stack;
 import com.graph.Queue;
+
 import com.graph.DepthFirstSearch;
 import com.graph.StationLoadListener;
 
@@ -22,10 +22,6 @@ import java.io.IOException;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,13 +40,20 @@ public class GUI extends JFrame {
     private int T; // Para guardar el T que representa distancia entre estaciones
     private LinkedList<StationLoadListener> listeners = new LinkedList();
 
+
     public GUI(NetworkTrain networkTrain) {
         this.networkTrain = networkTrain;
+
+
+    public GUI() {
+
         setTitle("Supermarket Location Planner");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         stations = new LinkedList<>();
         initUI();
+
+
     }
     
     public void addStationLoadListener(StationLoadListener listener) {
@@ -115,7 +118,8 @@ public class GUI extends JFrame {
 
         try {
             // Muestra un cuadro de diálogo para ingresar la estación inicial
-            String startStationName = JOptionPane.showInputDialog(this, "Ingrese el nombre de la estación de inicio:");
+            String startStationName = JOptionPane.showInputDialog(this, 
+                    "Ingrese el nombre de la estación de inicio:");
 
             if (startStationName != null && !startStationName.trim().isEmpty()) {
                 // Muestra un cuadro de diálogo para seleccionar el algoritmo
@@ -303,6 +307,7 @@ public class GUI extends JFrame {
         return -1;
     }
 
+
     // Método para obtener las estaciones cubiertas usando DFS
     public LinkedList<Station> getCoveredStationsDFS(Station startStation) {
         LinkedList<Station> coveredStations = new LinkedList<>();
@@ -359,6 +364,28 @@ public class GUI extends JFrame {
     public LinkedList<Station> getNeighbors(Station station) {
         return networkTrain.getNeighbors(station);
     }
+
+<
+    // Método para ejecutar el BFS y colorear las estaciones
+    private void runBFS(Station startStation) {
+        BreadthFirstSearch bfs = new BreadthFirstSearch(startStation, new LinkedList<Station>());
+        //Guardar las estaciones visitadas en una LinkedList
+        LinkedList<Station> visitedStations = new LinkedList<>();
+
+        bfs.traverse(new BFSListener() {
+            @Override
+            public void stationVisited(Station station) {
+                // Verifica si la estación ya ha sido visitada
+                if (!visitedStations.contains(station)) {
+                    visitedStations.add(station); // Marcar estación como visitada
+                    JOptionPane.showMessageDialog(null, "La estación ha sido agregada exitosamente", 
+                             "Aviso", JOptionPane.INFORMATION_MESSAGE);
+                    if (graphStreamGraph.getNode(station.getName()) != null) {
+                        graphStreamGraph.getNode(station.getName()).setAttribute("ui.style", "fill-color: green;");
+                    }
+                }else{
+                    JOptionPane.showMessageDialog(null, "La estación ya existe", 
+                             "Aviso", JOptionPane.WARNING_MESSAGE);
 
     private void runDFS(Station startStation, int T) {
         // Inicializamos la primera sucursal
@@ -433,10 +460,19 @@ public class GUI extends JFrame {
 //                                    + " porque está a menos de T de la sucursal " + conflictingBranch.getName() + ".");
                         }
                     }
+
                 }
             }
         }
 
+        // Mostrar las estaciones visitadas
+        Node<Station> aux = bfs.getVisitedStations().getHead();
+        while (aux != null) {
+            Station station = aux.getData();
+              Station visitedStation = aux.getData();
+            System.out.println("Estación recorrida en BFS: " + visitedStation.getName()); // Debug
+            aux = aux.getNext();
+        }  
         // Mostrar todas las distancias y los nombres de las estaciones
         System.out.println("Distancias desde la estación inicial:");
         for (Map.Entry<Station, Integer> entry : distances.entrySet()) {
@@ -538,6 +574,20 @@ public class GUI extends JFrame {
         }
     }
 
+    
+    // Verificación de que la estación no se repite
+    public void verificateStations(String station){
+            if (stations.contains(station)) {
+                JOptionPane.showMessageDialog(this, "La estación ya existe", 
+                        "Aviso", JOptionPane.WARNING_MESSAGE);
+            } else {
+                stations.add(station);
+                JOptionPane.showMessageDialog(this, "Estación añadida exitosamente", 
+                        "Aviso", JOptionPane.INFORMATION_MESSAGE);
+                addStationToGraph(station);  // Lógica para agregar al grafo
+           }
+        }
+                  
     // Verificación de que la estación no se repite
     public void verificateStations(String station) {
         if (stations.contains(station)) {
@@ -563,6 +613,6 @@ public class GUI extends JFrame {
                 new GUI(networkTrain).setVisible(true);
             }
         });
-    }
+    }    
 
 }
