@@ -42,7 +42,7 @@ public class SetList<E> {
         return elements;
     }
     
-        // Método para obtener el tamaño del set
+    // Método para obtener el tamaño del set
     public int size() {
         return elements.size();
     }
@@ -55,4 +55,4 @@ public class SetList<E> {
 }
 
 
-}
+

@@ -3,16 +3,13 @@ package com.interfaces;
 import com.graph.AlgorithmSelectionListener;
 import com.graph.NetworkTrain;
 import com.graph.LinkedList;
-import com.graph.Node;
-import com.graph.BreadthFirstSearch;
-import com.graph.BFSListener;
 import com.graph.BranchListener;
 import com.graph.Station;
 import com.graph.Stack;
 import com.graph.Queue;
 
-import com.graph.DepthFirstSearch;
 import com.graph.NetworkTrainListener;
+import com.graph.SetList;
 import com.graph.StationLoadListener;
 import com.graph.TValueListener;
 
@@ -220,72 +217,82 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         graphStreamGraph = new SingleGraph("Metro Network");
 
         try {
+            while(true){
             // Muestra un cuadro de diálogo para ingresar la estación inicial
-            String startStationName = JOptionPane.showInputDialog(this,
-                    "Ingrese el nombre de la estación de inicio:");
+                String startStationName = JOptionPane.showInputDialog(this,
+                        "Ingrese el nombre de la estación de inicio:");
 
-            if (startStationName != null && !startStationName.trim().isEmpty()) {
-                // Muestra un cuadro de diálogo para seleccionar el algoritmo
-                String[] algorithms = {"BFS", "DFS"};
-                String selectedAlgorithm = (String) JOptionPane.showInputDialog(
-                        this,
-                        "Seleccione el algoritmo a usar:",
-                        "Algoritmo",
-                        JOptionPane.QUESTION_MESSAGE,
-                        null,
-                        algorithms,
-                        algorithms[0]
-                );
+                if (startStationName != null && !startStationName.trim().isEmpty() 
+                        //matches es un regex que verifica que solo se usen letras y numeros
+                        && startStationName.toLowerCase().matches("^[a-zA-Z0-9]+$")) {
+                    break;
+                } else {
+                    JOptionPane.showMessageDialog(this, "Debe ingresar un nombre de estación válido.");
+                }
+            }
+            
+
+            // Muestra un cuadro de diálogo para seleccionar el algoritmo
+            String[] algorithms = {"BFS", "DFS"};
+            String selectedAlgorithm = (String) JOptionPane.showInputDialog(
+                    this,
+                    "Seleccione el algoritmo a usar:",
+                    "Algoritmo",
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    algorithms,
+                    algorithms[0]
+            );
 
 //                T = Integer.parseInt(JOptionPane.showInputDialog(this, "Ingrese la distancia T entre sucursales:"));
-                // Cargar y visualizar la red en GraphStream
-                String networkName = jsonObject.keys().next();
-                JSONArray metroLines = jsonObject.getJSONArray(networkName);
+            // Cargar y visualizar la red en GraphStream
+            String networkName = jsonObject.keys().next();
+            JSONArray metroLines = jsonObject.getJSONArray(networkName);
 
-                // Paso 1: Agregar todas las estaciones (nodos) y conexiones
-                for (int i = 0; i < metroLines.length(); i++) {
-                    JSONObject lineObject = metroLines.getJSONObject(i);
-                    String lineName = lineObject.keys().next();
-                    JSONArray stations = lineObject.getJSONArray(lineName);
+            // Paso 1: Agregar todas las estaciones (nodos) y conexiones
+            for (int i = 0; i < metroLines.length(); i++) {
+                JSONObject lineObject = metroLines.getJSONObject(i);
+                String lineName = lineObject.keys().next();
+                JSONArray stations = lineObject.getJSONArray(lineName);
 
-                    // Recorrer las estaciones y conectarlas
-                    for (int j = 0; j < stations.length(); j++) {
-                        Object currentStationObj = stations.get(j);
-                        String currentStation;
-                        String nextStation = null;
+                // Recorrer las estaciones y conectarlas
+                for (int j = 0; j < stations.length(); j++) {
+                    Object currentStationObj = stations.get(j);
+                    String currentStation;
+                    String nextStation = null;
 
-                        if (currentStationObj instanceof JSONObject) {
-                            JSONObject connectionObj = (JSONObject) currentStationObj;
-                            currentStation = connectionObj.keys().next();
-                            nextStation = connectionObj.getString(currentStation);
+                    if (currentStationObj instanceof JSONObject) {
+                        JSONObject connectionObj = (JSONObject) currentStationObj;
+                        currentStation = connectionObj.keys().next();
+                        nextStation = connectionObj.getString(currentStation);
 
-                            addStationToGraph(currentStation);
-                            addEdgeIfNotExists(currentStation, nextStation);
+                        addStationToGraph(currentStation);
+                        addEdgeIfNotExists(currentStation, nextStation);
 
-                            if (j > 0) {
-                                Object prevStationObj = stations.get(j - 1);
-                                String previousStation;
-                                if (prevStationObj instanceof JSONObject) {
-                                    previousStation = ((JSONObject) prevStationObj).keys().next();
-                                } else {
-                                    previousStation = (String) prevStationObj;
-                                }
-                                addEdgeIfNotExists(currentStation, previousStation);
-                            }
-                        } else {
-                            currentStation = (String) currentStationObj;
-                            addStationToGraph(currentStation);
-                        }
-
-                        if (j < stations.length() - 1) {
-                            Object nextStationObj = stations.get(j + 1);
-                            if (nextStationObj instanceof JSONObject) {
-                                JSONObject nextConnectionObj = (JSONObject) nextStationObj;
-                                nextStation = nextConnectionObj.keys().next();
+                        if (j > 0) {
+                            Object prevStationObj = stations.get(j - 1);
+                            String previousStation;
+                            if (prevStationObj instanceof JSONObject) {
+                                previousStation = ((JSONObject) prevStationObj).keys().next();
                             } else {
-                                nextStation = (String) nextStationObj;
+                                previousStation = (String) prevStationObj;
                             }
-                            addEdgeIfNotExists(currentStation, nextStation);
+                            addEdgeIfNotExists(currentStation, previousStation);
+                        }
+                    } else {
+                        currentStation = (String) currentStationObj;
+                        addStationToGraph(currentStation);
+                    }
+
+                    if (j < stations.length() - 1) {
+                        Object nextStationObj = stations.get(j + 1);
+                        if (nextStationObj instanceof JSONObject) {
+                            JSONObject nextConnectionObj = (JSONObject) nextStationObj;
+                            nextStation = nextConnectionObj.keys().next();
+                        } else {
+                            nextStation = (String) nextStationObj;
+                        }
+                        addEdgeIfNotExists(currentStation, nextStation);
                         }
                     }
                 }
@@ -308,9 +315,9 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
                 } else {
                     JOptionPane.showMessageDialog(this, "Estación no encontrada: " + startStationName);
                 }
-            } else {
-                JOptionPane.showMessageDialog(this, "Debe ingresar un nombre de estación válido.");
-            }
+            //} else {
+                //JOptionPane.showMessageDialog(this, "Debe ingresar un nombre de estación válido.");
+            //}
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -779,14 +786,15 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         // Mostrar las sucursales creadas
 //        System.out.println("Sucursales creadas (DFS): " + branches.toString());
     }
-
+//  YA SE AGREGO SETLIST, REVISAR AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     private void runBFS(Station startStation) {
         int T = this.T;
         // Inicializar la distancia de la estación inicial
         Queue<Station> queue = new Queue<>();
         branches.clear();
         branches.add(startStation); // Sucursal inicial
-        Set<Station> visitedStations = new HashSet<>();
+//        Set<Station> visitedStations = new HashSet<>();
+        SetList<Station> visitedStations = new SetList<>();
         Map<Station, Integer> distances = new HashMap<>();
         distances.put(startStation, 0);
 
