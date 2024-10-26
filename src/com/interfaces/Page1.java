@@ -75,7 +75,7 @@ public class Page1 extends javax.swing.JPanel {
         LinkedList<Station> branches = gui.getBranches(); // Obtiene la lista de sucursales desde GUI
         LinkedList<Station> allStations = gui.getNetworkTrain().getStations(); // Obtiene todas las estaciones desde GUI
 
-        String stationName = inputBranchToAdd.getText().trim();
+        String stationName = inputBranchToAdd.getText().trim().toLowerCase();
 
         // Verificar si el campo está vacío
         if (stationName.isEmpty()) {
@@ -90,6 +90,11 @@ public class Page1 extends javax.swing.JPanel {
                 stationToAdd = allStations.get(i);
                 break;
             }
+        }
+                //Verificar si la estacion ya esta eliminada entonces no agregar sucursal
+        if (gui.stationEliminated(stationToAdd)) {
+            JOptionPane.showMessageDialog(this, "La estación ingresada ya ha sido eliminada y no puede añadirse como sucursal.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
         }
 
         // Verificar si la estación es válida

@@ -19,8 +19,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.io.IOException;
 
 import java.nio.file.Files;
@@ -53,7 +51,10 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
     private LinkedList<BranchListener> bListeners;  // Lista de listeners
     private boolean algorithmSelected; // Variable para mantener el algoritmo seleccionado
     private LinkedList<AlgorithmSelectionListener> aListeners = new LinkedList<>();
-    private JTextField NumT;
+    private SetList<Station> eliminatedStations = new SetList<>();
+    
+
+    
 
     public GUI(NetworkTrain networkTrain) {
         this.networkTrain = networkTrain;
@@ -160,6 +161,14 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         for (StationLoadListener listener : listeners) {
             listener.onStationsLoaded(branches); // Notifica con la lista de estaciones cargadas
         }
+    }
+    
+    public void addEliminatedStations(Station station){
+        eliminatedStations.add(station);
+    }
+    
+    public boolean stationEliminated(Station station){
+        return eliminatedStations.contains(station);
     }
 
     private void initUI() {
@@ -515,13 +524,13 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
     // Método para obtener estaciones cubiertas por varias sucursales usando DFS
     public LinkedList<Station> getCoveredStationsDFS(Station start, int maxDistance) {
         LinkedList<Station> coveredStations = new LinkedList<>();
-        Set<Station> visited = new HashSet<>();
+        SetList<Station> visited = new SetList<>();
         runDFS(start, coveredStations, visited, 0, maxDistance);
         return coveredStations;
     }
 
     // Método auxiliar para ejecutar getCoveredStationsDFS
-    private void runDFS(Station current, LinkedList<Station> coveredStations, Set<Station> visited, int depth, int maxDistance) {
+    private void runDFS(Station current, LinkedList<Station> coveredStations, SetList<Station> visited, int depth, int maxDistance) {
         if (depth > maxDistance || visited.contains(current) || branches.contains(current)) {
             return; // Parar si superamos la distancia máxima, ya fue visitada, o es sucursal
         }
@@ -841,7 +850,6 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         Queue<Station> queue = new Queue<>();
         branches.clear();
         branches.add(startStation); // Sucursal inicial
-//        Set<Station> visitedStations = new HashSet<>();
         SetList<Station> visitedStations = new SetList<>();
         Map<Station, Integer> distances = new HashMap<>();
         distances.put(startStation, 0);
@@ -912,7 +920,6 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
      */
     private boolean checkForConflict(Station newBranch, int T) {
         Queue<Station> queue = new Queue<>();
-        //Set<Station> visitedStations = new HashSet<>();
         SetList<Station> visitedStations = new SetList<>();
         Map<Station, Integer> distances = new HashMap<>();
         distances.put(newBranch, 0);

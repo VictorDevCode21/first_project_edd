@@ -116,7 +116,7 @@ public class Page3 extends javax.swing.JPanel {
 
     private void removeBranchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeBranchButtonActionPerformed
         // Obtiene el texto ingresado por el usuario
-        String branchName = inputRemoveBranch.getText().trim();
+        String branchName = inputRemoveBranch.getText().trim().toLowerCase();
 
         // Verifica si el texto no está vacío
         if (!branchName.isEmpty()) {
@@ -128,6 +128,7 @@ public class Page3 extends javax.swing.JPanel {
             if (branchStation != null) {
                 gui.removeBranch(branchStation); // Llama al método removeBranch en GUI para eliminar la sucursal
                 gui.checkTotalCoverage(); // Verifica la cobertura total después de eliminar la sucursal
+                gui.addEliminatedStations(branchStation); // Añadir a la lista de eliminadas
 
                 displayBranchesList(); // Actualiza la lista en el TextArea
                 gui.updateGraph2(); // Actualiza el grafo después de eliminar la sucursal
