@@ -904,7 +904,8 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
      */
     private boolean checkForConflict(Station newBranch, int T) {
         Queue<Station> queue = new Queue<>();
-        Set<Station> visitedStations = new HashSet<>();
+        //Set<Station> visitedStations = new HashSet<>();
+        SetList visitedStations = new SetList();
         Map<Station, Integer> distances = new HashMap<>();
         distances.put(newBranch, 0);
 
