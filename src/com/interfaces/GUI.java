@@ -19,6 +19,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 
 import java.nio.file.Files;
@@ -51,6 +53,7 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
     private LinkedList<BranchListener> bListeners;  // Lista de listeners
     private boolean algorithmSelected; // Variable para mantener el algoritmo seleccionado
     private LinkedList<AlgorithmSelectionListener> aListeners = new LinkedList<>();
+    private JTextField NumT;
 
     public GUI(NetworkTrain networkTrain) {
         this.networkTrain = networkTrain;
@@ -446,7 +449,7 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         int maxDistance = T;
         LinkedList<Station> uncoveredStations = getUncoveredStations(useBFS);
         Map<Station, LinkedList<Station>> coverageMap = new HashMap<>();
-        Set<Station> suggestedBranches = new HashSet<>();
+        SetList<Station> suggestedBranches = new SetList<>();
 
         for (Station station : uncoveredStations) {
             LinkedList<Station> coverage;
@@ -536,7 +539,7 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
     // Método para obtener estaciones cubiertas por varias sucursales usando BFS
     public LinkedList<Station> getCoveredStationsBFS(Station start, int maxDistance) {
         LinkedList<Station> coveredStations = new LinkedList<>();
-        Set<Station> visited = new HashSet<>();
+        SetList<Station> visited = new SetList<>();
         Queue<Station> queue = new Queue<>();
         Map<Station, Integer> distances = new HashMap<>();
 
@@ -572,7 +575,12 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         }
 
         // Limpiar el grafo actual
-        graphStreamGraph.clear(); // Asegúrate de que esto se maneje correctamente.
+        graphStreamGraph.clear(); 
+        //Validación por si el grafo no está limpio.
+        if(graphStreamGraph.getNodeCount() != 0 || graphStreamGraph.getEdgeCount()!= 0){
+            JOptionPane.showMessageDialog(this, "El grafo no se ha limpiado correctamente", "Aviso", JOptionPane.WARNING_MESSAGE);
+            graphStreamGraph.clear();
+        }
 
         // Volver a agregar todas las estaciones y conexiones desde la red de transporte
         LinkedList<Station> allStations = networkTrain.getStations();
@@ -752,7 +760,7 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
 
         // Usamos una pila para implementar DFS manualmente
         Stack<Station> stack = new Stack<>();
-        Set<Station> visited = new HashSet<>();
+        SetList<Station> visited = new SetList<>();
         stack.push(startStation);
         visited.add(startStation);
 
@@ -905,7 +913,7 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
     private boolean checkForConflict(Station newBranch, int T) {
         Queue<Station> queue = new Queue<>();
         //Set<Station> visitedStations = new HashSet<>();
-        SetList visitedStations = new SetList();
+        SetList<Station> visitedStations = new SetList<>();
         Map<Station, Integer> distances = new HashMap<>();
         distances.put(newBranch, 0);
 
