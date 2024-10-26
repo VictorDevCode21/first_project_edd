@@ -177,16 +177,19 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
 
                         // Convertir el contenido a JSONObject
                         JSONObject jsonObject = new JSONObject(new JSONTokener(content));
-
+                        
+                        // Convierte todas las claves y valores de texto a minúsculas
+                        JSONObject lowerCaseJson = toLowerCaseJson(jsonObject);
+                        
                         // Cargar los datos desde el objeto JSONObject
                         networkTrain = new NetworkTrain();
-                        networkTrain.loadFromJson(jsonObject);
+                        networkTrain.loadFromJson(lowerCaseJson); 
                         branches = new LinkedList<>();
 
                         loadButton.setEnabled(false); // Deshabilita el botón para evitar múltiples cargas
 
                         // Mostrar la red en GraphStream
-                        showNetworkTrain(jsonObject);
+                        showNetworkTrain(lowerCaseJson); 
 
                         // Notificar a los oyentes que las estaciones han sido cargadas
                         notifyStationsLoaded();
@@ -205,6 +208,45 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         add(loadButton, BorderLayout.NORTH);
         // Otros componentes y configuraciones
     }
+    
+    // Convierte todas las claves y valores de texto a minúsculas en un JSONObject
+    private JSONObject toLowerCaseJson(JSONObject jsonObject) {
+        JSONObject result = new JSONObject();
+        
+        for (String key : jsonObject.keySet()) {
+            Object value = jsonObject.get(key);
+
+            String lowerCaseKey = key.toLowerCase();
+
+            if (value instanceof JSONObject) {
+                result.put(lowerCaseKey, toLowerCaseJson((JSONObject) value));
+            } else if (value instanceof JSONArray) {
+                result.put(lowerCaseKey, toLowerCaseJsonArray((JSONArray) value));
+            } else if (value instanceof String) {
+                result.put(lowerCaseKey, ((String) value).toLowerCase());
+            } else {
+                result.put(lowerCaseKey, value);
+            }
+        }
+
+        return result;
+    }
+
+    // Convierte todos los elementos de texto a minúsculas en un JSONArray
+    private JSONArray toLowerCaseJsonArray(JSONArray array) {
+        JSONArray result = new JSONArray();
+        for (int i = 0; i < array.length(); i++) {
+            Object value = array.get(i);
+            if (value instanceof JSONObject) {
+                result.put(toLowerCaseJson((JSONObject) value));
+            } else if (value instanceof String) {
+                result.put(((String) value).toLowerCase());
+            } else {
+                result.put(value);
+            }
+        }
+        return result;
+    }
 
     // Muestra el grafo con las estaciones y conexiones
     private void showNetworkTrain(JSONObject jsonObject) {
@@ -217,82 +259,83 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         graphStreamGraph = new SingleGraph("Metro Network");
 
         try {
-            while(true){
+            while (true) {
             // Muestra un cuadro de diálogo para ingresar la estación inicial
-                String startStationName = JOptionPane.showInputDialog(this,
-                        "Ingrese el nombre de la estación de inicio:");
+                String startStationName = JOptionPane.showInputDialog(this, "Ingrese el nombre de la estación de inicio:");
 
                 if (startStationName != null && !startStationName.trim().isEmpty() 
-                        //matches es un regex que verifica que solo se usen letras y numeros
-                        && startStationName.toLowerCase().matches("^[a-zA-Z0-9]+$")) {
-                    break;
+                        && startStationName.toLowerCase().matches("^[a-z0-9\\s]+$")) {
+                    //Matches: Regex que en este caso valida letras,numeros y espacios en blanco
+                        this.startStationName = startStationName.toLowerCase(); // Guarda el nombre 
+                        break;
                 } else {
-                    JOptionPane.showMessageDialog(this, "Debe ingresar un nombre de estación válido.");
+                    JOptionPane.showMessageDialog(this, "Debe ingresar un nombre de estación válido (solo letras y números).");
                 }
-            }
-            
+            } 
+                    
+                // Muestra un cuadro de diálogo para seleccionar el algoritmo
+                String[] algorithms = {"BFS", "DFS"};
+                String selectedAlgorithm = (String) JOptionPane.showInputDialog(
+                        this,
+                        "Seleccione el algoritmo a usar:",
+                        "Algoritmo",
+                        JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        algorithms,
+                        algorithms[0]
+                );
+                this.selectedAlgorithm = selectedAlgorithm;
+               
+                
+    //                T = Integer.parseInt(JOptionPane.showInputDialog(this, "Ingrese la distancia T entre sucursales:"));
+                // Cargar y visualizar la red en GraphStream
+                String networkName = jsonObject.keys().next();
+                JSONArray metroLines = jsonObject.getJSONArray(networkName);
 
-            // Muestra un cuadro de diálogo para seleccionar el algoritmo
-            String[] algorithms = {"BFS", "DFS"};
-            String selectedAlgorithm = (String) JOptionPane.showInputDialog(
-                    this,
-                    "Seleccione el algoritmo a usar:",
-                    "Algoritmo",
-                    JOptionPane.QUESTION_MESSAGE,
-                    null,
-                    algorithms,
-                    algorithms[0]
-            );
+                // Paso 1: Agregar todas las estaciones (nodos) y conexiones
+                for (int i = 0; i < metroLines.length(); i++) {
+                    JSONObject lineObject = metroLines.getJSONObject(i);
+                    String lineName = lineObject.keys().next();
+                    JSONArray stations = lineObject.getJSONArray(lineName);
 
-//                T = Integer.parseInt(JOptionPane.showInputDialog(this, "Ingrese la distancia T entre sucursales:"));
-            // Cargar y visualizar la red en GraphStream
-            String networkName = jsonObject.keys().next();
-            JSONArray metroLines = jsonObject.getJSONArray(networkName);
+                    // Recorrer las estaciones y conectarlas
+                    for (int j = 0; j < stations.length(); j++) {
+                        Object currentStationObj = stations.get(j);
+                        String currentStation;
+                        String nextStation = null;
 
-            // Paso 1: Agregar todas las estaciones (nodos) y conexiones
-            for (int i = 0; i < metroLines.length(); i++) {
-                JSONObject lineObject = metroLines.getJSONObject(i);
-                String lineName = lineObject.keys().next();
-                JSONArray stations = lineObject.getJSONArray(lineName);
+                        if (currentStationObj instanceof JSONObject) {
+                            JSONObject connectionObj = (JSONObject) currentStationObj;
+                            currentStation = connectionObj.keys().next();
+                            nextStation = connectionObj.getString(currentStation);
 
-                // Recorrer las estaciones y conectarlas
-                for (int j = 0; j < stations.length(); j++) {
-                    Object currentStationObj = stations.get(j);
-                    String currentStation;
-                    String nextStation = null;
+                            addStationToGraph(currentStation);
+                            addEdgeIfNotExists(currentStation, nextStation);
 
-                    if (currentStationObj instanceof JSONObject) {
-                        JSONObject connectionObj = (JSONObject) currentStationObj;
-                        currentStation = connectionObj.keys().next();
-                        nextStation = connectionObj.getString(currentStation);
-
-                        addStationToGraph(currentStation);
-                        addEdgeIfNotExists(currentStation, nextStation);
-
-                        if (j > 0) {
-                            Object prevStationObj = stations.get(j - 1);
-                            String previousStation;
-                            if (prevStationObj instanceof JSONObject) {
-                                previousStation = ((JSONObject) prevStationObj).keys().next();
-                            } else {
-                                previousStation = (String) prevStationObj;
+                            if (j > 0) {
+                                Object prevStationObj = stations.get(j - 1);
+                                String previousStation;
+                                if (prevStationObj instanceof JSONObject) {
+                                    previousStation = ((JSONObject) prevStationObj).keys().next();
+                                } else {
+                                    previousStation = (String) prevStationObj;
+                                }
+                                addEdgeIfNotExists(currentStation, previousStation);
                             }
-                            addEdgeIfNotExists(currentStation, previousStation);
-                        }
-                    } else {
-                        currentStation = (String) currentStationObj;
-                        addStationToGraph(currentStation);
-                    }
-
-                    if (j < stations.length() - 1) {
-                        Object nextStationObj = stations.get(j + 1);
-                        if (nextStationObj instanceof JSONObject) {
-                            JSONObject nextConnectionObj = (JSONObject) nextStationObj;
-                            nextStation = nextConnectionObj.keys().next();
                         } else {
-                            nextStation = (String) nextStationObj;
+                            currentStation = (String) currentStationObj;
+                            addStationToGraph(currentStation);
                         }
-                        addEdgeIfNotExists(currentStation, nextStation);
+
+                        if (j < stations.length() - 1) {
+                            Object nextStationObj = stations.get(j + 1);
+                            if (nextStationObj instanceof JSONObject) {
+                                JSONObject nextConnectionObj = (JSONObject) nextStationObj;
+                                nextStation = nextConnectionObj.keys().next();
+                            } else {
+                                nextStation = (String) nextStationObj;
+                            }
+                            addEdgeIfNotExists(currentStation, nextStation);
                         }
                     }
                 }
@@ -301,23 +344,20 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
                 graphStreamGraph.display();
                 isNetworkWindowOpen = true; // Marcar que la ventana está abierta
 
-                this.startStationName = startStationName;  // Guardar el nombre de la estación inicial
+                this.startStationName = startStationName;  // Guardar el nombre de la estación inicial  
                 this.selectedAlgorithm = selectedAlgorithm;  // Guardar el algoritmo seleccionado
 
                 // Ejecutar el algoritmo seleccionado
-                Station startStation = networkTrain.getStationByName(startStationName);
+                Station startStation = networkTrain.getStationByName(this.startStationName);
                 if (startStation != null) {
-                    if ("BFS".equals(selectedAlgorithm)) {
+                    if ("BFS".equals(this.selectedAlgorithm)) {
                         runBFS(startStation);
-                    } else if ("DFS".equals(selectedAlgorithm)) {
+                    } else if ("DFS".equals(this.selectedAlgorithm)) {
                         runDFS(startStation);
-                    }
+                      }
                 } else {
                     JOptionPane.showMessageDialog(this, "Estación no encontrada: " + startStationName);
                 }
-            //} else {
-                //JOptionPane.showMessageDialog(this, "Debe ingresar un nombre de estación válido.");
-            //}
         } catch (JSONException e) {
             e.printStackTrace();
         }
