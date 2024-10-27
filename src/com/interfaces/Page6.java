@@ -151,6 +151,9 @@ public class Page6 extends javax.swing.JPanel  {
         }
 
         // Manejar las conexiones con estaciones existentes
+        
+        boolean connectionAdded=false; //variable para verificar que se añadió la conexión
+        
         for (int i = 0; i < connectionsToAdd.length; i += 2) {
             String stationFrom = connectionsToAdd[i].trim();
             String stationTo = connectionsToAdd[i + 1].trim();
@@ -175,9 +178,7 @@ public class Page6 extends javax.swing.JPanel  {
             
             }
         }
-
-        // Refrescar la visualización del grafo
-        gui.updateGraph();
+         gui.updateGraph();
 
     }//GEN-LAST:event_addStationsActionPerformed
 
