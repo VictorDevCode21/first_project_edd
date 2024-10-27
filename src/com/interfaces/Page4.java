@@ -11,12 +11,18 @@ import javax.swing.JOptionPane;
  *
  * @author Joao
  */
+
+ /**
+  * Clase que representa la cuarta página del panel de la GUI.
+  */
 public class Page4 extends javax.swing.JPanel {
 
     private TValueListener listener;  // Listener para notificar cambios
 
     /**
-     * Creates new form Page4
+     * Crea una nueva instancia de Page4.
+     * 
+     * @param listener El listener para notificar cambios en el valor de T.
      */
     public Page4(TValueListener listener) {
         this.listener = listener;  // Inicializa el listener
@@ -66,6 +72,11 @@ public class Page4 extends javax.swing.JPanel {
         add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 370, 140));
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Acción realizada cuando se presiona el botón para establecer el valor de T.
+     * 
+     * @param evt El evento de acción.
+     */
     private void stablishTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stablishTActionPerformed
         try {
             // Obtén el valor de T del campo de texto

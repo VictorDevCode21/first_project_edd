@@ -8,16 +8,38 @@ package com.graph;
  *
  * @author PC
  */
+
+  /**
+   *Clase que implementa el algoritmo de búsqueda en profundidad (DFS) para recorrer estaciones.
+   */ 
+ 
 public class DepthFirstSearch {
-
+     
+    /** Grafo que representa la red de trenes. */
     private NetworkTrain graph;
-    private LinkedList<String> visitedStations; // Cambiado para almacenar nombres de estaciones
+    
+    /** Lista enlazada para almacenar los nombres de las estaciones visitadas. */
+    private LinkedList<String> visitedStations; 
 
+    
+    /**
+     * Constructor para inicializar la búsqueda en profundidad.
+     *
+     * @param graph el grafo que representa la red de trenes
+     */
+    
     public DepthFirstSearch(NetworkTrain graph) {
         this.graph = graph;
         visitedStations = new LinkedList<>();
     }
 
+    /**
+     * Realiza la búsqueda en profundidad desde la estación de inicio.
+     *
+     * @param startStation el nombre de la estación de inicio
+     * @return una lista enlazada con los nombres de las estaciones visitadas en el orden en que fueron recorridas
+     */
+    
     public LinkedList<String> dfs(String startStation) {
         // Simulamos el Stack usando la clase Stack que es una LinkedList 
         Stack<String> stack = new Stack<>();

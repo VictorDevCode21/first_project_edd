@@ -8,13 +8,20 @@ import com.graph.Station;
  *
  * @author Joao
  */
+
+ /**
+  * Clase que representa la segunda página del panel de la GUI.
+  */
 public class Page2 extends javax.swing.JPanel {
 
     private PanelChangeListener listener; // Referencia al listener
     private GUI gui;
 
     /**
-     * Creates new form Page2
+     * Crea una nueva instancia de Page2.
+     * 
+     * @param gui La instancia de la GUI principal.
+     * @param listener El listener para cambios de panel.
      */
     public Page2(GUI gui, PanelChangeListener listener) {
         this.listener = listener;
@@ -71,6 +78,12 @@ public class Page2 extends javax.swing.JPanel {
         add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 370, 140));
     }// </editor-fold>//GEN-END:initComponents
 
+    
+    /**
+     * Acción realizada cuando se presiona el botón para revisar la cobertura total.
+     * 
+     * @param evt El evento de acción.
+     */
     private void checkTotalCoverageButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkTotalCoverageButtonActionPerformed
         // Mostrar la interfaz correspondiente
         ShowTotalCoverage showTotalCoverage = new ShowTotalCoverage(listener, gui);
@@ -80,7 +93,11 @@ public class Page2 extends javax.swing.JPanel {
 
 
     }//GEN-LAST:event_checkTotalCoverageButtonActionPerformed
-
+    /**
+     * Acción realizada cuando se presiona el botón para ver las sucursales sugeridas.
+     * 
+     * @param evt El evento de acción.
+     */
     private void suggestedBranchesButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_suggestedBranchesButtonActionPerformed
         // Crear y mostrar la interfaz ShowSuggestedBranches, pasando la sugerencia
         ShowSuggestedBranches showSuggestedBranches = new ShowSuggestedBranches(listener, gui);

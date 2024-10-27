@@ -12,13 +12,20 @@ import javax.swing.JOptionPane;
  *
  * @author Joao
  */
+ 
+ /**
+  * Clase que representa la sexta página del panel de la GUI.
+  */
 public class Page6 extends javax.swing.JPanel  {
 
     private GUI gui;
     private NetworkTrain networkTrain;
 
     /**
-     * Creates new form Page5
+     * Crea una nueva instancia de Page6.
+     * 
+     * @param gui La instancia de la GUI principal.
+     * @param networkTrain La instancia de la red de trenes.
      */
     public Page6(GUI gui, NetworkTrain networkTrain) {
         this.gui = gui;
@@ -27,21 +34,7 @@ public class Page6 extends javax.swing.JPanel  {
         initComponents();
     }
 
-//    @Override
-//    public void onStationAdded(Station station) {
-//        System.out.println("Nueva estación agregada: " + station.getName());
-//        // Actualizar la GUI para reflejar la nueva estación
-//        gui.updateGraph();
-//    }
-//
-//    //Victor1, Victor2, Victor3
-//    //Victor1,Caracas, Victor3,Zoologico
-//    @Override
-//    public void onConnectionAdded(Station station1, Station station2) {
-//        System.out.println("Nueva conexión agregada entre: " + station1.getName() + " y " + station2.getName());
-//        // Actualizar la GUI para reflejar la nueva conexión
-//        gui.updateGraph();
-//    }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -100,6 +93,11 @@ public class Page6 extends javax.swing.JPanel  {
         add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 370, 140));
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Acción realizada cuando se presiona el botón para agregar estaciones.
+     * 
+     * @param evt El evento de acción.
+     */
     private void addStationsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addStationsActionPerformed
         String stationsInput = inputStationsToAdd.getText();
         String connectionsInput = inputConnectionsToAdd.getText();
@@ -175,10 +173,20 @@ public class Page6 extends javax.swing.JPanel  {
 
     }//GEN-LAST:event_addStationsActionPerformed
 
+    /**
+     * Acción realizada cuando se ingresa una conexión.
+     * 
+     * @param evt El evento de acción.
+     */
     private void inputConnectionsToAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inputConnectionsToAddActionPerformed
 
     }//GEN-LAST:event_inputConnectionsToAddActionPerformed
 
+    /**
+     * Acción realizada cuando se ingresan estaciones.
+     * 
+     * @param evt El evento de acción.
+     */
     private void inputStationsToAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inputStationsToAddActionPerformed
 
     }//GEN-LAST:event_inputStationsToAddActionPerformed

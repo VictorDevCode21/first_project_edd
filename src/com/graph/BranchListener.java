@@ -8,7 +8,16 @@ package com.graph;
  *
  * @author PC
  */
+
+
+/**
+ *Define un listener que notifica cuando se produce un cambio en las sucursales
+ */
 public interface BranchListener {
 
-    void onBranchChanged();  // Método que se llamará al cambiar las sucursales
+    
+    /**
+     * Método que se llamará al cambiar las sucursales
+     */
+    void onBranchChanged();  
 }

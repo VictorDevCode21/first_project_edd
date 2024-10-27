@@ -16,47 +16,102 @@ import org.graphstream.graph.implementations.SingleGraph;
  *
  * @author PC
  */
+
+
+/**
+ *
+ * Clase que representa una red del metro 
+ */
 public class NetworkTrain {
 
     private LinkedList<Station> stations;
     private Graph graph;
     private LinkedList<NetworkTrainListener> networkListeners;
 
+    
+    
+    /**
+     * Constructor de la clase NetworkTrain.
+     * Inicializa las listas de estaciones y listeners, y crea un grafo para la red del metro.
+     */
+    
     public NetworkTrain() {
         this.stations = new LinkedList();
         this.graph = new SingleGraph("Metro de Caracas");
         this.networkListeners = new LinkedList<>(); // Inicializar la lista correctamente
     }
+    
+    
+    /**
+     * Agrega un listener a la lista de listeners de la red del metro.
+     * 
+     * @param listener El listener a agregar.
+     */
 
     public void addListener(NetworkTrainListener listener) {
         networkListeners.add(listener);
     }
+    
+    /**
+     * Elimina un listener de la lista de listeners de la red del metro.
+     * 
+     * @param networkListener El listener a eliminar.
+     */
 
     public void removeListener(NetworkTrainListener networkListener) {
         networkListeners.remove(networkListener);
     }
+    
+    /**
+     * Notifica a todos los listeners que se ha agregado una nueva estación.
+     * 
+     * @param station La estación que se ha agregado.
+     */
 
     private void notifyStationAdded(Station station) {
         for (NetworkTrainListener networkListener : networkListeners) {
             networkListener.onStationAdded(station);
         }
     }
+    
+    
+    /**
+     * Notifica a todos los listeners que se ha agregado una nueva conexión entre estaciones.
+     * 
+     * @param station1 La primera estación de la conexión.
+     * @param station2 La segunda estación de la conexión.
+     */
 
     private void notifyConnectionAdded(Station station1, Station station2) {
         for (NetworkTrainListener networkListener : networkListeners) {
             networkListener.onConnectionAdded(station1, station2);
         }
     }
+    
+    
+    /**
+     * Agrega una nueva estación a la red de metro.
+     * 
+     * @param name El nombre de la estación a agregar.
+     */
 
     public void addStation(String name) {
         // Verificar si la estación ya existe
         if (getStation(name) == null) {
-            Station newStation = new Station(name);
-            getStations().add(newStation);
+            Station newStation = new Station(name); 
+            getStations().add(newStation); 
             graph.addNode(name); // Agregar nodo al grafo solo si no existe
             notifyStationAdded(newStation); // Notifica a sus listener
         }
     }
+    
+    
+    /**
+     * Agrega una nueva estación a la red de metro y la asocia a una línea.
+     * 
+     * @param lineName El nombre de la línea a la que pertenece la estación.
+     * @param stationName El nombre de la estación a agregar.
+     */
 
     public void addStation(String lineName, String stationName) {
         // Verificar si la estación ya existe
@@ -66,8 +121,15 @@ public class NetworkTrain {
             graph.addNode(stationName); // Agregar nodo al grafo solo si no existe
             notifyStationAdded(newStation); // Notificar a los listeners que se añadió la estación
         }
-        // Aquí puedes agregar lógica para asociar la estación a la línea si es necesario
+        
     }
+    
+    /**
+     * Obtiene una estación por su nombre.
+     * 
+     * @param name El nombre de la estación a buscar.
+     * @return La estación encontrada, o null si no se encuentra.
+     */
 
     public Station getStation(String name) {
         Node aux = getStations().getHead();
@@ -81,6 +143,13 @@ public class NetworkTrain {
         }
         return null;
     }
+    
+    /**
+     * Agrega una conexión entre dos estaciones.
+     * 
+     * @param name1 El nombre de la primera estación.
+     * @param name2 El nombre de la segunda estación.
+     */
 
     public void addConnection(String name1, String name2) {
         Station station1 = getStation(name1);
@@ -113,8 +182,14 @@ public class NetworkTrain {
             }
         }
     }
+    
+    /**
+     * Obtiene los vecinos de una estación.
+     * 
+     * @param station La estación de la que se quieren obtener los vecinos.
+     * @return Una lista con las estaciones vecinas.
+     */
 
-    // Método para obtener los vecinos de una estación
     public LinkedList<Station> getNeighbors(Station station) {
         LinkedList<Station> neighbors = new LinkedList<>(); // Lista para almacenar los vecinos
 
@@ -137,8 +212,14 @@ public class NetworkTrain {
 
         return neighbors; // Retorna la lista de vecinos
     }
+    
+    /**
+     * Obtiene una estación por su nombre.
+     * 
+     * @param name El nombre de la estación a buscar.
+     * @return La estación encontrada, o null si no se encuentra.
+     */
 
-    // Método para obtener una estación por su nombre
     public Station getStationByName(String name) {
         Node<Station> current = stations.getHead();
         while (current != null) {
@@ -150,8 +231,13 @@ public class NetworkTrain {
         }
         return null; // Retorna null si no se encuentra la estación
     }
+    
+    /**
+     * Carga la red de trenes desde un archivo JSON.
+     * 
+     * @param json El objeto JSON que contiene la información de la red de trenes.
+     */
 
-    //    
     public void loadFromJson(JSONObject json) {
         String networkName = json.keys().next();
         JSONArray metroLines = json.getJSONArray(networkName);
@@ -199,9 +285,13 @@ public class NetworkTrain {
                 }
             }
         }
-//        printGraph();
-    }
 
+    }
+    
+    /**
+     * Imprime el grafo de la red de metro, mostrando las estaciones y sus conexiones.
+     */
+    
     public void printGraph() {
         for (Station station : stations) {
             System.out.println("Estación: " + station.getName());
@@ -216,7 +306,11 @@ public class NetworkTrain {
             }
         }
     }
-
+    
+    /**
+     * Imprime la red de metro, mostrando las estaciones y sus conexiones.
+     */
+    
     public void printNetwork() {
         Node aux = getStations().getHead();
 
@@ -234,6 +328,10 @@ public class NetworkTrain {
             aux = aux.getNext();
         }
     }
+    
+    /**
+     * Imprime todas las conexiones en la red de metro.
+     */
 
     public void printAllConnections() {
         System.out.println("Conexiones en la red:");
@@ -243,13 +341,21 @@ public class NetworkTrain {
             }
         }
     }
-
+    
     /**
-     * @return the stations
+     * Obtiene la lista de estaciones.
+     * 
+     * @return La lista de estaciones.
      */
+    
     public LinkedList<Station> getStations() {
         return stations;
     }
+    
+    
+    /**
+     * Imprime todas las estaciones en la red de metro.
+     */
 
     public void printStations() {
         System.out.println("Estaciones en la red:");
@@ -257,15 +363,24 @@ public class NetworkTrain {
             System.out.println(station.getName());
         }
     }
-
+    
     /**
-     * @param stations the stations to set
+     * Establece la lista de estaciones.
+     * 
+     * @param stations La lista de estaciones a establecer.
      */
+
     public void setStations(LinkedList stations) {
         this.stations = stations;
     }
 
-    // Método para verificar si una estación existe
+    /**
+     * Verifica si una estación existe en la red de metro.
+     * 
+     * @param stationName El nombre de la estación a verificar.
+     * @return true si la estación existe, false en caso contrario.
+     */
+    
     public boolean stationExists(String stationName) {
         // Debe comprobar si la estación existe en la lista de estaciones
         for (Station station : stations) { // Asumiendo que `stations` es tu lista de estaciones

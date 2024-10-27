@@ -15,6 +15,11 @@ import javax.swing.JOptionPane;
  *
  * @author PC
  */
+
+
+/**
+ *  Clase que representa la interfaz de bienvenida de la aplicación.
+ */
 public class WelcomeInterface extends javax.swing.JFrame implements StationLoadListener, PanelChangeListener, TValueListener, BranchListener {
 
     private GUI gui;  // Instancia de GUI
@@ -24,7 +29,7 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
     private int tValue = -1; // Almacena el valor de T
 
     /**
-     * Creates new form WelcomeInterface
+     * Crea una nueva instancia de WelcomeInterface.
      */
     public WelcomeInterface() {
         initComponents();
@@ -42,6 +47,11 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
 
     }
 
+    /**
+     * Muestra el panel especificado en el área de contenido.
+     * 
+     * @param p El panel a mostrar.
+     */
     private void ShowPanel(JPanel p) {
         p.setSize(389, 178);
         p.setLocation(0, 0);
@@ -53,6 +63,11 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
         content.repaint();
     }
 
+    /**
+     * Método llamado cuando se cambia el panel.
+     * 
+     * @param newPanel El nuevo panel a mostrar.
+     */
     @Override
     public void onChangePanel(JPanel newPanel) {
         ShowPanel(newPanel);
@@ -177,18 +192,27 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    // Este método será llamado cuando se active el evento
+    /**
+     * Método llamado cuando cambian las sucursales.
+     */
     @Override
     public void onBranchChanged() {
-        // Aquí puedes implementar la lógica para actualizar el estado de las sucursales
+        
         updateBranchesDisplay(); // Método que actualiza la visualización de sucursales
     }
 
-    // Método para actualizar la visualización de las sucursales
+    /**
+     * Método para actualizar la visualización de las sucursales.
+     */
     private void updateBranchesDisplay() {
         LinkedList<Station> branches = gui.getBranches();
     }
 
+    /**
+     * Método llamado cuando se cargan las estaciones.
+     * 
+     * @param loadedStations La lista de estaciones cargadas.
+     */
     @Override
     public void onStationsLoaded(LinkedList<Station> loadedStations) {
         // Aquí puedes manejar las estaciones cargadas
@@ -196,6 +220,11 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
         this.stations = loadedStations; // Asegúrate de tener un campo para guardar las estaciones en WelcomeInterface
     }
 
+    /**
+     * Método llamado cuando cambia el valor de T.
+     * 
+     * @param newT El nuevo valor de T.
+     */
     @Override
     public void onTValueChanged(int newT) {
         this.tValue = newT;  // Almacena el valor T
@@ -207,6 +236,11 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
     }
 
 
+    /**
+     * Muestra el grafo cuando se presiona el botón "Show Graph".
+     * 
+     * @param evt El evento de acción.
+     */
     private void showGraphButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showGraphButtonActionPerformed
         // Verifica si tValue es -1 (no establecido)
         if (tValue == -1) {
@@ -233,6 +267,11 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
 
     }//GEN-LAST:event_showGraphButtonActionPerformed
 
+    /**
+     * Acción realizada cuando se presiona el botón "Add Station".
+     * 
+     * @param evt El evento de acción.
+     */
     private void addStationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addStationActionPerformed
         try {
             checkNetworkLoaded();
@@ -251,6 +290,12 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
 
     }//GEN-LAST:event_addStationActionPerformed
 
+    
+    /**
+     * Acción realizada cuando se presiona el botón "Add Line".
+     * 
+     * @param evt El evento de acción.
+     */
     private void addLineButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addLineButtonActionPerformed
         try {
             checkNetworkLoaded();
@@ -265,6 +310,12 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
         }
     }//GEN-LAST:event_addLineButtonActionPerformed
 
+    
+    /**
+     * Acción realizada cuando se presiona el botón "Delete Branch".
+     * 
+     * @param evt El evento de acción.
+     */
     private void deleteBranchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBranchActionPerformed
         try {
             checkNetworkLoaded();
@@ -283,6 +334,11 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
         }
     }//GEN-LAST:event_deleteBranchActionPerformed
 
+    /**
+     * Acción realizada cuando se presiona el botón "Set T".
+     * 
+     * @param evt El evento de acción.
+     */
     private void setTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setTActionPerformed
 
         Page4 p4 = new Page4(this);
@@ -290,6 +346,11 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
 
     }//GEN-LAST:event_setTActionPerformed
 
+    /**
+     * Acción realizada cuando se presiona el botón "Branch Coverage".
+    * 
+    * @param evt El evento de acción.
+    */
     private void branchCoverageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_branchCoverageActionPerformed
         try {
             // Verifica si la red está cargada correctamente
@@ -310,6 +371,12 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
         }
     }//GEN-LAST:event_branchCoverageActionPerformed
 
+    
+    /**
+     * Acción realizada cuando se presiona el botón "Total Coverage".
+     * 
+     * @param evt El evento de acción.
+     */
     private void totalCoverage1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_totalCoverage1ActionPerformed
         try {
             // Verifica si la red está cargada correctamente
@@ -330,7 +397,9 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
         }
     }//GEN-LAST:event_totalCoverage1ActionPerformed
 
-    //  Revisa si las estaciones estan cargadas 
+    /**
+     * Revisa si las estaciones están cargadas correctamente.
+     */
     private void checkNetworkLoaded() {
         try {
             // Verificar si gui es null

@@ -8,26 +8,43 @@ package com.graph;
  *
  * @author PC
  */
-public class BreadthFirstSearch {
 
+ /**
+  *Clase que implementa el algoritmo de búsqueda en anchura (BFS) para recorrer estaciones.
+  */
+public class BreadthFirstSearch {
+    
     private Station startStation; // Estación de inicio para el algoritmo
     private LinkedList<Station> visitedStations; // LinkedList para almacenar estaciones visitadas
+    
+    /**
+     * Constructor para inicializar la búsqueda en anchura.
+     *
+     * @param startStation la estación de inicio para el algoritmo
+     * @param visitedStations la lista de estaciones visitadas
+     */
 
     public BreadthFirstSearch(Station startStation, LinkedList<Station> visitedStations) {
         this.startStation = startStation;
         this.visitedStations = visitedStations; // Inicializa la lista de estaciones visitadas
     }
 
+    /**
+     * Realiza la búsqueda en anchura desde la estación de inicio y notifica a los listeners.
+     *
+     * @param listener el listener que será notificado cuando una estación sea visitada
+     */
+    
     public void traverse(BFSListener listener) {
         Queue<Station> queue = new Queue<>();
         visitedStations.add(startStation); // Añadimos la estación de inicio a las visitadas
         queue.enqueue(startStation);
-//        System.out.println("Iniciando BFS desde la estación: " + startStation.getName());
+
 
         while (!queue.isEmpty()) {
             Station currentStation = queue.dequeue();
             listener.stationVisited(currentStation);
-//            System.out.println("Visitando estación: " + currentStation.getName());
+
 
             // Verificar las conexiones de la estación actual
             for (Connection connection : currentStation.getConnections()) {
@@ -40,14 +57,18 @@ public class BreadthFirstSearch {
                 if (!isVisited(adjacentStation)) {
                     visitedStations.add(adjacentStation); // Añadimos al conjunto de visitadas
                     queue.enqueue(adjacentStation);
-//                    System.out.println("Encolando estación: " + adjacentStation.getName());
+
                 } else {
-//                    System.out.println("Conexión ya visitada entre: " + currentStation.getName() + " y " + adjacentStation.getName());
+
                 }
             }
         }
     }
 
+    /**
+     * Imprime las estaciones visitadas en el orden en que fueron recorridas.
+     */
+    
     public void printVisitedStations() {
         System.out.println("Estaciones visitadas en orden:");
         Node<Station> aux = visitedStations.getHead();
@@ -58,6 +79,13 @@ public class BreadthFirstSearch {
         }
     }
 
+    /**
+     * Verifica si una estación ya ha sido visitada.
+     *
+     * @param station la estación a verificar
+     * @return true si la estación ya fue visitada, false en caso contrario
+     */
+    
     private boolean isVisited(Station station) {
         Node<Station> visitedAux = visitedStations.getHead(); // Obtener la cabeza de la lista de visitadas
         while (visitedAux != null) {
@@ -69,6 +97,12 @@ public class BreadthFirstSearch {
         return false; // La estación no ha sido visitada
     }
 
+    /**
+     * Obtiene la lista de estaciones visitadas.
+     *
+     * @return la lista de estaciones visitadas
+     */
+    
     public LinkedList<Station> getVisitedStations() {
         return this.visitedStations;
     }

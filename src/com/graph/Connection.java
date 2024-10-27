@@ -12,59 +12,98 @@ package com.graph;
 /* Se aclara que se utilizara grafo no dirigido por lo que las conexiones seran 
     Bidireccionales
  */
+/**
+ * Clase que representa una conexión (aristas)  entre dos estaciones en la red de metro.
+ */
 public class Connection {
 
     private Station station1; // Estacion de origen
     private Station station2; // Estacion de destino 
     private String type; // Atributo para el tipo de conexion
 
-    //  Constructor para la clase conexion donde se requieren 2 estaciones
+    /**
+     * Constructor para la clase conexión donde se requieren dos estaciones.
+     * 
+     * @param station1 La estación de origen.
+     * @param station2 La estación de destino.
+     */
+    
     public Connection(Station station1, Station station2) {
         this.station1 = station1;
         this.station2 = station2;
         this.type = "regular"; // Por defecto sera del tipo regular
     }
+    
+    /**
+     * Constructor para la clase conexión donde se requieren dos estaciones y un tipo de conexión.
+     * 
+     * @param station1 La estación de origen.
+     * @param station2 La estación de destino.
+     * @param type El tipo de conexión.
+     */
 
     public Connection(Station station1, Station station2, String type) {
         this.station1 = station1;
         this.station2 = station2;
         this.type = type; // Por defecto sera del tipo regular
     }
+    
 
-    // Retorna cual es la estacion de origen   
+    /**
+     * Retorna la estación de origen.
+     * 
+     * @return La estación de origen.
+     */
+    
     public Station getStation1() {
         return station1;
     }
-
-    // Retorna la estacion de destino    
+    
+    /**
+     * Retorna la estación de destino.
+     * 
+     * @return La estación de destino.
+     */
+    
     public Station getStation2() {
         return station2;
     }
 
     /**
-     * @param station1 the station1 to set
+     * Establece la estación de origen.
+     * 
+     * @param station1 La estación de origen a establecer.
      */
     public void setStation1(Station station1) {
         this.station1 = station1;
     }
 
     /**
-     * @param station2 the station2 to set
+     * Establece la estación de destino.
+     * 
+     * @param station2 La estación de destino a establecer.
      */
+    
     public void setStation2(Station station2) {
         this.station2 = station2;
     }
 
     /**
-     * @return the type
+     * Retorna el tipo de conexión.
+     * 
+     * @return El tipo de conexión.
      */
+    
     public String getType() {
         return type;
     }
 
     /**
-     * @param type the type to set
+     * Establece el tipo de conexión.
+     * 
+     * @param type El tipo de conexión a establecer.
      */
+    
     public void setType(String type) {
         this.type = type;
     }
@@ -77,6 +116,14 @@ public class Connection {
     public boolean isPedestrian() {
         return "peatonal".equalsIgnoreCase(type); // Compara el tipo ignorando mayúsculas y minúsculas
     }
+    
+    
+    /**
+     * Verifica si esta conexión es igual a otra conexión.
+     * 
+     * @param other La otra conexión a comparar.
+     * @return true si las conexiones son iguales, false en caso contrario.
+     */
 
     public boolean isEqual(Connection other) {
         if (other == null) {
@@ -87,6 +134,7 @@ public class Connection {
                 || (this.station1.equals(other.station2) && this.station2.equals(other.station1)));
     }
 
+    
     /**
      * Método para obtener la estación vecina a partir de una estación dada.
      *

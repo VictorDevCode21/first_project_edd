@@ -8,6 +8,16 @@ package com.graph;
  *
  * @author PC
  */
+
+/**
+ *Define un listener que notifique cuando se haga una busqueda BFS
+ */
 public interface BFSListener {
-    void stationVisited(Station station);
+    
+    /**
+     * Método llamado cuando una estación es visitada durante la búsqueda en anchura.
+     *
+     * @param station la estación que ha sido visitada
+     */
+    void stationVisited(Station station);//
 }

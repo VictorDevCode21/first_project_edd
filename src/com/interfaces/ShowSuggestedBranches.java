@@ -11,6 +11,10 @@ import com.graph.Station;
  *
  * @author Joao
  */
+
+/**
+ *Clase que muestra las sucursales sugeridas en la red de metro.
+ */
 public class ShowSuggestedBranches extends javax.swing.JPanel implements AlgorithmSelectionListener, BranchListener {
 
     private PanelChangeListener listener; // Referencia al listener
@@ -19,7 +23,10 @@ public class ShowSuggestedBranches extends javax.swing.JPanel implements Algorit
     private AlgorithmSelectionListener algorithmListener;
 
     /**
-     * Creates new form Page5
+     * Crea una nueva instancia de ShowSuggestedBranches.
+     * 
+     * @param listener El listener para cambios de panel.
+     * @param gui La instancia de la GUI principal.
      */
     public ShowSuggestedBranches(PanelChangeListener listener, GUI gui) {
         this.listener = listener;
@@ -31,13 +38,21 @@ public class ShowSuggestedBranches extends javax.swing.JPanel implements Algorit
         gui.addAlgorithmSelectionListener(this);
         gui.addBranchListener(this);
     }
-
+    
+    /**
+     * Método llamado cuando se selecciona un algoritmo.
+     * 
+     * @param useBFS true si se selecciona BFS, false si se selecciona DFS.
+     */
     @Override
     public void onAlgorithmSelected(boolean useBFS) {
         this.selectedAlgorithm = useBFS;
         showSuggestedBranches();
     }
     
+    /**
+     * Método llamado cuando cambian las sucursales.
+     */
     @Override
     public void onBranchChanged() {
         // Lógica para actualizar las sucursales sugeridas cuando cambian las sucursales
@@ -111,6 +126,11 @@ public class ShowSuggestedBranches extends javax.swing.JPanel implements Algorit
         add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 370, 140));
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Acción realizada cuando se presiona el botón de cerrar.
+     * 
+     * @param evt El evento de acción.
+     */
     private void closeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeButtonActionPerformed
 
         if (listener != null) {
@@ -121,18 +141,31 @@ public class ShowSuggestedBranches extends javax.swing.JPanel implements Algorit
         }
     }//GEN-LAST:event_closeButtonActionPerformed
 
+    /**
+     * Acción realizada cuando se selecciona el botón DFS.
+     * 
+     * @param evt El evento de acción.
+     */
     private void selectDFSButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectDFSButtonActionPerformed
         selectedAlgorithm = false;  // DFS seleccionado
         gui.notifyAlgorithmSelection(selectedAlgorithm); // Notificar selección
         showSuggestedBranches();
     }//GEN-LAST:event_selectDFSButtonActionPerformed
 
+    /**
+     * Acción realizada cuando se selecciona el botón BFS.
+     * 
+     * @param evt El evento de acción.
+     */
     private void selectBFSButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectBFSButtonActionPerformed
         selectedAlgorithm = true;  // BFS seleccionado
         gui.notifyAlgorithmSelection(selectedAlgorithm); // Notificar selección
         showSuggestedBranches();
     }//GEN-LAST:event_selectBFSButtonActionPerformed
 
+    /**
+     * Muestra las sucursales sugeridas en el JTextArea.
+     */
     private void showSuggestedBranches() {
         // Obtener las estaciones no cubiertas y sugerir nuevas sucursales
         String suggestBranch = gui.suggestNewBranches(selectedAlgorithm);

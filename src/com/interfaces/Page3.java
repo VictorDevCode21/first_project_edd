@@ -13,12 +13,18 @@ import com.graph.LinkedList;
  *
  * @author Joao
  */
+
+ /**
+  * Clase que representa la tercera página del panel de la GUI.
+  */
 public class Page3 extends javax.swing.JPanel {
 
     private GUI gui; // Referencia a la clase GUI para obtener las sucursales
 
     /**
-     * Creates new form Page3
+     * Crea una nueva instancia de Page3.
+     * 
+     * @param gui La instancia de la GUI principal.
      */
     public Page3(GUI gui) {
         this.gui = gui; // Asigna el objeto GUI
@@ -107,13 +113,22 @@ public class Page3 extends javax.swing.JPanel {
         // Actualiza el TextArea con la lista de sucursales
         showBranchesList.setText(branchesText.toString());
     }
-
-
+    
+    /**
+     * Crea una nueva instancia de Page3.
+     * 
+     * @param gui La instancia de la GUI principal.
+     */
     private void inputRemoveBranchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inputRemoveBranchActionPerformed
 
 
     }//GEN-LAST:event_inputRemoveBranchActionPerformed
 
+    /**
+     * Acción realizada cuando se presiona el botón para eliminar una sucursal.
+     * 
+     * @param evt El evento de acción.
+     */
     private void removeBranchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeBranchButtonActionPerformed
         // Obtiene el texto ingresado por el usuario
         String branchName = inputRemoveBranch.getText().trim();

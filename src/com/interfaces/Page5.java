@@ -11,6 +11,11 @@ import javax.swing.JOptionPane;
  *
  * @author Joao
  */
+
+
+ /**
+  * Clase que representa la quinta página del panel de la GUI.
+  */
 public class Page5 extends javax.swing.JPanel {
 
     private String selectedBranchName; // Variable para guardar el nombre de la sucursal
@@ -21,7 +26,11 @@ public class Page5 extends javax.swing.JPanel {
     private PanelChangeListener listener; // Referencia al listener
 
     /**
-     * Creates new form Page5
+     * Crea una nueva instancia de Page5.
+     * 
+     * @param gui La instancia de la GUI principal.
+     * @param networkTrain La instancia de la red de trenes.
+     * @param listener El listener para cambios de panel.
      */
     public Page5(GUI gui, NetworkTrain networkTrain, PanelChangeListener listener) {
         this.gui = gui;
@@ -31,7 +40,10 @@ public class Page5 extends javax.swing.JPanel {
         loadBranches();
         initComponents();
     }
-
+    
+    /**
+     * Carga las sucursales desde la GUI.
+     */
     private void loadBranches() {
         branches = gui.getBranches();
     }
@@ -114,16 +126,31 @@ public class Page5 extends javax.swing.JPanel {
         add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 370, 140));
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Acción realizada cuando se selecciona el botón DFS.
+     * 
+     * @param evt El evento de acción.
+     */
     private void dfsSelectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dfsSelectButtonActionPerformed
         selectedAlgorithm = "DFS"; // Guardamos la selección como DFS
         loadBranches(); // Cargar sucursales para DFS
     }//GEN-LAST:event_dfsSelectButtonActionPerformed
 
+    /**
+     * Acción realizada cuando se selecciona el botón BFS.
+     * 
+     * @param evt El evento de acción.
+     */
     private void bfsSelectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bfsSelectButtonActionPerformed
         selectedAlgorithm = "BFS"; // Guardamos la selección como BFS
         loadBranches(); // Cargar sucursales para DFS
     }//GEN-LAST:event_bfsSelectButtonActionPerformed
 
+    /**
+     * Acción realizada cuando se presiona el botón para ver la cobertura.
+     * 
+     * @param evt El evento de acción.
+     */
     private void seeCoverageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_seeCoverageActionPerformed
         // Verificar que se haya ingresado un nombre de sucursal
         if (selectedBranchName == null || selectedBranchName.isEmpty()) {
@@ -170,6 +197,11 @@ public class Page5 extends javax.swing.JPanel {
 
     }//GEN-LAST:event_seeCoverageActionPerformed
 
+    /**
+     * Acción realizada cuando se ingresa el nombre de la sucursal.
+     * 
+     * @param evt El evento de acción.
+     */
     private void inputBranchNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inputBranchNameActionPerformed
         selectedBranchName = inputBranchName.getText();
 
@@ -178,6 +210,11 @@ public class Page5 extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_inputBranchNameActionPerformed
 
+    /**
+     * Acción realizada cuando se presiona el botón para agregar el nombre de la sucursal.
+     * 
+     * @param evt El evento de acción.
+     */
     private void addSucursalNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addSucursalNameActionPerformed
         selectedBranchName = inputBranchName.getText();  // Captura el nombre desde el campo de texto
 

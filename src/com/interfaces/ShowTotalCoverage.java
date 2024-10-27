@@ -14,6 +14,10 @@ import com.graph.Station;
 /**
  *
  * @author Joao
+ */ 
+
+/**
+ * Clase que muestra la cobertura total de las sucursales en la red de trenes.
  */
 public class ShowTotalCoverage extends javax.swing.JPanel implements AlgorithmSelectionListener, BranchListener {
 
@@ -22,7 +26,10 @@ public class ShowTotalCoverage extends javax.swing.JPanel implements AlgorithmSe
     private boolean selectedAlgorithm;
 
     /**
-     * Creates new form Page5
+     * Crea una nueva instancia de ShowTotalCoverage.
+     * 
+     * @param listener El listener para cambios de panel.
+     * @param gui La instancia de la GUI principal.
      */
     public ShowTotalCoverage(PanelChangeListener listener, GUI gui) {
         this.listener = listener;
@@ -34,12 +41,20 @@ public class ShowTotalCoverage extends javax.swing.JPanel implements AlgorithmSe
 
     }
 
+    /**
+     * Método llamado cuando se selecciona un algoritmo.
+     * 
+     * @param useBFS true si se selecciona BFS, false si se selecciona DFS.
+     */
     @Override
     public void onAlgorithmSelected(boolean useBFS) {
         this.selectedAlgorithm = useBFS;
         showTotalCoverage();
     }
 
+    /**
+     * Método llamado cuando cambian las sucursales.
+     */
     @Override
     public void onBranchChanged() {
         // Lógica para actualizar la cobertura total cuando cambian las sucursales
@@ -112,6 +127,11 @@ public class ShowTotalCoverage extends javax.swing.JPanel implements AlgorithmSe
         add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 370, 140));
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Acción realizada cuando se presiona el botón de cerrar.
+     * 
+     * @param evt El evento de acción.
+     */
     private void closeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeButtonActionPerformed
 
         if (listener != null) {
@@ -122,18 +142,31 @@ public class ShowTotalCoverage extends javax.swing.JPanel implements AlgorithmSe
         }
     }//GEN-LAST:event_closeButtonActionPerformed
 
+    /**
+     * Acción realizada cuando se selecciona el botón DFS.
+     * 
+     * @param evt El evento de acción.
+     */
     private void selectDFSButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectDFSButtonActionPerformed
         selectedAlgorithm = false;
         gui.notifyAlgorithmSelection(selectedAlgorithm); // Notificar selección
         showTotalCoverage();
     }//GEN-LAST:event_selectDFSButtonActionPerformed
 
+    /**
+     * Acción realizada cuando se selecciona el botón BFS.
+     * 
+     * @param evt El evento de acción.
+     */
     private void selectBFSButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectBFSButtonActionPerformed
         selectedAlgorithm = true;
         gui.notifyAlgorithmSelection(selectedAlgorithm); // Notificar selección
         showTotalCoverage();
     }//GEN-LAST:event_selectBFSButtonActionPerformed
 
+    /**
+     * Muestra la cobertura total en el JTextArea.
+     */
     private void showTotalCoverage() {
         boolean isFullyCovered = gui.checkTotalCoverage();
         if (isFullyCovered) {

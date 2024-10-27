@@ -13,12 +13,18 @@ import javax.swing.JOptionPane;
  *
  * @author Joao
  */
+
+/**
+ * Clase que representa la primera página del panel de la GUI.
+ */
 public class Page1 extends javax.swing.JPanel {
 
     private GUI gui;
 
     /**
-     * Creates new form Page1
+     * Crea una nueva instancia de Page1.
+     * 
+     * @param gui La instancia de la GUI principal.
      */
     public Page1(GUI gui) {
         this.gui = gui;
@@ -67,10 +73,22 @@ public class Page1 extends javax.swing.JPanel {
         add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 370, 140));
     }// </editor-fold>//GEN-END:initComponents
 
+    
+    /**
+     * Acción realizada cuando se ingresa el nombre de la sucursal.
+     * 
+     * @param evt El evento de acción.
+     */
     private void inputBranchToAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inputBranchToAddActionPerformed
 
     }//GEN-LAST:event_inputBranchToAddActionPerformed
 
+    
+    /**
+     * Acción realizada cuando se presiona el botón para agregar una sucursal.
+     * 
+     * @param evt El evento de acción.
+     */
     private void addBranchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addBranchButtonActionPerformed
         LinkedList<Station> branches = gui.getBranches(); // Obtiene la lista de sucursales desde GUI
         LinkedList<Station> allStations = gui.getNetworkTrain().getStations(); // Obtiene todas las estaciones desde GUI

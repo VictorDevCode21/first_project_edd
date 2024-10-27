@@ -9,42 +9,64 @@ package com.graph;
  * @author PC
  */
 
-    // Clase Nodo generica para implementar lista enlazada
+/**
+ * Clase genérica que representa un nodo en una lista enlazada.
+ * 
+ * @param <T> El tipo de dato que almacenará el nodo.
+ */
+
 public class Node<T> {
     private T data;            // Data que se guardara en el nodo
     private Node<T> next;      // Puntero hacia el nodo siguiente
     private Integer headQuarterDistance; // Distancia de la sucursal principal
 
-    // Constructor para inicializar el nodo
+    /**
+     * Constructor para inicializar el nodo con el dato proporcionado.
+     * 
+     * @param data El dato que se almacenará en el nodo.
+     */
+    
     public Node(T data) {
         this.data = data;
         this.next = null;
     }
 
     /**
-     * @return the data
+     * Obtiene el dato almacenado en el nodo.
+     * 
+     * @return El dato almacenado en el nodo.
      */
+    
     public T getData() {
         return data;
     }
+    
 
     /**
-     * @param data the data to set
+     * Establece el dato a almacenar en el nodo.
+     * 
+     * @param data El dato a almacenar en el nodo.
      */
     public void setData(T data) {
         this.data = data;
     }
 
     /**
-     * @return the next
+     * Obtiene el nodo siguiente en la lista enlazada.
+     * 
+     * @return El nodo siguiente.
      */
+    
     public Node<T> getNext() {
         return next;
     }
 
     /**
-     * @param next the next to set
+     * Establece el nodo siguiente en la lista enlazada.
+     * 
+     * @param next El nodo siguiente a establecer.
      */
+    
     public void setNext(Node<T> next) {
         this.next = next;
     }

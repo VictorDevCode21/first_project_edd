@@ -13,6 +13,11 @@ import com.graph.Station;
  *
  * @author Joao
  */
+ 
+ 
+ /**
+  *Clase que muestra la cobertura de las sucursales en la red de metro.
+  */
 public class ShowBranchesCoverage extends javax.swing.JPanel {
 
     private LinkedList<Station> coveredStations;
@@ -21,7 +26,12 @@ public class ShowBranchesCoverage extends javax.swing.JPanel {
     private NetworkTrain networkTrain;
 
     /**
-     * Creates new form Page5
+     * Crea una nueva instancia de ShowBranchesCoverage.
+     * 
+     * @param coveredStations La lista de estaciones cubiertas.
+     * @param listener El listener para cambios de panel.
+     * @param gui La instancia de la GUI principal.
+     * @param networkTrain La instancia de la red de trenes.
      */
     public ShowBranchesCoverage(LinkedList<Station> coveredStations, PanelChangeListener listener,GUI gui , NetworkTrain networkTrain ) {
         this.coveredStations = coveredStations; // Almacenar la lista de sucursales
@@ -32,6 +42,9 @@ public class ShowBranchesCoverage extends javax.swing.JPanel {
         displayCoveredStations(); // Llamar al método para mostrar las estaciones
     }
 
+    /**
+     * Muestra las estaciones cubiertas en el JTextArea.
+     */
     private void displayCoveredStations() {
         LinkedList stationNames = new LinkedList(); // Crear una nueva lista enlazada para los nombres de las estaciones
 
@@ -44,7 +57,14 @@ public class ShowBranchesCoverage extends javax.swing.JPanel {
         // Establecer el texto en el JTextArea directamente
         showBranches.setText(convertListToString(stationNames));
     }
+    
 
+    /**
+     * Convierte una lista de elementos a un String con saltos de línea.
+     * 
+     * @param list La lista de elementos.
+     * @return el String resultante.
+     */
     private String convertListToString(LinkedList list) {
         String result = ""; // Inicializa una cadena vacía
 
@@ -99,6 +119,11 @@ public class ShowBranchesCoverage extends javax.swing.JPanel {
         add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 370, 140));
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Acción realizada cuando se presiona el botón de cerrar.
+     * 
+     * @param evt El evento de acción.
+     */
     private void closeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeButtonActionPerformed
 
         if (listener != null) {
