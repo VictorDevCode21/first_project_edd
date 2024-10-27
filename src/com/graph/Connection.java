@@ -8,10 +8,7 @@ package com.graph;
  *
  * @author PC
  */
-// Clase para establecer las conexiones (aristas)
-/* Se aclara que se utilizara grafo no dirigido por lo que las conexiones seran 
-    Bidireccionales
- */
+
 /**
  * Clase que representa una conexión (aristas)  entre dos estaciones en la red de metro.
  */

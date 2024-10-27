@@ -8,45 +8,81 @@ package com.graph;
  *
  * @author Joao
  */
+
+/**
+ * La clase SetList representa una lista de elementos que no permite duplicados.
+ * Utiliza una LinkedList para almacenar los elementos.
+ * 
+ * @param <E> el tipo de elementos en esta lista.
+ */
 public class SetList<E> {
 
     private LinkedList<E> elements;
     
-    //Inicializar lista de elementos
+    /**
+     * Inicializa una nueva instancia de SetList con una lista vacía.
+     */
     public SetList(){
         elements = new LinkedList<>();
     }
     
     
-    // Agregar elementos al set (sin duplicados)
+    /**
+     * Agrega un elemento al set si no está ya presente.
+     * 
+     * @param element el elemento a agregar.
+     */
     public void add(E element) {
         if (!elements.contains(element)) {
             elements.add(element);
         }
     }
 
-    // Agrega todos los elementos de una LinkedList, eliminando los duplicados
+    /**
+     * Agrega todos los elementos de una LinkedList al set, eliminando duplicados.
+     * 
+     * @param list la lista de elementos a agregar.
+     */
     public void addAll(LinkedList<E> list) {
         for (E item : list) {
             add(item);  
         }
     }
 
-    // Método para verificar si contiene un elemento
+    /**
+     * Verifica si el set contiene un elemento específico.
+     * 
+     * @param element el elemento a verificar.
+     * @return true si el set contiene el elemento, false en caso contrario.
+     */
     public boolean contains(E element) {
         return elements.contains(element);
     }
 
-    // Método para obtener todos los elementos como una LinkedList
+    
+    /**
+     * Obtiene todos los elementos del set como una LinkedList.
+     * 
+     * @return una LinkedList que contiene todos los elementos del set.
+     */
     public LinkedList<E> getElements() {
         return elements;
     }
     
-    // Método para obtener el tamaño del set
+    /**
+     * Obtiene el tamaño del set.
+     * 
+     * @return el número de elementos en el set.
+     */
     public int size() {
         return elements.size();
     }
 
+    /**
+     * Devuelve una representación en cadena de los elementos del set.
+     * 
+     * @return una cadena que representa los elementos del set.
+     */
     @Override
     public String toString() {
         return elements.toString();

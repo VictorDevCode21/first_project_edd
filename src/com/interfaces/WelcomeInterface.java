@@ -268,6 +268,15 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
     }//GEN-LAST:event_showGraphButtonActionPerformed
 
 
+    /**
+ * Acción realizada cuando se presiona el botón "Add Branch".
+ * Este método maneja el evento de acción generado por el botón "Add Branch".
+ * Verifica si la red está cargada y, si es así, muestra el panel correspondiente.
+ * Si la red no está cargada, muestra un mensaje de error.
+ * 
+ * @param evt El evento de acción generado por el botón.
+ */
+    
     private void addBranchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addBranchActionPerformed
 
         try {
