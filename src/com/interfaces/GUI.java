@@ -34,27 +34,31 @@ import org.json.JSONTokener;
 /**
  *
  * @author carlos
+ * 
  */
 public class GUI extends JFrame implements BranchListener, AlgorithmSelectionListener, NetworkTrainListener {
 
-    private NetworkTrain networkTrain;
-    private Graph graphStreamGraph;
-    private LinkedList<String> stations;
-    private LinkedList<Station> branches; // Lista para almacenar sucursales
-    private int T; // Para guardar el T que representa distancia entre estaciones
+    private NetworkTrain networkTrain;        // Clase que representa las estaciones de la red de estaciones
+    private Graph graphStreamGraph;           // Grafo visual para mostrar la red de estaciones
+    private LinkedList<String> stations;      // Lista de nombres de las estaciones
+    private LinkedList<Station> branches;     // Lista para almacenar sucursales
+    private int T;                            // Para guardar el T que representa distancia entre estaciones
     private LinkedList<StationLoadListener> listeners = new LinkedList(); // Lista para agregar estaciones
-    private String selectedAlgorithm;  // Variable para almacenar el algoritmo seleccionado
-    private String startStationName;   // Variable para almacenar la estación inicial
+    private String selectedAlgorithm;         // Variable para almacenar el algoritmo seleccionado
+    private String startStationName;          // Variable para almacenar la estación inicial
     private boolean isNetworkWindowOpen = false; // Controlar si la ventana de red está abierta
-    private LinkedList<TValueListener> tValueListeners = new LinkedList<>();
+    private LinkedList<TValueListener> tValueListeners = new LinkedList<>();  //Lista de listeners para cambios en el valor de T
     private LinkedList<BranchListener> bListeners;  // Lista de listeners
-    private boolean algorithmSelected; // Variable para mantener el algoritmo seleccionado
-    private LinkedList<AlgorithmSelectionListener> aListeners = new LinkedList<>();
-    private SetList<Station> eliminatedStations = new SetList<>();
-    private MapsList<String, Station> stationMap;
+    private boolean algorithmSelected;        // Variable para mantener el algoritmo seleccionado
+    private LinkedList<AlgorithmSelectionListener> aListeners = new LinkedList<>(); //Lista de listeners para la selección de algoritmos
+    private SetList<Station> eliminatedStations = new SetList<>(); //Lista de estaciones eliminadas
+    private MapsList<String, Station> stationMap; //Mapa(lista) de nombres de estaciones a objetos de estación
 
     
-
+/**
+ * Constructor de GUI
+ * @param networkTrain 
+ */
     public GUI(NetworkTrain networkTrain) {
         this.networkTrain = networkTrain;
         this.branches = new LinkedList();
@@ -68,7 +72,10 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         initUI();
     }
     
-    
+    /**
+     * Se llama cuando se añade una nueva estación desde la interfaz gráfica.
+     * @param station La estación que ha sido añadida.
+     */
     @Override
     public void onStationAdded(Station station) {
         System.out.println("Nueva estación agregada desde GUI: " + station.getName());
@@ -76,6 +83,11 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         updateGraph();
     }
 
+    /**
+     * Se llama cuando se añade una nueva conexión entre dos estaciones desde la interfaz gráfica.
+     * @param station1 La primera estación de la conexión.
+     * @param station2 La segunda estación de la conexión.
+     */
     @Override
     public void onConnectionAdded(Station station1, Station station2) {
         System.out.println("Nueva conexión agregada desde GUI: " + station1.getName() + " y " + station2.getName());
@@ -83,23 +95,39 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         updateGraph();
     }
     
-    
-
+    /**
+     * Se llama cuando se selecciona un algoritmo (BFS o DFS) en la interfaz gráfica.
+     * @param isBFS {@code true} Si se seleccionó BFS.
+     *              {@code false} Si se seleccionó DFS.
+     */
     @Override
     public void onAlgorithmSelected(boolean isBFS) {
         algorithmSelected = isBFS; // Actualiza el estado según la selección
     }
 
+    /**
+     * Añade un listener para la selección del algoritmo.
+     * @param aListener El listener a añadir.
+     */
     // Método para añadir un listener
     public void addAlgorithmSelectionListener(AlgorithmSelectionListener aListener) {
         aListeners.add(aListener);
     }
 
+    /**
+     * Elimina un listener de la selección del algoritmo.
+     * @param aListener El listener a eliminar.
+     */
     // Método para eliminar un listener
     public void removeAlgorithmSelectionListener(AlgorithmSelectionListener aListener) {
         aListeners.remove(aListener);
     }
 
+    /**
+     * Notifica a todos los listeners sobre la selección del algoritmo.
+     * @param useBFS {@code true} Si se está utilizando BFS.
+     *               {@code false} Si se está utilizando DFS.
+     */
     // Método para notificar a los listeners
     public void notifyAlgorithmSelection(boolean useBFS) {
         for (AlgorithmSelectionListener aListener : aListeners) {
@@ -107,10 +135,19 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         }
     }
 
+    /**
+     * Devuelve el estado de si se ha seleccionado DFS.
+     * @return {@code true} Si se está utilizando DFS.
+     *         {@code false} Si se está utilizando BFS.
+     */
     public boolean isDFSSelected() {
         return algorithmSelected; // Método para obtener el estado del algoritmo
     }
 
+    /**
+     * Se llama cuando cambian las sucursales.
+     * Actualiza la GUI y verifica la cobertura total de las estaciones.
+     */
     @Override
     public void onBranchChanged() {
         // Lógica para actualizar el estado de la GUI cuando cambian las sucursales
@@ -118,17 +155,28 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         suggestNewBranches(algorithmSelected);  // Sugiere nuevas sucursales
     }
 
+    /**
+     * Añade una nueva sucursal a la lista de sucursales.
+     * @param branch La estación que se añadirá como sucursal.
+     */
     // Método para añadir una sucursal
     public void addBranch(Station branch) {
         branches.add(branch);
         notifyListeners();  // Notificar a los listeners
     }
 
+    /**
+     * Añade un listener para los cambios en las sucursales.
+     * @param bListener El listener a añadir.
+     */
     // Método para registrar un listener
     public void addBranchListener(BranchListener bListener) {
         bListeners.add(bListener);
     }
 
+    /**
+     * Notifica a todos los listeners sobre cambios en las sucursales.
+     */
     // Método para notificar a todos los listeners
     private void notifyListeners() {
         for (BranchListener bListener : bListeners) {
@@ -136,26 +184,45 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         }
     }
 
+    /**
+     * Añade un listener para cambios en el valor de T.
+     * @param listener El listener a añadir.
+     */
     public void addTValueListener(TValueListener listener) {
         tValueListeners.add(listener);
     }
 
+    /**
+     * Notifica a todos los listeners sobre cambios en el valor de T.
+     * @param newT El nuevo valor de T. 
+     */
     private void notifyTValueChanged(int newT) {
         for (TValueListener listener : tValueListeners) {
             listener.onTValueChanged(newT);
         }
     }
-
+    
+    /**
+     * Actualiza el valor de T y notifica a los listeners. 
+     * @param newT El nuevo valor de T.
+     */
     public void setT(int newT) {
         this.T = newT;  // Actualiza el valor de T
         notifyTValueChanged(newT);
         updateGraph();  // Llama a updateGraph para redibujar el grafo y crear las sucursales
     }
 
+    /**
+     * Añade un listener para la carga de estaciones.
+     * @param listener El listener a añadir.
+     */
     public void addStationLoadListener(StationLoadListener listener) {
         listeners.add(listener);
     }
 
+    /**
+     * Notifica a todos los listeners que las estaciones han sido cargadas.
+     */
     // Método para notificar a los oyentes
     private void notifyStationsLoaded() {
         for (StationLoadListener listener : listeners) {
@@ -163,14 +230,34 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         }
     }
     
+    /**
+     * Añade una estación a la lista de estaciones eliminadas.
+     * @param station La estación a eliminar.
+     */
     public void addEliminatedStations(Station station){
         eliminatedStations.add(station);
     }
     
+    /**
+     * Verifica si una estación ha sido eliminada.
+     * @param station La estación a verificar.
+     * @return {@code true} Si la estación ha sido eliminada.
+     *         {@code false} Si la estación no ha sido eliminada.
+     */
     public boolean stationEliminated(Station station){
         return eliminatedStations.contains(station);
     }
 
+    /**
+     * Inicializa la interfaz de usuario para la aplicación.
+     * Crea y configura los paneles y componentes necesarios,
+     * incluyendo el botón para cargar la red de transporte.
+     * El botón de carga permite al usuario seleccionar un archivo JSON
+     * que contiene la información de la NetworkTrain. Al cargar
+     * el archivo, se deshabilita el botón para evitar múltiples cargas
+     * simultáneas. Si se produce un error durante la carga del archivo,
+     * se muestra un mensaje de error.
+     */
     private void initUI() {
         // Paneles y componentes
         JButton loadButton = new JButton("Cargar Red de Transporte");
@@ -221,6 +308,14 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         // Otros componentes y configuraciones
     }
     
+    /**
+     * Convierte todas las claves y valores de texto a minúsculas en un objeto JSON.
+     * Este método recorre todas las claves del objeto JSON proporcionado y transforma
+     * las claves y los valores de tipo String a minúsculas. Si un valor es un objeto JSON
+     * o un arreglo JSON, también se procesará recursivamente.
+     * @param jsonObject El objeto JSON que se desea convertir.
+     * @return Un nuevo objeto JSON con todas las claves y valores de texto en minúsculas.
+     */
     // Convierte todas las claves y valores de texto a minúsculas en un JSONObject
     private JSONObject toLowerCaseJson(JSONObject jsonObject) {
         JSONObject result = new JSONObject();
@@ -243,7 +338,15 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
 
         return result;
     }
-
+    
+    /**
+     * Convierte todos los elementos de texto a minúsculas en un arreglo JSON.
+     * Este método recorre cada elemento del arreglo JSON proporcionado y transforma
+     * los valores de tipo String a minúsculas. Si un elemento es un objeto JSON,
+     * se procesará utilizando el método toLowerCaseJson.
+     * @param array  El arreglo JSON que se desea convertir.
+     * @return Un nuevo arreglo JSON con todos los elementos de texto en minúsculas.
+     */
     // Convierte todos los elementos de texto a minúsculas en un JSONArray
     private JSONArray toLowerCaseJsonArray(JSONArray array) {
         JSONArray result = new JSONArray();
@@ -260,6 +363,16 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         return result;
     }
 
+    /**
+     * Muestra la red de trenes en una ventana utilizando GraphStream.
+     * Este método permite al usuario ingresar el nombre de una estación inicial y seleccionar un 
+     * algoritmo (BFS o DFS) para visualizar la red de trenes. Si la ventana de visualización ya 
+     * está abierta, no se realiza ninguna acción. 
+     * El objeto JSON contendrá la estructura de la red, incluyendo las estaciones y sus conexiones. 
+     * Este método agrega nodos y aristas al grafo y finalmente muestra la red.
+     * @param jsonObject El objeto JSON que representa la red de trenes, que contiene información 
+     *                   sobre las estaciones y las conexiones entre ellas.
+     */
     // Muestra el grafo con las estaciones y conexiones
     private void showNetworkTrain(JSONObject jsonObject) {
         if (isNetworkWindowOpen) {
@@ -375,6 +488,13 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         }
     }
 
+    /**}
+     * Verifica si todas las estaciones de la red están cubiertas por las sucursales existentes.
+     * Utiliza el algoritmo de búsqueda seleccionado (BFS o DFS) para determinar la cobertura total
+     * de las estaciones a partir de las sucursales.
+     * @return {@code true}si todas las estaciones están cubiertas.
+     *         {@code false} Si todas las estaciones no est[an cubiertas.
+     */
     // Método para verificar la cobertura total
     public boolean checkTotalCoverage() {
         boolean useBFS = algorithmSelected;
@@ -395,6 +515,13 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         return coveredStations.containsAll(allStations); // Devuelve true si todas las estaciones están cubiertas
     }
 
+    /**
+     * Agrega estaciones cubiertas a la lista sin duplicados.
+     * Este método toma una lista de estaciones cubiertas existentes y una nueva 
+     * lista de estaciones cubiertas, asegurando que no se agreguen duplicados.
+     * @param coveredStations Lista de estaciones cubiertas donde se agregarán nuevas estaciones.
+     * @param newStations Lista de estaciones nuevas que se desean agregar a la lista de cubiertas.
+     */
     // Método auxiliar para agregar estaciones cubiertas sin duplicados
     private void addCoveredStations(LinkedList<Station> coveredStations, LinkedList<Station> newStations) {
         for (int i = 0; i < newStations.size(); i++) {
@@ -405,6 +532,14 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         }
     }
 
+    /**
+     * Obtiene una lista de estaciones que no están cubiertas por las sucursales existentes.
+     * Utiliza el algoritmo de búsqueda seleccionado (BFS o DFS) para calcular 
+     * las estaciones cubiertas y luego determina cuáles no están cubiertas.
+     * @param useBFS Indica si se debe usar la búsqueda en amplitud (BFS) o búsqueda en profundidad (DFS) 
+     *               para calcular las estaciones cubiertas.
+     * @return Una lista de estaciones que no están cubiertas por las sucursales.
+     */
     // Método para obtener las estaciones no cubiertas
     public LinkedList<Station> getUncoveredStations(boolean useBFS) {
         LinkedList<Station> allStations = networkTrain.getStations(); // Todas las estaciones de la red
@@ -454,6 +589,16 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         return uncoveredStations; // Devolver las estaciones no cubiertas
     }
 
+    /**
+     * Sugiere una nueva sucursal para cubrir la mayor cantidad de estaciones no cubiertas.
+     * Este método evalúa cada estación no cubierta y determina cuál, al ser convertida en sucursal,
+     * permitiría cubrir la mayor cantidad de estaciones utilizando el algoritmo especificado (BFS o DFS).
+     * @param useBFS Indica si se debe usar la búsqueda en amplitud (BFS) o búsqueda en profundidad (DFS) 
+     *               para calcular las estaciones cubiertas.
+     * @return Una sugerencia de sucursal que cubre el mayor número de estaciones no cubiertas, junto con
+     *         la lista de estaciones cubiertas, o un mensaje indicando que no se encontraron estaciones
+     *         para sugerir.
+     */
     public String suggestNewBranches(boolean useBFS) {
         int maxDistance = T;
         LinkedList<Station> uncoveredStations = getUncoveredStations(useBFS);
@@ -508,6 +653,11 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         }
     }
 
+    /**
+     * Limpia la lista de sucursales, eliminando duplicados.
+     * Este método recorre la lista de sucursales actuales y asegura que cada sucursal sea única,
+     * eliminando cualquier duplicado antes de actualizar la lista original de sucursales.
+     */
     public void cleanBranches() {
         LinkedList<Station> uniqueBranches = new LinkedList<>(); // Crear una nueva lista para sucursales únicas
 
@@ -522,6 +672,14 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
     }
 
 
+    /**
+     * Obtiene las estaciones cubiertas por varias sucursales utilizando un algoritmo DFS.
+     * Este método inicia la búsqueda desde la estación de inicio proporcionada y 
+     * registra las estaciones alcanzadas hasta una distancia máxima especificada. 
+     * @param start Estación desde la cual se comienza la búsqueda.
+     * @param maxDistance Distancia máxima a la que se buscarán estaciones cubiertas.
+     * @return Lista de estaciones cubiertas por varias sucursales dentro de la distancia máxima.
+     */
     // Método para obtener estaciones cubiertas por varias sucursales usando DFS
     public LinkedList<Station> getCoveredStationsDFS(Station start, int maxDistance) {
         LinkedList<Station> coveredStations = new LinkedList<>();
@@ -530,6 +688,16 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         return coveredStations;
     }
 
+    /**
+     * Método auxiliar para ejecutar la búsqueda en profundidad (DFS) en la red de trenes.
+     * Este método es llamado recursivamente para explorar las estaciones vecinas hasta 
+     * alcanzar la distancia máxima o si se encuentran estaciones que ya han sido visitadas o que son sucursales.
+     * @param current Estación actualmente en evaluación.
+     * @param coveredStations  Lista que almacena las estaciones cubiertas hasta el momento.
+     * @param visited Conjunto de estaciones que ya han sido visitadas durante la búsqueda.
+     * @param depth Profundidad actual en la búsqueda.
+     * @param maxDistance Distancia máxima permitida para la búsqueda.
+     */
     // Método auxiliar para ejecutar getCoveredStationsDFS
     private void runDFS(Station current, LinkedList<Station> coveredStations, SetList<Station> visited, int depth, int maxDistance) {
         if (depth > maxDistance || visited.contains(current) || branches.contains(current)) {
@@ -546,6 +714,14 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         }
     }
 
+    /**
+     * Obtiene las estaciones cubiertas por varias sucursales utilizando un algoritmo 
+     * de búsqueda en amplitud (BFS). Este método inicia la búsqueda desde la estación de 
+     * inicio proporcionada y registra las estaciones alcanzadas hasta una distancia máxima especificada.
+     * @param start Estación desde la cual se comienza la búsqueda.
+     * @param maxDistance Distancia máxima a la que se buscarán estaciones cubiertas.
+     * @return Lista de estaciones cubiertas por varias sucursales dentro de la distancia máxima.
+     */
     // Método para obtener estaciones cubiertas por varias sucursales usando BFS
     public LinkedList<Station> getCoveredStationsBFS(Station start, int maxDistance) {
         LinkedList<Station> coveredStations = new LinkedList<>();
@@ -579,6 +755,12 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         return coveredStations;
     }
 
+    /**
+     * Actualiza el grafo visual para reflejar el estado actual de la NetworkTrain.
+     *  Si la instancia del grafo o la red de trenes no están cargadas, el método termina sin realizar cambios.
+     * Primero limpia el grafo, luego añade todas las estaciones y sus conexiones basadas en la red de trenes
+     * y finalmente recalcula y colorea las sucursales basadas en el algoritmo seleccionado.
+     */
     public void updateGraph() {
         if (graphStreamGraph == null || networkTrain == null) {
             return;  // Si el grafo o la red no están cargados, no hay nada que actualizar
@@ -630,6 +812,14 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         // graphStreamGraph.display();  // Esto es innecesario
     }
 
+    /**
+     * Calcula la distancia mínima en estaciones entre dos estaciones dadas.
+     * Utiliza BFS para encontrar el camino más corto entre las estaciones.
+     * @param from La estación de inicio desde la cual calcular la distancia.
+     * @param to La estación de destino hasta la cual calcular la distancia.
+     * @return La distancia en número de estaciones entre las dos estaciones. 
+     *         Retorna 0 si ambas estaciones son iguales, y -1 si no hay camino entre ellas.
+     */
     private int calculateDistance(Station from, Station to) {
         if (from.equals(to)) {
             return 0; // La distancia a sí misma es 0
@@ -671,21 +861,38 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         return -1;
     }
 
-    // Verificar si networkTrain ha sido cargado para validaciones de otros botones en la WelcomeInterface   
+    /**
+     * Verifica si la NetworkTrain ha sido agregada, lo cual ayuda a habilitar o deshabilitar otras funciones.
+     * @return {@code true} Si la instancia de Networktrain no es nula, está cargada.
+     *         {@code false} Si la instancia de Networktrain es nula, no está cargada.
+     */  
     public boolean isNetworkLoaded() {
         return networkTrain != null;
     }
 
-    // Devuelve una lista de las sucursales creadas    
+    /**
+     * Obtiene una lista de las sucursales creadas.
+     * @return Lista enlazada con todas las estaciones marcadas como sucursales.
+     */
     public LinkedList<Station> getBranches() {
         // Supongamos que tienes una lista de sucursales en tu clase GUI
         return this.branches; // Devuelve la lista de sucursales como una lista de Strings
     }
 
+    /**
+     * Obtiene la instancia de la NetworkTrain asociada a GUI.
+     * @return La instancia actual de {@link NetworkTrain}, que representa el 
+     *         grafo de la red de estaciones.
+     */
     public NetworkTrain getNetworkTrain() {
         return this.networkTrain;  // Donde networkTrain es la instancia de tu grafo
     }
 
+    /**
+     * Elimina una sucursal específica de la lista de sucursales y actualiza 
+     * su visualización en el grafo.
+     * @param branchName La sucursal que se desea eliminar de la lista de sucursales.
+     */
     public void removeBranch(Station branchName) {
         branches.remove(branchName);  // Remueve la sucursal de la lista
         notifyListeners();  // Notificar a los listeners
@@ -698,7 +905,13 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         updateGraph2();
     }
 
-    // Método para obtener las estaciones cubiertas usando DFS
+    /**
+     * Obtiene las estaciones que están dentro de la cobertura desde una estación 
+     * de inicio utilizando un algoritmo de DFS.
+     * @param startStation Estación de inicio desde la cual se comienza la búsqueda de estaciones cubiertas.
+     * @return Lista enlazada de estaciones que están dentro de la cobertura 
+     *         de acuerdo con la distancia máxima especificada por el valor de T.
+     */
     public LinkedList<Station> getCoveredStationsDFS(Station startStation) {
         LinkedList<Station> coveredStations = new LinkedList<>();
         // Llamar al método DFS existente
@@ -706,7 +919,14 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         return coveredStations; // Devuelve la lista de estaciones cubiertas
     }
 
-    // Método para obtener las estaciones cubiertas usando BFS
+    /**
+     * Obtiene las estaciones que están dentro de la cobertura desde una 
+     * estación inicial utilizando un algoritmo de BFS
+     * @param startStation La estación de inicio desde la cual se comienza 
+     *                     la búsqueda de estaciones cubiertas.
+     * @return Lista enlazada de estaciones que están dentro de la cobertura 
+     *         de acuerdo con la distancia máxima especificada por el valor de T.
+     */
     public LinkedList<Station> getCoveredStationsBFS(Station startStation) {
         LinkedList<Station> coveredStations = new LinkedList<>();
         // Llamar al método BFS existente
@@ -714,7 +934,18 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         return coveredStations; // Devuelve la lista de estaciones cubiertas
     }
 
-    // Sobrecarga de metodo para usar el dfs y poder saber la cobertura de sucursal 
+    /** 
+     * Realiza una búsqueda en profundidad DFS a partir de una estación actual
+     * para identificar estaciones dentro de una distancia máxima desde la 
+     * estación de inicio. Las estaciones cubiertas se agregan a la lista proporcionada.
+     * @param current         La estación actual desde la cual se realiza la búsqueda DFS.
+     * @param coveredStations Lista enlazada con las estaciones dentro 
+     *                        del rango de cobertura agregadas durante el recorrido.
+     * @param depth           Distancia actual desde la estación de inicio, el valor 
+     *                        se incrementa con cada llamada recursiva.
+     * @param maxDistance     Distancia máxima permitida desde la estación de 
+     *                        inicio para considerar una estación como cubierta. 
+     */
     private void runDFS(Station current, LinkedList<Station> coveredStations, int depth, int maxDistance) {
         if (depth > maxDistance) {
             return; // No continuar si se ha superado el límite
@@ -727,21 +958,31 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         }
     }
 
-    // Sobrecarga de metodo para usar el bfs y poder saber la cobertura de sucursal 
+    /**
+     * Realiza una búsqueda en achura BFS desde una estación de inicio para
+     * encontrar y marcar estaciones dentro de una distancia máxima. Las estaciones
+     * cubiertas se agregan a la lista proporcionada.
+     * @param start Estación de inicio desde la cual se inicia el recorrido BFS
+     * @param coveredStations Lista enlazada donde se agregarán las estaciones dentro del rango de cobertura.
+     * @param maxDistance Distancia máxima permitida desde la estación de inicio para considerar una estación como cubierta.
+     */
     private void runBFS(Station start, LinkedList<Station> coveredStations, int maxDistance) {
-        Queue<Station> queue = new Queue<>();
+        Queue<Station> queue = new Queue<>(); //Cola para realizar la busqueda de anchura.
         //Map<Station, Integer> distances = new HashMap<>();
-        MapsList<Station, Integer> distances = new MapsList<>();
+        MapsList<Station, Integer> distances = new MapsList<>(); //Mapa de distancias desde la estación de inicio.
         queue.enqueue(start);
-        distances.put(start, 0);
+        distances.put(start, 0); //Distancia de inicio en 0
 
         while (!queue.isEmpty()) {
             Station current = queue.dequeue();
             int currentDistance = distances.get(current);
 
+            // Si la distancia actual está dentro del máximo, la estación se considera cubierta.
             if (currentDistance <= maxDistance) {
                 coveredStations.add(current);
+                // Recorre los vecinos de la estación actual.
                 for (Station neighbor : getNeighbors(current)) {
+                    // Si el vecino aún no tiene una distancia registrada, se establece y se agrega a la cola.
                     if (!distances.containsKey(neighbor)) {
                         distances.put(neighbor, currentDistance + 1);
                         queue.enqueue(neighbor);
@@ -751,11 +992,23 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         }
     }
 
-    // Método para obtener los vecinos de una estación
+    /**
+     * Obtiene los vecinos de una estación específico (estaciones conectadas).
+     * Delega la llamada al método en networktrain {@link NetworkTrain#getNeighbors(Station)}.
+     * @param station Estación para la cual se desean obtener los vecinos.
+     * @return Lista enlazada de estaciones vecinas conectadas.
+     */
     public LinkedList<Station> getNeighbors(Station station) {
         return networkTrain.getNeighbors(station);
     }
 
+    /**
+     * Realiza un recorrido en profundidad DFS a partir de una estación inicial.
+     * Inicializa las estructuras necesarias, colorea la estación inicial en verde y 
+     * recorre las estaciones adyacentes agregándolas a la pila si no han sido visitadas.
+     * Verifica y maneja conflictor basador en la distancia de la estación inicial.
+     * @param startStation Estación de inicio para el recorrido en profundidad.
+     */
     private void runDFS(Station startStation) {
         int T = this.T;
         // Inicializamos la primera sucursal
@@ -847,7 +1100,14 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         // Mostrar las sucursales creadas
 //        System.out.println("Sucursales creadas (DFS): " + branches.toString());
     }
-//  YA SE AGREGO SETLIST, REVISAR AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
+    /**
+     *  Realiza un recorrido en anchura BFS a partir de la estación inicial.
+     * Inicializa las estructuras necesarias, colorea la estación inicial en verde,
+     * recorre las estaciones adyacentes agregándolas a la cola si no han sido aún visitadas y
+     * verifica y maneja conflictos en base a la distancia de la estación inicial.
+     * @param startStation La estación de inicio para el recorrido de anchura
+     */
     private void runBFS(Station startStation) {
         int T = this.T;
         // Inicializar la distancia de la estación inicial
@@ -962,14 +1222,13 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
 
         return false; // No hay conflicto
     }
-
-    // Agregar una estación al grafo
-//    private void addStationToGraph(String stationName) {
-//        if (graphStreamGraph.getNode(stationName) == null) {
-//            graphStreamGraph.addNode(stationName).setAttribute("ui.label", stationName);
-//        }
-//    }
-    // Agrega una arista si no existe entre dos estaciones
+    
+    /**
+     * Agrega en el grafo una arista entre dos estaciones si no existe.
+     * Verifica si las estaciones son diferentes y crea un identificador único para la conexión
+     * @param station1 Nombre de la primera estación
+     * @param station2 Nombre de la segunda estación
+     */
     private void addEdgeIfNotExists(String station1, String station2) {
         // Asegúrate de que las estaciones sean diferentes
         if (station1.equals(station2)) {
@@ -989,7 +1248,11 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         }
     }
 
-    // Agregar estación al grafo si no existe
+    /**
+     * Agrega estaciones al grafo si no existe. Verifica si la estación ya está 
+     * presente en el grafo y, si no, la añade y configura su etiqueta.
+     * @param station Instancia de la estación que se va a agregar
+     */
     private void addStationToGraph(String station) {
         if (graphStreamGraph.getNode(station) == null) {
             graphStreamGraph.addNode(station);
@@ -997,7 +1260,12 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         }
     }
 
-    // Verificación de que la estación no se repite
+    /**
+     * Verifica que la estación no se repita en la lista de estaciones.
+     * Si existe, muestra un mensaje de advertencia
+     * Si no existe, la añade a la lista, al grafo y emite un mensaje de confirmación.
+     * @param station Nombre de la estación que se verifica y agrega.
+     */
     public void verificateStations(String station) {
         if (stations.contains(station)) {
             JOptionPane.showMessageDialog(this, "La estación ya existe", "Aviso", JOptionPane.WARNING_MESSAGE);
@@ -1008,11 +1276,20 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         }
     }
 
-    // Método para obtener el valor de T
+    /**
+     * Obtiene el valor de T.
+     * @return valor de T.
+     */
     public int getT() {
         return this.T;
     }
 
+    /**
+    * Actualiza el grafo a partir de las estaciones y conexiones presentes en la networktrain.
+    * Si el grafo o la red no están cargados, no se hace ninguna actualización.
+    * Recorre todas las estaciones y conexiones, añadiéndolas al grafo si no existen,
+    * y colorea en verde las estaciones que son sucursales.
+     */
     public void updateGraph2() {
         if (graphStreamGraph == null || networkTrain == null) {
             return;  // Si el grafo o la red no están cargados, no hay nada que actualizar
