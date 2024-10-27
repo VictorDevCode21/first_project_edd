@@ -154,20 +154,26 @@ public class Page6 extends javax.swing.JPanel  {
         for (int i = 0; i < connectionsToAdd.length; i += 2) {
             String stationFrom = connectionsToAdd[i].trim();
             String stationTo = connectionsToAdd[i + 1].trim();
+            
+            if (!networkTrain.stationExists(stationFrom) || !networkTrain.stationExists(stationTo)) {
 
-            // Validar las estaciones
-            if (!networkTrain.stationExists(stationFrom)) {
-                JOptionPane.showMessageDialog(null, "Error: La estación " + stationFrom + " no existe en la red.");
-                continue;
+                // Validar las estaciones
+                if (!networkTrain.stationExists(stationFrom)) {
+                    JOptionPane.showMessageDialog(null, "Error: La estación " + stationFrom + " no existe en la red.");
+                    continue;
+                }
+
+                if (!networkTrain.stationExists(stationTo)) {
+                    JOptionPane.showMessageDialog(null, "Error: La estación " + stationTo + " no existe en la red.");
+                    continue;
+                }
+                
+            } else {
+
+                // Agregar la conexión entre la nueva estación y la estación existente
+                networkTrain.addConnection(stationFrom, stationTo);
+            
             }
-
-            if (!networkTrain.stationExists(stationTo)) {
-                JOptionPane.showMessageDialog(null, "Error: La estación " + stationTo + " no existe en la red.");
-                continue;
-            }
-
-            // Agregar la conexión entre la nueva estación y la estación existente
-            networkTrain.addConnection(stationFrom, stationTo);
         }
 
         // Refrescar la visualización del grafo
