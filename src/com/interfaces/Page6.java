@@ -99,8 +99,14 @@ public class Page6 extends javax.swing.JPanel  {
      * @param evt El evento de acción.
      */
     private void addStationsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addStationsActionPerformed
-        String stationsInput = inputStationsToAdd.getText();
-        String connectionsInput = inputConnectionsToAdd.getText();
+        String stationsInput = inputStationsToAdd.getText().toLowerCase();
+        String connectionsInput = inputConnectionsToAdd.getText().toLowerCase();
+        
+        // Validar el input de estaciones
+        if (!stationsInput.matches("^[a-zA-Z0-9 ]+$")) {
+            JOptionPane.showMessageDialog(null, "Error: El input de estaciones solo puede contener letras, números y espacios.");
+            return;
+        }
 
         // Dividir los inputs en arrays
         String[] stationsToAdd = stationsInput.split(",");
