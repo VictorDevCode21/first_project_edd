@@ -20,10 +20,32 @@ public class NetworkTrain {
 
     private LinkedList<Station> stations;
     private Graph graph;
+    private LinkedList<NetworkTrainListener> networkListeners;
 
     public NetworkTrain() {
         this.stations = new LinkedList();
         this.graph = new SingleGraph("Metro de Caracas");
+        this.networkListeners = new LinkedList<>(); // Inicializar la lista correctamente
+    }
+
+    public void addListener(NetworkTrainListener listener) {
+        networkListeners.add(listener);
+    }
+
+    public void removeListener(NetworkTrainListener networkListener) {
+        networkListeners.remove(networkListener);
+    }
+
+    private void notifyStationAdded(Station station) {
+        for (NetworkTrainListener networkListener : networkListeners) {
+            networkListener.onStationAdded(station);
+        }
+    }
+
+    private void notifyConnectionAdded(Station station1, Station station2) {
+        for (NetworkTrainListener networkListener : networkListeners) {
+            networkListener.onConnectionAdded(station1, station2);
+        }
     }
 
     public void addStation(String name) {
@@ -32,6 +54,7 @@ public class NetworkTrain {
             Station newStation = new Station(name);
             getStations().add(newStation);
             graph.addNode(name); // Agregar nodo al grafo solo si no existe
+            notifyStationAdded(newStation); // Notifica a sus listener
         }
     }
 
@@ -41,6 +64,7 @@ public class NetworkTrain {
             Station newStation = new Station(stationName);
             getStations().add(newStation);
             graph.addNode(stationName); // Agregar nodo al grafo solo si no existe
+            notifyStationAdded(newStation); // Notificar a los listeners que se añadió la estación
         }
         // Aquí puedes agregar lógica para asociar la estación a la línea si es necesario
     }
@@ -82,6 +106,8 @@ public class NetworkTrain {
                 station2.addConnection(connection);
                 graph.addEdge(station1.getName() + "-" + station2.getName(), station1.getName(), station2.getName());
 //                System.out.println("Conexión agregada: " + station1.getName() + " <-> " + station2.getName());
+                // Notificar que una conexión fue añadida
+                notifyConnectionAdded(station1, station2);
             } else {
 //                System.out.println("La conexión ya existe: " + station1.getName() + " <-> " + station2.getName());
             }
@@ -237,6 +263,17 @@ public class NetworkTrain {
      */
     public void setStations(LinkedList stations) {
         this.stations = stations;
+    }
+
+    // Método para verificar si una estación existe
+    public boolean stationExists(String stationName) {
+        // Debe comprobar si la estación existe en la lista de estaciones
+        for (Station station : stations) { // Asumiendo que `stations` es tu lista de estaciones
+            if (station.getName().equalsIgnoreCase(stationName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
