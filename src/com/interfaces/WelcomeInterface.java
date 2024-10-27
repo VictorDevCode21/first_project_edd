@@ -254,7 +254,7 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
         try {
             checkNetworkLoaded();
 
-            Page6 p6 = new Page6(gui , networkTrain);
+            Page6 p6 = new Page6(gui, networkTrain);
             ShowPanel(p6);
         } catch (Exception e) {
             // Maneja el error si checkNetworkLoaded lanza una excepción
@@ -310,7 +310,23 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
     }//GEN-LAST:event_branchCoverageActionPerformed
 
     private void totalCoverage1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_totalCoverage1ActionPerformed
-        // TODO add your handling code here:
+        try {
+            // Verifica si la red está cargada correctamente
+            checkNetworkLoaded();
+
+            // Si la red está cargada, obten las branches
+            LinkedList<Station> branches = gui.getBranches();
+
+            // Crea y muestra el panel Page5 con los datos
+            ShowTotalCoverage totalCoverage = new ShowTotalCoverage(this, gui);
+            ShowPanel(totalCoverage);
+
+        } catch (Exception e) {
+            // Maneja el error si checkNetworkLoaded lanza una excepción
+            JOptionPane.showMessageDialog(this,
+                    "Error: La red no está cargada correctamente. Por favor, cargue la red antes de proceder.",
+                    "Error de carga de red", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_totalCoverage1ActionPerformed
 
     //  Revisa si las estaciones estan cargadas 
