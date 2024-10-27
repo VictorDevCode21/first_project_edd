@@ -3,16 +3,14 @@ package com.interfaces;
 import com.graph.AlgorithmSelectionListener;
 import com.graph.NetworkTrain;
 import com.graph.LinkedList;
-import com.graph.Node;
-import com.graph.BreadthFirstSearch;
-import com.graph.BFSListener;
 import com.graph.BranchListener;
+import com.graph.MapsList;
 import com.graph.Station;
 import com.graph.Stack;
 import com.graph.Queue;
 
-import com.graph.DepthFirstSearch;
 import com.graph.NetworkTrainListener;
+import com.graph.SetList;
 import com.graph.StationLoadListener;
 import com.graph.TValueListener;
 
@@ -27,9 +25,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -54,6 +50,10 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
     private LinkedList<BranchListener> bListeners;  // Lista de listeners
     private boolean algorithmSelected; // Variable para mantener el algoritmo seleccionado
     private LinkedList<AlgorithmSelectionListener> aListeners = new LinkedList<>();
+    private SetList<Station> eliminatedStations = new SetList<>();
+    private MapsList<String, Station> stationMap;
+
+    
 
     public GUI(NetworkTrain networkTrain) {
         this.networkTrain = networkTrain;
@@ -64,6 +64,7 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         stations = new LinkedList<>();
         bListeners = new LinkedList<>();  // Inicializar la lista de listeners
         networkTrain.addListener(this);
+        stationMap = new MapsList<>();
         initUI();
     }
     
@@ -161,6 +162,14 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
             listener.onStationsLoaded(branches); // Notifica con la lista de estaciones cargadas
         }
     }
+    
+    public void addEliminatedStations(Station station){
+        eliminatedStations.add(station);
+    }
+    
+    public boolean stationEliminated(Station station){
+        return eliminatedStations.contains(station);
+    }
 
     private void initUI() {
         // Paneles y componentes
@@ -180,16 +189,19 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
 
                         // Convertir el contenido a JSONObject
                         JSONObject jsonObject = new JSONObject(new JSONTokener(content));
-
+                        
+                        // Convierte todas las claves y valores de texto a minúsculas
+                        JSONObject lowerCaseJson = toLowerCaseJson(jsonObject);
+                        
                         // Cargar los datos desde el objeto JSONObject
                         networkTrain = new NetworkTrain();
-                        networkTrain.loadFromJson(jsonObject);
+                        networkTrain.loadFromJson(lowerCaseJson); 
                         branches = new LinkedList<>();
 
                         loadButton.setEnabled(false); // Deshabilita el botón para evitar múltiples cargas
 
                         // Mostrar la red en GraphStream
-                        showNetworkTrain(jsonObject);
+                        showNetworkTrain(lowerCaseJson); 
 
                         // Notificar a los oyentes que las estaciones han sido cargadas
                         notifyStationsLoaded();
@@ -208,6 +220,45 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         add(loadButton, BorderLayout.NORTH);
         // Otros componentes y configuraciones
     }
+    
+    // Convierte todas las claves y valores de texto a minúsculas en un JSONObject
+    private JSONObject toLowerCaseJson(JSONObject jsonObject) {
+        JSONObject result = new JSONObject();
+        
+        for (String key : jsonObject.keySet()) {
+            Object value = jsonObject.get(key);
+
+            String lowerCaseKey = key.toLowerCase();
+
+            if (value instanceof JSONObject) {
+                result.put(lowerCaseKey, toLowerCaseJson((JSONObject) value));
+            } else if (value instanceof JSONArray) {
+                result.put(lowerCaseKey, toLowerCaseJsonArray((JSONArray) value));
+            } else if (value instanceof String) {
+                result.put(lowerCaseKey, ((String) value).toLowerCase());
+            } else {
+                result.put(lowerCaseKey, value);
+            }
+        }
+
+        return result;
+    }
+
+    // Convierte todos los elementos de texto a minúsculas en un JSONArray
+    private JSONArray toLowerCaseJsonArray(JSONArray array) {
+        JSONArray result = new JSONArray();
+        for (int i = 0; i < array.length(); i++) {
+            Object value = array.get(i);
+            if (value instanceof JSONObject) {
+                result.put(toLowerCaseJson((JSONObject) value));
+            } else if (value instanceof String) {
+                result.put(((String) value).toLowerCase());
+            } else {
+                result.put(value);
+            }
+        }
+        return result;
+    }
 
     // Muestra el grafo con las estaciones y conexiones
     private void showNetworkTrain(JSONObject jsonObject) {
@@ -220,11 +271,20 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         graphStreamGraph = new SingleGraph("Metro Network");
 
         try {
+            while (true) {
             // Muestra un cuadro de diálogo para ingresar la estación inicial
-            String startStationName = JOptionPane.showInputDialog(this,
-                    "Ingrese el nombre de la estación de inicio:");
+                String startStationName = JOptionPane.showInputDialog(this, "Ingrese el nombre de la estación de inicio:");
 
-            if (startStationName != null && !startStationName.trim().isEmpty()) {
+                if (startStationName != null && !startStationName.trim().isEmpty() 
+                        && startStationName.toLowerCase().matches("^[a-z0-9\\s]+$")) {
+                    //Matches: Regex que en este caso valida letras,numeros y espacios en blanco
+                        this.startStationName = startStationName.toLowerCase(); // Guarda el nombre 
+                        break;
+                } else {
+                    JOptionPane.showMessageDialog(this, "Debe ingresar un nombre de estación válido (solo letras y números).");
+                }
+            } 
+                    
                 // Muestra un cuadro de diálogo para seleccionar el algoritmo
                 String[] algorithms = {"BFS", "DFS"};
                 String selectedAlgorithm = (String) JOptionPane.showInputDialog(
@@ -236,8 +296,10 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
                         algorithms,
                         algorithms[0]
                 );
-
-//                T = Integer.parseInt(JOptionPane.showInputDialog(this, "Ingrese la distancia T entre sucursales:"));
+                this.selectedAlgorithm = selectedAlgorithm;
+               
+                
+    //                T = Integer.parseInt(JOptionPane.showInputDialog(this, "Ingrese la distancia T entre sucursales:"));
                 // Cargar y visualizar la red en GraphStream
                 String networkName = jsonObject.keys().next();
                 JSONArray metroLines = jsonObject.getJSONArray(networkName);
@@ -294,23 +356,20 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
                 graphStreamGraph.display();
                 isNetworkWindowOpen = true; // Marcar que la ventana está abierta
 
-                this.startStationName = startStationName;  // Guardar el nombre de la estación inicial
+                this.startStationName = startStationName;  // Guardar el nombre de la estación inicial  
                 this.selectedAlgorithm = selectedAlgorithm;  // Guardar el algoritmo seleccionado
 
                 // Ejecutar el algoritmo seleccionado
-                Station startStation = networkTrain.getStationByName(startStationName);
+                Station startStation = networkTrain.getStationByName(this.startStationName);
                 if (startStation != null) {
-                    if ("BFS".equals(selectedAlgorithm)) {
+                    if ("BFS".equals(this.selectedAlgorithm)) {
                         runBFS(startStation);
-                    } else if ("DFS".equals(selectedAlgorithm)) {
+                    } else if ("DFS".equals(this.selectedAlgorithm)) {
                         runDFS(startStation);
-                    }
+                      }
                 } else {
                     JOptionPane.showMessageDialog(this, "Estación no encontrada: " + startStationName);
                 }
-            } else {
-                JOptionPane.showMessageDialog(this, "Debe ingresar un nombre de estación válido.");
-            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -398,8 +457,9 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
     public String suggestNewBranches(boolean useBFS) {
         int maxDistance = T;
         LinkedList<Station> uncoveredStations = getUncoveredStations(useBFS);
-        Map<Station, LinkedList<Station>> coverageMap = new HashMap<>();
-        Set<Station> suggestedBranches = new HashSet<>();
+        //Map<Station, LinkedList<Station>> coverageMap = new HashMap<>();
+        MapsList<Station, LinkedList<Station>> coverageMap = new MapsList<>();
+        SetList<Station> suggestedBranches = new SetList<>();
 
         for (Station station : uncoveredStations) {
             LinkedList<Station> coverage;
@@ -465,13 +525,13 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
     // Método para obtener estaciones cubiertas por varias sucursales usando DFS
     public LinkedList<Station> getCoveredStationsDFS(Station start, int maxDistance) {
         LinkedList<Station> coveredStations = new LinkedList<>();
-        Set<Station> visited = new HashSet<>();
+        SetList<Station> visited = new SetList<>();
         runDFS(start, coveredStations, visited, 0, maxDistance);
         return coveredStations;
     }
 
     // Método auxiliar para ejecutar getCoveredStationsDFS
-    private void runDFS(Station current, LinkedList<Station> coveredStations, Set<Station> visited, int depth, int maxDistance) {
+    private void runDFS(Station current, LinkedList<Station> coveredStations, SetList<Station> visited, int depth, int maxDistance) {
         if (depth > maxDistance || visited.contains(current) || branches.contains(current)) {
             return; // Parar si superamos la distancia máxima, ya fue visitada, o es sucursal
         }
@@ -489,10 +549,10 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
     // Método para obtener estaciones cubiertas por varias sucursales usando BFS
     public LinkedList<Station> getCoveredStationsBFS(Station start, int maxDistance) {
         LinkedList<Station> coveredStations = new LinkedList<>();
-        Set<Station> visited = new HashSet<>();
+        SetList<Station> visited = new SetList<>();
         Queue<Station> queue = new Queue<>();
-        Map<Station, Integer> distances = new HashMap<>();
-
+        //Map<Station, Integer> distances = new HashMap<>();
+        MapsList<Station, Integer> distances = new MapsList<>();
         queue.enqueue(start);
         distances.put(start, 0);
 
@@ -525,7 +585,12 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         }
 
         // Limpiar el grafo actual
-        graphStreamGraph.clear(); // Asegúrate de que esto se maneje correctamente.
+        graphStreamGraph.clear(); 
+        //Validación por si el grafo no está limpio.
+        if(graphStreamGraph.getNodeCount() != 0 || graphStreamGraph.getEdgeCount()!= 0){
+            JOptionPane.showMessageDialog(this, "El grafo no se ha limpiado correctamente", "Aviso", JOptionPane.WARNING_MESSAGE);
+            graphStreamGraph.clear();
+        }
 
         // Volver a agregar todas las estaciones y conexiones desde la red de transporte
         LinkedList<Station> allStations = networkTrain.getStations();
@@ -571,7 +636,8 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         }
 
         // Mapa para rastrear las distancias desde la estación 'from'
-        Map<Station, Integer> distances = new HashMap<>();
+        //Map<Station, Integer> distances = new HashMap<>();
+        MapsList<Station, Integer> distances = new MapsList<>();
         Queue<Station> queue = new Queue<>();
         LinkedList<Station> visited = new LinkedList<>(); // Usar LinkedList para rastrear estaciones visitadas
 
@@ -664,7 +730,8 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
     // Sobrecarga de metodo para usar el bfs y poder saber la cobertura de sucursal 
     private void runBFS(Station start, LinkedList<Station> coveredStations, int maxDistance) {
         Queue<Station> queue = new Queue<>();
-        Map<Station, Integer> distances = new HashMap<>();
+        //Map<Station, Integer> distances = new HashMap<>();
+        MapsList<Station, Integer> distances = new MapsList<>();
         queue.enqueue(start);
         distances.put(start, 0);
 
@@ -694,7 +761,8 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         // Inicializamos la primera sucursal
         branches.clear();
         branches.add(startStation);
-        Map<Station, Integer> distances = new HashMap<>();
+        //Map<Station, Integer> distances = new HashMap<>();
+        MapsList<Station, Integer> distances = new MapsList<>();
         distances.put(startStation, 0); // La distancia de la estación inicial es 0
 
         // Colorear la primera sucursal en verde
@@ -705,7 +773,7 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
 
         // Usamos una pila para implementar DFS manualmente
         Stack<Station> stack = new Stack<>();
-        Set<Station> visited = new HashSet<>();
+        SetList<Station> visited = new SetList<>();
         stack.push(startStation);
         visited.add(startStation);
 
@@ -770,7 +838,7 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
 
         // Mostrar todas las distancias y los nombres de las estaciones
         System.out.println("Distancias desde la estación inicial:");
-        for (Map.Entry<Station, Integer> entry : distances.entrySet()) {
+        for (MapsList.Entry<Station, Integer> entry : distances.entrySet()) {
             Station station = entry.getKey();
             Integer distance = entry.getValue();
             System.out.println("Estación: " + station.getName() + ", Distancia: " + distance);
@@ -779,15 +847,16 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         // Mostrar las sucursales creadas
 //        System.out.println("Sucursales creadas (DFS): " + branches.toString());
     }
-
+//  YA SE AGREGO SETLIST, REVISAR AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     private void runBFS(Station startStation) {
         int T = this.T;
         // Inicializar la distancia de la estación inicial
         Queue<Station> queue = new Queue<>();
         branches.clear();
         branches.add(startStation); // Sucursal inicial
-        Set<Station> visitedStations = new HashSet<>();
-        Map<Station, Integer> distances = new HashMap<>();
+        SetList<Station> visitedStations = new SetList<>();
+        //Map<Station, Integer> distances = new HashMap<>();
+        MapsList<Station, Integer> distances = new MapsList<>();
         distances.put(startStation, 0);
 
         // Colorear la estación inicial en verde
@@ -833,7 +902,7 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         }
 
         // Mostrar las estaciones y sus distancias
-        for (Map.Entry<Station, Integer> entry : distances.entrySet()) {
+        for (MapsList.Entry<Station, Integer> entry : distances.entrySet()) {
             Station station = entry.getKey();
             Integer distance = entry.getValue();
 
@@ -856,8 +925,9 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
      */
     private boolean checkForConflict(Station newBranch, int T) {
         Queue<Station> queue = new Queue<>();
-        Set<Station> visitedStations = new HashSet<>();
-        Map<Station, Integer> distances = new HashMap<>();
+        SetList<Station> visitedStations = new SetList<>();
+        //Map<Station, Integer> distances = new HashMap<>();
+        MapsList<Station, Integer> distances = new MapsList<>();
         distances.put(newBranch, 0);
 
         queue.enqueue(newBranch);

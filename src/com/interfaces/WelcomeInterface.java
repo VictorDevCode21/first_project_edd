@@ -72,7 +72,7 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
         jLabel2 = new javax.swing.JLabel();
         showGraphButton = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
-        addStation = new javax.swing.JButton();
+        addBranch = new javax.swing.JButton();
         addLineButton = new javax.swing.JButton();
         deleteBranch = new javax.swing.JButton();
         setT = new javax.swing.JButton();
@@ -107,13 +107,13 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
         jPanel2.setBackground(new java.awt.Color(0, 51, 102));
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        addStation.setText("Add Station");
-        addStation.addActionListener(new java.awt.event.ActionListener() {
+        addBranch.setText("Add Branch");
+        addBranch.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                addStationActionPerformed(evt);
+                addBranchActionPerformed(evt);
             }
         });
-        jPanel2.add(addStation, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 10, 170, -1));
+        jPanel2.add(addBranch, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 10, 170, -1));
 
         addLineButton.setText("Add Line");
         addLineButton.addActionListener(new java.awt.event.ActionListener() {
@@ -233,7 +233,7 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
 
     }//GEN-LAST:event_showGraphButtonActionPerformed
 
-    private void addStationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addStationActionPerformed
+    private void addBranchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addBranchActionPerformed
         try {
             checkNetworkLoaded();
 
@@ -249,7 +249,7 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
                     "Error de carga de red", JOptionPane.ERROR_MESSAGE);
         }
 
-    }//GEN-LAST:event_addStationActionPerformed
+    }//GEN-LAST:event_addBranchActionPerformed
 
     private void addLineButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addLineButtonActionPerformed
         try {
@@ -390,8 +390,8 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton addBranch;
     private javax.swing.JButton addLineButton;
-    private javax.swing.JButton addStation;
     private javax.swing.JButton branchCoverage;
     private javax.swing.JPanel content;
     private javax.swing.JButton deleteBranch;
