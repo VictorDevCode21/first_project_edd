@@ -232,10 +232,25 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
     }//GEN-LAST:event_branchCoverageActionPerformed
 
     private void checkNetworkLoaded() {
-        if (gui.isNetworkLoaded()) {
-            isGraphShown = true; // Solo cambia a true si todo ha sido cargado correctamente
-        } else {
-            isGraphShown = false; // Si hay error se mantiene en false
+        try {
+            // Verificar si gui es null
+            if (this.gui == null) {
+                System.out.println("Error: GUI no está inicializada.");
+                isGraphShown = false;
+                return; // Salir del método si gui es null
+            }
+
+            // Verificar si la red está cargada correctamente
+            if (gui.isNetworkLoaded()) {
+                isGraphShown = true; // Solo cambia a true si todo ha sido cargado correctamente
+            } else {
+                System.out.println("La red no está cargada.");
+                isGraphShown = false; // Si hay error se mantiene en false
+            }
+        } catch (Exception e) {
+            // Capturar cualquier excepción y mostrar un mensaje de error
+            System.out.println("Ocurrió un error al verificar si la red está cargada: " + e.getMessage());
+            isGraphShown = false; // Asegurarse de que el grafo no se muestre en caso de error
         }
     }
 
