@@ -8,6 +8,7 @@ import com.graph.BranchListener;
 import com.graph.NetworkTrain;
 import com.graph.Station;
 import com.graph.LinkedList;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -33,6 +34,24 @@ public class Page3 extends javax.swing.JPanel {
         });
 
         displayBranchesList(); // Llama al método que muestra la lista de sucursales
+    }
+    
+    // Método para verificar si una estación es visible (no está en gris)
+    private boolean isStationVisible(String stationName) {
+        // Obtén el texto del JTextArea que muestra las sucursales
+        String branchesText = showBranchesList.getText(); // 'showBranchesList' es tu JTextArea
+
+        // Divide el texto en líneas
+        String[] branchesArray = branchesText.split("\n");
+
+        // Verifica si la estación está en la lista de estaciones visibles
+        for (String branch : branchesArray) {
+            if (branch.trim().equalsIgnoreCase(stationName)) {
+                return true; // La estación es visible
+            }
+        }
+
+        return false; // La estación no es visible
     }
 
     /**
@@ -119,12 +138,23 @@ public class Page3 extends javax.swing.JPanel {
         String branchName = inputRemoveBranch.getText().trim().toLowerCase();
 
         // Verifica si el texto no está vacío
-        if (!branchName.isEmpty()) {
+        if (!branchName.isEmpty() || !branchName.matches("^[a-zA-Z0-9 ]+$")) {
             // Obtiene la referencia a la instancia de NetworkTrain a través de GUI
-            NetworkTrain networkTrain = gui.getNetworkTrain();  // Asumo que tienes un método en GUI para obtener el grafo
-
-            // Busca la sucursal en NetworkTrain (el grafo) y la elimina
+            //JOptionPane.showMessageDialog(this, "El nombre de la sucursal tiene un error", "Error", JOptionPane.ERROR_MESSAGE);
+            
+        }
+        
+        NetworkTrain networkTrain = gui.getNetworkTrain();  // Asumo que tienes un método en GUI para obtener el grafo
+        try{
+                // Busca la sucursal en NetworkTrain (el grafo)
             Station branchStation = networkTrain.getStationByName(branchName); // Método en NetworkTrain para obtener la estación
+
+            // Verifica si la estación está en gris o no visible
+            if (!isStationVisible(branchName)) { // Método que comprueba si la estación es visible
+                JOptionPane.showMessageDialog(this, "Error: La estación " + branchName + " no se puede eliminar porque no está visible o existe un error en su nombre.", "Error", JOptionPane.ERROR_MESSAGE);
+                return; // Salir del método si la estación no es visible
+            }
+            
             if (branchStation != null) {
                 gui.removeBranch(branchStation); // Llama al método removeBranch en GUI para eliminar la sucursal
                 gui.checkTotalCoverage(); // Verifica la cobertura total después de eliminar la sucursal
@@ -134,8 +164,11 @@ public class Page3 extends javax.swing.JPanel {
                 gui.updateGraph2(); // Actualiza el grafo después de eliminar la sucursal
             } else {
                 // Si la sucursal no existe, puedes mostrar un mensaje de error o manejar el caso
+                JOptionPane.showMessageDialog(null, "Sucursal no encontrada");
                 System.out.println("Sucursal no encontrada.");
             }
+        }catch(Exception e){
+             JOptionPane.showMessageDialog(this, "Error al intentar eliminar la sucursal: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_removeBranchButtonActionPerformed
 

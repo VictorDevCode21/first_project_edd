@@ -109,7 +109,7 @@ public class Page6 extends javax.swing.JPanel  {
             JOptionPane.showMessageDialog(null, "Error: El input de estaciones solo puede contener letras, números y espacios.");
             return;
         }
-    
+
         // Dividir los inputs en arrays
         String[] stationsToAdd = stationsInput.split(",");
         String[] connectionsToAdd = connectionsInput.split(",");
