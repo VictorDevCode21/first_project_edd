@@ -171,7 +171,7 @@ public class Page5 extends javax.swing.JPanel {
     }//GEN-LAST:event_seeCoverageActionPerformed
 
     private void inputBranchNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inputBranchNameActionPerformed
-        selectedBranchName = inputBranchName.getText();
+        selectedBranchName = inputBranchName.getText().toLowerCase();
 
         if (selectedBranchName.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Por favor, ingrese un nombre de sucursal.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -179,7 +179,7 @@ public class Page5 extends javax.swing.JPanel {
     }//GEN-LAST:event_inputBranchNameActionPerformed
 
     private void addSucursalNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addSucursalNameActionPerformed
-        selectedBranchName = inputBranchName.getText();  // Captura el nombre desde el campo de texto
+        selectedBranchName = inputBranchName.getText().toLowerCase();  // Captura el nombre desde el campo de texto
 
         if (selectedBranchName.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Por favor, ingrese un nombre de sucursal.", "Error", JOptionPane.ERROR_MESSAGE);

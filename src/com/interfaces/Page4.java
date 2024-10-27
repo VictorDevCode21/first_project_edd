@@ -35,7 +35,7 @@ public class Page4 extends javax.swing.JPanel {
         jPanel3 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
-        inputTValue = new javax.swing.JTextField();
+        TValue = new javax.swing.JTextField();
         stablishT = new javax.swing.JButton();
 
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -51,8 +51,13 @@ public class Page4 extends javax.swing.JPanel {
         jLabel1.setText("Introduce el valor de T: ");
         jPanel3.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 50, -1, -1));
 
-        inputTValue.setBackground(new java.awt.Color(153, 153, 153));
-        jPanel3.add(inputTValue, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 50, 100, 20));
+        TValue.setBackground(new java.awt.Color(153, 153, 153));
+        TValue.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                TValueActionPerformed(evt);
+            }
+        });
+        jPanel3.add(TValue, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 50, 100, 20));
 
         stablishT.setBackground(new java.awt.Color(153, 153, 153));
         stablishT.setText("Add");
@@ -67,9 +72,16 @@ public class Page4 extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void stablishTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stablishTActionPerformed
+        String inputText = TValue.getText().trim(); // Obtener el texto y eliminar espacios
+        
+        // Verificar que el texto no esté vacío y que sea un número válido mayor que 0 y menor que 10
+        if (inputText.isEmpty() || !inputText.matches("[1-9]")) {
+            JOptionPane.showMessageDialog(this, "Introduzca un valor numérico válido para T (entre 1 y 9).");
+            return; // Salir del método si la validación falla
+        }
         try {
             // Obtén el valor de T del campo de texto
-            int newT = Integer.parseInt(inputTValue.getText().trim());
+            int newT = Integer.parseInt(TValue.getText().trim());
 
             // Notificar al listener sobre el cambio en T
             if (listener != null) {
@@ -87,9 +99,13 @@ public class Page4 extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_stablishTActionPerformed
 
+    private void TValueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TValueActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_TValueActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTextField inputTValue;
+    private javax.swing.JTextField TValue;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel3;
