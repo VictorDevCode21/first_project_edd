@@ -224,6 +224,7 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
             gui.setT(tValue);  // Establece el valor T almacenado
         }
 
+        
         if (!gui.isVisible()) {
             gui.setVisible(true);  // Asegúrate de que solo se abra si no está visible
         } else {
@@ -237,7 +238,7 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
             checkNetworkLoaded();
 
             // Obtén la lista de sucursales desde GUI
-            LinkedList<Station> branches = gui.getBranches();
+//            LinkedList<Station> branches = gui.getBranches();
 
             Page1 p1 = new Page1(gui);
             ShowPanel(p1);
@@ -254,7 +255,7 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
         try {
             checkNetworkLoaded();
 
-            Page6 p6 = new Page6(gui , networkTrain);
+            Page6 p6 = new Page6(gui, networkTrain);
             ShowPanel(p6);
         } catch (Exception e) {
             // Maneja el error si checkNetworkLoaded lanza una excepción
@@ -269,7 +270,7 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
             checkNetworkLoaded();
 
             // Obtén la lista de sucursales desde GUI
-            LinkedList<Station> branches = gui.getBranches();
+//            LinkedList<Station> branches = gui.getBranches();
 
             // Pasa las sucursales a la interfaz Page3
             Page3 p3 = new Page3(gui);  // Le pasamos la lista de sucursales y la instancia de GUI
@@ -295,7 +296,7 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
             checkNetworkLoaded();
 
             // Si la red está cargada, obten las branches
-            LinkedList<Station> branches = gui.getBranches();
+//            LinkedList<Station> branches = gui.getBranches();
 
             // Crea y muestra el panel Page5 con los datos
             Page5 p5 = new Page5(gui, networkTrain, this);
@@ -310,20 +311,46 @@ public class WelcomeInterface extends javax.swing.JFrame implements StationLoadL
     }//GEN-LAST:event_branchCoverageActionPerformed
 
     private void totalCoverage1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_totalCoverage1ActionPerformed
-        // TODO add your handling code here:
+        try {
+            // Verifica si la red está cargada correctamente
+            checkNetworkLoaded();
+
+            // Si la red está cargada, obten las branches
+            LinkedList<Station> branches = gui.getBranches();
+
+            // Crea y muestra el panel Page5 con los datos
+            ShowTotalCoverage totalCoverage = new ShowTotalCoverage(this, gui);
+            ShowPanel(totalCoverage);
+
+        } catch (Exception e) {
+            // Maneja el error si checkNetworkLoaded lanza una excepción
+            JOptionPane.showMessageDialog(this,
+                    "Error: La red no está cargada correctamente. Por favor, cargue la red antes de proceder.",
+                    "Error de carga de red", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_totalCoverage1ActionPerformed
 
     //  Revisa si las estaciones estan cargadas 
     private void checkNetworkLoaded() {
-//        if (gui == null) {
-//            JOptionPane.showMessageDialog(this,
-//                    "La red no ha sido cargada. Por favor, haga click en 'Show Graph' antes de continuar.",
-//                    "Error", JOptionPane.ERROR_MESSAGE);
-//            return;
-//        }
+        try {
+            // Verificar si gui es null
+            if (this.gui == null) {
+                System.out.println("Error: GUI no está inicializada.");
+                isGraphShown = false;
+                return; // Salir del método si gui es null
+            }
 
-        if (gui.isNetworkLoaded()) {
-            isGraphShown = true;
+            // Verificar si la red está cargada correctamente
+            if (gui.isNetworkLoaded()) {
+                isGraphShown = true; // Solo cambia a true si todo ha sido cargado correctamente
+            } else {
+                System.out.println("La red no está cargada.");
+                isGraphShown = false; // Si hay error se mantiene en false
+            }
+        } catch (Exception e) {
+            // Capturar cualquier excepción y mostrar un mensaje de error
+            System.out.println("Ocurrió un error al verificar si la red está cargada: " + e.getMessage());
+            isGraphShown = false; // Asegurarse de que el grafo no se muestre en caso de error
         }
     }
 
