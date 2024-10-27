@@ -4,6 +4,7 @@ import com.graph.AlgorithmSelectionListener;
 import com.graph.NetworkTrain;
 import com.graph.LinkedList;
 import com.graph.BranchListener;
+import com.graph.MapsList;
 import com.graph.Station;
 import com.graph.Stack;
 import com.graph.Queue;
@@ -24,9 +25,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,7 +51,7 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
     private boolean algorithmSelected; // Variable para mantener el algoritmo seleccionado
     private LinkedList<AlgorithmSelectionListener> aListeners = new LinkedList<>();
     private SetList<Station> eliminatedStations = new SetList<>();
-    
+    private MapsList<String, Station> stationMap;
 
     
 
@@ -65,6 +64,7 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         stations = new LinkedList<>();
         bListeners = new LinkedList<>();  // Inicializar la lista de listeners
         networkTrain.addListener(this);
+        stationMap = new MapsList<>();
         initUI();
     }
     
@@ -457,7 +457,8 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
     public String suggestNewBranches(boolean useBFS) {
         int maxDistance = T;
         LinkedList<Station> uncoveredStations = getUncoveredStations(useBFS);
-        Map<Station, LinkedList<Station>> coverageMap = new HashMap<>();
+        //Map<Station, LinkedList<Station>> coverageMap = new HashMap<>();
+        MapsList<Station, LinkedList<Station>> coverageMap = new MapsList<>();
         SetList<Station> suggestedBranches = new SetList<>();
 
         for (Station station : uncoveredStations) {
@@ -550,8 +551,8 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         LinkedList<Station> coveredStations = new LinkedList<>();
         SetList<Station> visited = new SetList<>();
         Queue<Station> queue = new Queue<>();
-        Map<Station, Integer> distances = new HashMap<>();
-
+        //Map<Station, Integer> distances = new HashMap<>();
+        MapsList<Station, Integer> distances = new MapsList<>();
         queue.enqueue(start);
         distances.put(start, 0);
 
@@ -635,7 +636,8 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         }
 
         // Mapa para rastrear las distancias desde la estación 'from'
-        Map<Station, Integer> distances = new HashMap<>();
+        //Map<Station, Integer> distances = new HashMap<>();
+        MapsList<Station, Integer> distances = new MapsList<>();
         Queue<Station> queue = new Queue<>();
         LinkedList<Station> visited = new LinkedList<>(); // Usar LinkedList para rastrear estaciones visitadas
 
@@ -728,7 +730,8 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
     // Sobrecarga de metodo para usar el bfs y poder saber la cobertura de sucursal 
     private void runBFS(Station start, LinkedList<Station> coveredStations, int maxDistance) {
         Queue<Station> queue = new Queue<>();
-        Map<Station, Integer> distances = new HashMap<>();
+        //Map<Station, Integer> distances = new HashMap<>();
+        MapsList<Station, Integer> distances = new MapsList<>();
         queue.enqueue(start);
         distances.put(start, 0);
 
@@ -758,7 +761,8 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         // Inicializamos la primera sucursal
         branches.clear();
         branches.add(startStation);
-        Map<Station, Integer> distances = new HashMap<>();
+        //Map<Station, Integer> distances = new HashMap<>();
+        MapsList<Station, Integer> distances = new MapsList<>();
         distances.put(startStation, 0); // La distancia de la estación inicial es 0
 
         // Colorear la primera sucursal en verde
@@ -834,7 +838,7 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
 
         // Mostrar todas las distancias y los nombres de las estaciones
         System.out.println("Distancias desde la estación inicial:");
-        for (Map.Entry<Station, Integer> entry : distances.entrySet()) {
+        for (MapsList.Entry<Station, Integer> entry : distances.entrySet()) {
             Station station = entry.getKey();
             Integer distance = entry.getValue();
             System.out.println("Estación: " + station.getName() + ", Distancia: " + distance);
@@ -851,7 +855,8 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         branches.clear();
         branches.add(startStation); // Sucursal inicial
         SetList<Station> visitedStations = new SetList<>();
-        Map<Station, Integer> distances = new HashMap<>();
+        //Map<Station, Integer> distances = new HashMap<>();
+        MapsList<Station, Integer> distances = new MapsList<>();
         distances.put(startStation, 0);
 
         // Colorear la estación inicial en verde
@@ -897,7 +902,7 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
         }
 
         // Mostrar las estaciones y sus distancias
-        for (Map.Entry<Station, Integer> entry : distances.entrySet()) {
+        for (MapsList.Entry<Station, Integer> entry : distances.entrySet()) {
             Station station = entry.getKey();
             Integer distance = entry.getValue();
 
@@ -921,7 +926,8 @@ public class GUI extends JFrame implements BranchListener, AlgorithmSelectionLis
     private boolean checkForConflict(Station newBranch, int T) {
         Queue<Station> queue = new Queue<>();
         SetList<Station> visitedStations = new SetList<>();
-        Map<Station, Integer> distances = new HashMap<>();
+        //Map<Station, Integer> distances = new HashMap<>();
+        MapsList<Station, Integer> distances = new MapsList<>();
         distances.put(newBranch, 0);
 
         queue.enqueue(newBranch);
